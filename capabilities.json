@@ -1,0 +1,62 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Pages",
+            "name": "pages",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Page Number",
+            "name": "number",
+            "kind": "Measure"
+        }
+    ],
+    "objects":{
+        "button": {
+            "displayName": "Buttons",
+            "properties": {
+                "color": {
+                    "displayName": "Color",
+                    "description": "The fill color of the buttons.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "padding": {
+                    "displayName": "Padding",
+                    "description": "The padding between buttons.",
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "categorical": {
+                "categories": {
+                    "for": {
+                        "in": "pages"
+                    },
+                    "dataReductionAlgorithm": {
+                        "top": {}
+                    }
+                },
+                "values": {
+                    "select": [
+                        {
+                            "bind": {
+                                "to": "number"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
