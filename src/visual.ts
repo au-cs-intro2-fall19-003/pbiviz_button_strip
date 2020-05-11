@@ -120,9 +120,12 @@ export class Visual implements IVisual {
                 return d
             })
             .attr("fill", "red")
-            .attr("x", "50%")
-            .attr("y", "50%")
+            .attr("y", (dims.hPadding+dims.height)/2)
+            .attr("x", function(d, i){
+                return i*(dims.width + dims.wPadding) + (dims.wPadding + dims.width)/2
+            })
             .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "central")
             .style("font-size", 20 + "px");
             
 
