@@ -30,11 +30,20 @@ import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
 export class ButtonSettings {
-  public color: string = "blue";
+  public color: string = "#F2C811";
   public padding: number = 10;
+  public transparency: number = 0;
+}
+
+export class TextSettings{
+  public color: string = "#000";
+  public alignment: string = "center"
+  public fontSize: number = 14;
+  public transparency: number = 0;
 }
 export class VisualSettings extends DataViewObjectsParser {
   public button: ButtonSettings = new ButtonSettings();
+  public text: TextSettings = new TextSettings();
 }
 
 

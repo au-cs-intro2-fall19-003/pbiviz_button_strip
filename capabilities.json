@@ -16,8 +16,8 @@
             "displayName": "Buttons",
             "properties": {
                 "color": {
-                    "displayName": "Color",
-                    "description": "The fill color of the buttons.",
+                    "displayName": "Background color",
+                    "description": "Background color for the buttons.",
                     "type": {
                         "fill": {
                             "solid": {
@@ -32,9 +32,58 @@
                     "type": {
                         "numeric": true
                     }
+                },
+                "transparency": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the button.",
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
+        },
+        "text":{
+            "displayName": "Text",
+            "properties": {
+                "color": {
+                    "displayName": "Font color",
+                    "description": "Font color for the text.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "alignment": {
+                    "displayName": "Alignment",
+                    "description": "Alignment position for the text",
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
+                    }
+                },
+                "fontSize": {
+                    "displayName": "Font Size",
+                    "description": "The size of the font.",
+                    "type": {
+                        "formatting": {
+                            "fontSize": true
+                        }
+                    }
+                },
+                "transparency": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the font.",
+                    "type": {
+                        "numeric": true
+                    }
+                }        
+            }
         }
+
     },
     "dataViewMappings": [
         {
