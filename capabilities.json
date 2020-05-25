@@ -42,7 +42,7 @@
                 },
                 "sizingMethod": {
                     "displayName": "Sizing method",
-                    "description": "How buttons will be sized based on their text",
+                    "description": "How buttons will be sized based on their text.",
                     "type": {
                         "enumeration": [
                             {
@@ -58,6 +58,22 @@
                                 "value": "dynamic"
                             }
                         ]
+                    }
+                },
+                "buttonSize": {
+                    "displayName": "Button size",
+                    "description": "The size of each button.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "buttonAlignment": {
+                    "displayName": "Button alignment",
+                    "description": "Alignment for buttons in the visual",
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
                     }
                 }
             }

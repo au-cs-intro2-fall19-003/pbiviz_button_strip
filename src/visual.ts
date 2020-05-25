@@ -53,6 +53,7 @@ class Frame {
     wPadding: number
     height: number
     width: number
+    widthTakenSoFar: number
     textWidth: number
     y_pos: number
     x_pos: number
@@ -62,7 +63,7 @@ class Title {
     text: string
     fill: string
     fill_opacity: number
-    align: enums.Text_Align
+    align: enums.Align
     font_size: number
     font_family: string
     padding: number
@@ -96,18 +97,21 @@ export class Visual implements IVisual {
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
-        // delete settings.text.fontFamily;
+        if (settings.button.sizingMethod != enums.Button_Sizing_Method.fixed) {
+            delete settings.button.buttonSize;
+            delete settings.button.buttonAlignment;
+        }
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
 
     private calcPadding(padding: number, n: number, vw): number {
-        return Math.floor((Math.min(vw / (4*n), Math.max(0, padding))))
+        return Math.floor((Math.min(vw / (4 * n), Math.max(0, padding))))
     }
 
     private getTextWidth(text: string, font: string): number {
-        let canvas = document.createElement("canvas"); 
-        let context = canvas.getContext("2d");  
+        let canvas = document.createElement("canvas");
+        let context = canvas.getContext("2d");
         context.font = font;
         let metrics = context.measureText(text);
         return metrics.width;
@@ -118,11 +122,11 @@ export class Visual implements IVisual {
     private calcFrames(data: string[], settings: VisualSettings, options: VisualUpdateOptions): Frame[] {
         let frames: Frame[] = [];
 
-        let totalPadding = (data.length - 1)*settings.button.padding;
-        let totalMargins = data.length*2*settings.text.margin;
+        let totalPadding = (data.length - 1) * settings.button.padding;
+        let totalMargins = data.length * 2 * settings.text.margin;
         let viewportWidthForText = options.viewport.width - totalPadding - totalMargins;
         let totalTextWidth = this.getTextWidth(data.join(""), settings.text.fontSize + "pt " + settings.text.fontFamily);
-        let buttonWidthScaleFactor = viewportWidthForText/totalTextWidth
+        let buttonWidthScaleFactor = viewportWidthForText / totalTextWidth
         let wPadding = this.calcPadding(settings.button.padding, data.length, options.viewport.width)
         let widthTaken = 0
         for (let i = 0; i < data.length; i++) {
@@ -139,17 +143,33 @@ export class Visual implements IVisual {
                 get width(): number {
                     switch (settings.button.sizingMethod) {
                         case enums.Button_Sizing_Method.uniform:
-                            return (options.viewport.width - this.wPadding*(data.length-1))/(data.length)
+                            return (options.viewport.width - this.wPadding * (data.length - 1)) / (data.length)
                         case enums.Button_Sizing_Method.fixed:
-                            return 100
+                            return settings.button.buttonSize
                         case enums.Button_Sizing_Method.dynamic:
-                            return this.textWidth*buttonWidthScaleFactor + 2*settings.text.margin
+                            return this.textWidth * buttonWidthScaleFactor + 2 * settings.text.margin
                     }
                 },
                 get y_pos(): number {
-                    return this.hPadding/2
-                }, 
-                x_pos: widthTaken
+                    return this.hPadding / 2
+                },
+                widthTakenSoFar: widthTaken,
+                get x_pos(): number {
+                    if (settings.button.sizingMethod == enums.Button_Sizing_Method.fixed) {
+                        let areaTaken = data.length*this.width + (data.length-1)*this.wPadding
+                        let areaRemaining = options.viewport.width - areaTaken
+                        switch (settings.button.buttonAlignment) {
+                            case enums.Align.left:
+                                return i * (this.width + this.wPadding)
+                            case enums.Align.right:
+                                return areaRemaining + i*(this.width + this.wPadding)
+                            case enums.Align.center:
+                                return areaRemaining/2 + i*(this.width + this.wPadding)
+                        }
+                    } else {
+                        return this.widthTakenSoFar
+                    }
+                }
             }
             frames.push(frame)
             widthTaken += frame.width + wPadding
@@ -211,7 +231,7 @@ export class Visual implements IVisual {
             .attr("class", "titleContainer")
             .append("xhtml:div")
             .attr("class", "title")
-        console.log(frameData)
+
         titlesFO = this.container.selectAll('foreignObject').data(titleData)
             .attr("height", function (d, i) { return frameData[i].height })
             .attr("width", function (d, i) { return frameData[i].width })
@@ -232,106 +252,6 @@ export class Visual implements IVisual {
             .style("color", function (d) { return d.fill })
             .style("padding", function (d) { return d.padding + 'px' })
             .html(function (d) { return d.text });
-
-
-        // var dims = {
-        //     n: this.pages.length,
-        //     hPadding: 50,
-        //     get height(): number {
-        //         return options.viewport.height - this.hPadding
-        //     },
-        //     wPadding: this.visualSettings.button.padding,
-        //     get width(): number{
-        //         return (options.viewport.width/this.n - this.wPadding)
-        //     },
-
-        // }
-
-
-        // this.container.selectAll('rect')
-        //     .data(this.pages)
-        //     .attr("fill", this.visualSettings.button.color)
-        //     .style("fill-opacity", 0.5)
-        //     .attr("height", dims.height)
-        //     .attr("width", dims.width)
-        //     .attr("y", dims.hPadding/2)
-        //     .attr("x", function(d, i){
-        //         return i*(dims.width + dims.wPadding) + dims.wPadding/2
-        //     })
-
-        // this.container.selectAll('text')
-        //     .data(this.pages)
-        //     .text(function(d){
-        //         return d
-        //     })
-        //     .attr("fill", "red")
-        //     .attr("y", (dims.hPadding+dims.height)/2)
-        //     .attr("x", function(d, i){
-        //         return i*(dims.width + dims.wPadding) + (dims.wPadding + dims.width)/2
-        //     })
-        //     .attr("text-anchor", "middle")
-        //     .attr("dominant-baseline", "central")
-        //     .style("font-size", 20 + "px");
-
-
-        //update
-        // var text = this.container
-        //     .selectAll("text")
-        //     .data(this.pages)
-        //     .enter()
-        //     .append("text")
-        //     .attr("fill", "black") 
-        //     .attr("x", "50%")
-        //     .attr("y", "50%")
-        //     .attr("dy", "0.35em")
-        //     .attr("text-anchor", "middle")
-        //     .text(function (d) {
-        //         return d;
-        //     })
-
-        // //enter
-        // text.enter().append("p")
-        //     .data(this.pages)
-        //     .enter()
-        //     .append("text")
-        //     .attr("fill", "black") 
-        //     .attr("x", "50%")
-        //     .attr("y", "50%")
-        //     .attr("dy", "0.35em")
-        //     .attr("text-anchor", "middle")
-        //     .text(function (d) { return d; });
-
-
-        // for (let i = 0; i < this.pages.length; i++) {
-        //     // let rect: Selection<SVGElement> = this.container.append("rect")
-        //     //     .classed("rect", true)
-        //     //     .style("fill", "red")
-        //     //     .style("fill-opacity", 0.5)
-        //     //     .style("stroke", "black")
-        //     //     .style("stroke-width", 2)
-        //     //     .attr("width", dims.width)
-        //     //     .attr("height", dims.height);
-        //     // let text:  Selection<SVGElement> = rect.append("text")
-        //     //     .classed("textValue", true)
-        //     //     .text("Value")
-        //     //     .attr("x", "50%")
-        //     //     .attr("y", "50%")
-        //     //     .attr("dy", "0.35em")
-
-        //     //     .attr("fill", "blue")     
-        //     //     .style("font-size", dims.fontSizeValue + "px");
-
-        //     let text:  Selection<SVGElement> = rect.append("text")
-        //         .classed("textValue", true)
-        //         .text("Value")
-        //         .attr("x", "50%")
-        //         .attr("y", "50%")
-        //         .attr("dy", "0.35em")
-        //         .attr("text-anchor", "middle")
-        //         .attr("fill", "blue")     
-        //         .style("font-size", dims.fontSizeValue + "px");
-
-        // }
 
         // this.initialiseViz(this.target)
         // console.log('Visual update', options);

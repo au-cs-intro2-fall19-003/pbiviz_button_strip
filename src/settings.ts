@@ -37,11 +37,13 @@ export class ButtonSettings {
   public padding: number = 10;
   public transparency: number = 0;
   public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
+  public buttonSize: number = 100;
+  public buttonAlignment: enums.Align = enums.Align.left;
 }
 
 export class TextSettings{
   public color: string = "#fff";
-  public alignment: enums.Text_Align = enums.Text_Align.center;
+  public alignment: enums.Align = enums.Align.center;
   public fontSize: number = 14;
   public fontFamily: string = "wf_standard-font, helvetica, arial, sans-serif";
   public transparency: number = 0;
