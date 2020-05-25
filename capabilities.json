@@ -11,7 +11,7 @@
             "kind": "Measure"
         }
     ],
-    "objects":{
+    "objects": {
         "button": {
             "displayName": "Buttons",
             "properties": {
@@ -39,10 +39,30 @@
                     "type": {
                         "numeric": true
                     }
+                },
+                "sizingMethod": {
+                    "displayName": "Sizing method",
+                    "description": "How buttons will be sized based on their text",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Uniform",
+                                "value": "uniform"
+                            },
+                            {
+                                "displayName": "Fixed",
+                                "value": "fixed"
+                            },
+                            {
+                                "displayName": "Dynamic",
+                                "value": "dynamic"
+                            }
+                        ]
+                    }
                 }
             }
         },
-        "text":{
+        "text": {
             "displayName": "Text",
             "properties": {
                 "color": {
@@ -66,11 +86,19 @@
                     }
                 },
                 "fontSize": {
-                    "displayName": "Font Size",
+                    "displayName": "Font size",
                     "description": "The size of the font.",
                     "type": {
                         "formatting": {
                             "fontSize": true
+                        }
+                    }
+                },
+                "fontFamily": {
+                    "displayName": "Font family",
+                    "type": {
+                        "formatting": {
+                            "fontFamily": true
                         }
                     }
                 },
@@ -80,10 +108,16 @@
                     "type": {
                         "numeric": true
                     }
-                }        
+                },
+                "margin": {
+                    "displayName": "Margin",
+                    "description": "Margin between text and button side",
+                    "type": {
+                        "numeric": true
+                    }
+                }
             }
         }
-
     },
     "dataViewMappings": [
         {

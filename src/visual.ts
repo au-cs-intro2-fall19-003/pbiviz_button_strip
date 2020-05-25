@@ -42,8 +42,10 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import * as d3 from "d3";
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
+import * as enums from "./enums"
 
-class frame {
+
+class Frame {
     data: string
     fill: string
     fill_opacity: number
@@ -51,32 +53,22 @@ class frame {
     wPadding: number
     height: number
     width: number
+    textWidth: number
     y_pos: number
     x_pos: number
 }
 
-class title {
+class Title {
     text: string
     fill: string
     fill_opacity: number
-    align: Text_Align
+    align: enums.Text_Align
     font_size: number
-    y_pos: number
-    x_pos: number
-    text_anchor: Text_Anchor
+    font_family: string
+    padding: number
 }
 
-enum Text_Align {
-    center = "center",
-    left = "left",
-    right = "right"
-}
 
-enum Text_Anchor {
-    start = "Start",
-    middle = "Middle",
-    end = "End"
-}
 
 
 export class Visual implements IVisual {
@@ -104,77 +96,79 @@ export class Visual implements IVisual {
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
+        // delete settings.text.fontFamily;
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
 
     private calcPadding(padding: number, n: number, vw): number {
-        return Math.floor((Math.min(vw / (4 * n), Math.max(0, padding))))
+        return Math.floor((Math.min(vw / (4*n), Math.max(0, padding))))
+    }
+
+    private getTextWidth(text: string, font: string): number {
+        let canvas = document.createElement("canvas"); 
+        let context = canvas.getContext("2d");  
+        context.font = font;
+        let metrics = context.measureText(text);
+        return metrics.width;
     }
 
 
-    private calcFrames(data: string[], settings: VisualSettings, options: VisualUpdateOptions): frame[] {
-        let frames: frame[] = [];
+
+    private calcFrames(data: string[], settings: VisualSettings, options: VisualUpdateOptions): Frame[] {
+        let frames: Frame[] = [];
+
+        let totalPadding = (data.length - 1)*settings.button.padding;
+        let totalMargins = data.length*2*settings.text.margin;
+        let viewportWidthForText = options.viewport.width - totalPadding - totalMargins;
+        let totalTextWidth = this.getTextWidth(data.join(""), settings.text.fontSize + "pt " + settings.text.fontFamily);
+        let buttonWidthScaleFactor = viewportWidthForText/totalTextWidth
+        let wPadding = this.calcPadding(settings.button.padding, data.length, options.viewport.width)
+        let widthTaken = 0
         for (let i = 0; i < data.length; i++) {
-            let frame: frame = {
+            let frame: Frame = {
                 data: data[i],
                 fill: settings.button.color,
-                fill_opacity: 1 - settings.button.transparency/100,
+                fill_opacity: 1 - settings.button.transparency / 100,
                 hPadding: 50,
                 get height(): number {
                     return options.viewport.height - this.hPadding
                 },
-                wPadding: this.calcPadding(settings.button.padding, data.length, options.viewport.width),
+                wPadding: wPadding,
+                textWidth: this.getTextWidth(data[i], settings.text.fontSize + "pt " + settings.text.fontFamily),
                 get width(): number {
-                    return (options.viewport.width / data.length - this.wPadding)
+                    switch (settings.button.sizingMethod) {
+                        case enums.Button_Sizing_Method.uniform:
+                            return (options.viewport.width - this.wPadding*(data.length-1))/(data.length)
+                        case enums.Button_Sizing_Method.fixed:
+                            return 100
+                        case enums.Button_Sizing_Method.dynamic:
+                            return this.textWidth*buttonWidthScaleFactor + 2*settings.text.margin
+                    }
                 },
                 get y_pos(): number {
-                    return this.hPadding / 2
-                },
-                get x_pos(): number {
-                    return i * (this.width + this.wPadding) + this.wPadding / 2
-                }
-
+                    return this.hPadding/2
+                }, 
+                x_pos: widthTaken
             }
             frames.push(frame)
+            widthTaken += frame.width + wPadding
         }
         return frames;
     }
 
-    private calcTitles(data: string[], settings: VisualSettings, options: VisualUpdateOptions, frames: frame[]): title[] {
-        let titles: title[] = []
+    private calcTitles(data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]): Title[] {
+        let titles: Title[] = []
 
         for (let i = 0; i < data.length; i++) {
-            let title: title = {
+            let title: Title = {
                 text: data[i],
                 fill: settings.text.color,
-                fill_opacity: 1 - settings.text.transparency/100,
-                align: settings.text.alignment as Text_Align,
-                get y_pos(): number {
-                    return frames[i].y_pos + frames[i].height/2 + this.font_size/4
-                },
-                get x_pos(): number {
-                    switch(this.align){
-                        case Text_Align.left:
-                            return frames[i].x_pos
-                        case Text_Align.center:
-                            return frames[i].x_pos + frames[i].width/2
-                        case Text_Align.right:
-                            return frames[i].x_pos + frames[i].width
-                    }
-                },
+                fill_opacity: 1 - settings.text.transparency / 100,
+                align: settings.text.alignment,
                 font_size: settings.text.fontSize,
-                get text_anchor(): Text_Anchor{
-                    switch(this.align){
-                        case Text_Align.left:
-                            return Text_Anchor.start
-                        case Text_Align.center:
-                            return Text_Anchor.middle
-                        case Text_Align.right:
-                            return Text_Anchor.end
-                    }
-                }
-
+                font_family: settings.text.fontFamily,
+                padding: settings.text.margin
             }
             titles.push(title)
         }
@@ -185,48 +179,59 @@ export class Visual implements IVisual {
 
         this.visualSettings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
         this.pages = <string[]>options.dataViews[0].categorical.categories[0].values;
-        let frames = this.calcFrames(this.pages, this.visualSettings, options)
-        let titles = this.calcTitles(this.pages, this.visualSettings, options, frames)
-
-        console.log(this.visualSettings.text.transparency)
+        let frameData = this.calcFrames(this.pages, this.visualSettings, options)
+        let titleData = this.calcTitles(this.pages, this.visualSettings, options, frameData)
 
         this.svg
             .style('width', options.viewport.width)
             .style('height', options.viewport.height)
 
 
-        let xrects = this.container.selectAll('rect').data(frames)
-        xrects.exit().remove()
-        xrects.enter().append('rect')
+        let frames = this.container.selectAll('rect').data(frameData)
+        frames.exit().remove()
+        frames.enter().append('rect')
             .attr("class", "frame");
 
-        let rects = this.container.selectAll('rect').data(frames)
-        rects
+        frames = this.container.selectAll('rect').data(frameData)
+        frames
             .attr("fill", function (d) { return d.fill })
             .style("fill-opacity", function (d) { return d.fill_opacity })
             .attr("height", function (d) { return d.height })
             .attr("width", function (d) { return d.width })
-            .attr("y", function (d) { return d.y_pos })
             .attr("x", function (d) { return d.x_pos })
-
-
-
-        let xtexts = this.container.selectAll('text').data(titles)
-        xtexts.exit().remove()
-        xtexts.enter().append('text')
-            .attr("class", "title");
-
-        let texts = this.container.selectAll('text').data(titles)
-        texts
-            .html(function (d) { return d.text })
-            .attr("fill", function (d) { return d.fill })
-            .style("fill-opacity", function (d) { return d.fill_opacity })
-            .style("font-size", function (d) { return d.font_size + "px"})
-            // .attr("height", function (d) { return d.height })
-            // .attr("width", function (d) { return d.width })
             .attr("y", function (d) { return d.y_pos })
-            .attr("x", function (d) { return d.x_pos })
-            .attr("text-anchor", function (d) { return d.text_anchor })
+
+
+
+        let titlesFO = this.container.selectAll('foreignObject').data(titleData)
+        titlesFO.exit().remove()
+        titlesFO.enter().append('foreignObject')
+            .attr("class", "titleForeignObject")
+            .append("xhtml:div")
+            .attr("class", "titleContainer")
+            .append("xhtml:div")
+            .attr("class", "title")
+        console.log(frameData)
+        titlesFO = this.container.selectAll('foreignObject').data(titleData)
+            .attr("height", function (d, i) { return frameData[i].height })
+            .attr("width", function (d, i) { return frameData[i].width })
+            .attr("x", function (d, i) { return frameData[i].x_pos })
+            .attr("y", function (d, i) { return frameData[i].y_pos })
+        let titlesContaner = titlesFO.select('.titleContainer')
+            .style("height", "100%")
+            .style("width", "100%")
+            .style("display", "table")
+
+        let titles = titlesContaner.select(".title")
+            .style("display", "table-cell")
+            .style("vertical-align", "middle")
+            .style("opacity", function (d) { return d.fill_opacity })
+            .style("font-size", function (d) { return d.font_size + "pt" })
+            .style("font-family", function (d) { return d.font_family })
+            .style("text-align", function (d) { return d.align })
+            .style("color", function (d) { return d.fill })
+            .style("padding", function (d) { return d.padding + 'px' })
+            .html(function (d) { return d.text });
 
 
         // var dims = {

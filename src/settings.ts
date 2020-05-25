@@ -29,18 +29,25 @@
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
+import * as enums from "./enums"
+
+
 export class ButtonSettings {
-  public color: string = "#F2C811";
+  public color: string = "#de6a73";
   public padding: number = 10;
   public transparency: number = 0;
+  public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
 }
 
 export class TextSettings{
-  public color: string = "#000";
-  public alignment: string = "center"
+  public color: string = "#fff";
+  public alignment: enums.Text_Align = enums.Text_Align.center;
   public fontSize: number = 14;
+  public fontFamily: string = "wf_standard-font, helvetica, arial, sans-serif";
   public transparency: number = 0;
+  public margin: number = 0;
 }
+
 export class VisualSettings extends DataViewObjectsParser {
   public button: ButtonSettings = new ButtonSettings();
   public text: TextSettings = new TextSettings();
