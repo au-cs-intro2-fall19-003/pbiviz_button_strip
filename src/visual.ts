@@ -53,14 +53,14 @@ class Frame {
     options: VisualUpdateOptions
     data: string[]
     static widthSoFar: number = 0
-    widthSoFar: number; 
+    widthSoFar: number;
     constructor(i: number, data: string[], settings: VisualSettings, options: VisualUpdateOptions) {
         this.settings = settings
         this.data = data
         this.n = this.data.length
         this.i = i
-        this.options = options
-        if (i == 0)
+        this.options = options 
+        if (this.indexInRow == 0)
             Frame.widthSoFar = 0
         this.widthSoFar = Frame.widthSoFar
         Frame.widthSoFar += this.width
@@ -72,6 +72,34 @@ class Frame {
         let metrics = context.measureText(text);
         return metrics.width;
     }
+    get rowLength(): number{
+        switch(this.settings.button.layout){
+            case(enums.Button_Layout.horizontal):
+                return this.n
+            case(enums.Button_Layout.vertical):
+                return 1
+            case(enums.Button_Layout.grid):
+                return Math.max(1, this.settings.button.rowLength)
+        }
+    }
+    get rowNumber(): number {
+        return Math.floor(this.i / this.rowLength)
+    }
+    get indexInRow(): number {
+        return this.i % this.rowLength
+    }
+    get framesInRow(): number {
+        return (this.numRows - 1) * this.rowLength > this.i || this.n % this.rowLength == 0 ? this.rowLength : this.n % this.rowLength
+    }
+    get numRows(): number {
+        return Math.ceil(this.n / this.rowLength)
+    }
+    get rowStartingIndex(): number {
+        return this.rowNumber * this.rowLength
+    }
+    get rowData(): string[] {
+        return this.data.slice(this.rowStartingIndex, this.rowStartingIndex + this.framesInRow)
+    }
     get text(): string {
         return this.data[this.i]
     }
@@ -81,51 +109,58 @@ class Frame {
     get fill_opacity(): number {
         return 1 - this.settings.button.transparency / 100
     }
-    get wPadding(): number {
-        let wPadding = Math.max(0, this.settings.button.padding)
-        return Math.min(this.options.viewport.width / (4 * this.n), wPadding)
+    get padding(): number {
+        let padding = Math.max(0, this.settings.button.padding)
+        return Math.min(this.options.viewport.width / (4 * this.n), padding)
     }
     get height(): number {
-        return this.options.viewport.height
+        switch (this.settings.button.sizingMethod) {
+            case(enums.Button_Sizing_Method.fixed):
+                return this.settings.button.buttonHeight
+            default:
+                return (this.options.viewport.height - this.padding * (this.numRows-1))/ this.numRows
+        }
+        
     }
     get width(): number {
         switch (this.settings.button.sizingMethod) {
             case enums.Button_Sizing_Method.uniform:
-                return (this.options.viewport.width - this.wPadding * (this.n - 1)) / (this.n)
+                return (this.options.viewport.width - this.padding * (this.rowLength - 1)) / (this.rowLength)
             case enums.Button_Sizing_Method.fixed:
-                return this.settings.button.buttonSize
+                return this.settings.button.buttonWidth
             case enums.Button_Sizing_Method.dynamic:
-                let totalPadding = (this.n - 1)*this.settings.button.padding;
-                let totalMargins = (this.n * 2)*this.settings.text.margin;
+                let totalPadding = (this.framesInRow - 1) * this.settings.button.padding;
+                let totalMargins = (this.framesInRow * 2) * this.settings.text.margin;
                 let viewportWidthForText = this.options.viewport.width - totalPadding - totalMargins;
-                let totalTextWidth = this.getTextWidth(this.data.join(""), this.settings.text.fontSize + "pt " + this.settings.text.fontFamily);
+                let totalTextWidth = this.getTextWidth(this.rowData.join(""), this.settings.text.fontSize + "pt " + this.settings.text.fontFamily);
                 let textWidth = this.getTextWidth(this.text, this.settings.text.fontSize + "pt " + this.settings.text.fontFamily);
                 let buttonWidthScaleFactor = viewportWidthForText / totalTextWidth
                 let width = textWidth * buttonWidthScaleFactor + 2 * this.settings.text.margin
                 return width
-            }
+        }
     }
     get y_pos(): number {
-        return 0
+        return this.rowNumber * (this.height + this.padding)
     }
     get x_pos(): number {
         switch (this.settings.button.sizingMethod) {
             case enums.Button_Sizing_Method.fixed:
-                let areaTaken = this.data.length * this.width + (this.n - 1) * this.wPadding
+                let areaTaken = this.framesInRow * this.width + (this.framesInRow - 1) * this.padding
                 let areaRemaining = this.options.viewport.width - areaTaken
+                console.log(this.framesInRow)
                 switch (this.settings.button.buttonAlignment) {
                     case enums.Align.left:
-                        return this.i * (this.width + this.wPadding)
+                        return this.indexInRow * (this.width + this.padding)
                     case enums.Align.right:
-                        return areaRemaining + this.i * (this.width + this.wPadding)
+                        return areaRemaining + this.indexInRow * (this.width + this.padding)
                     case enums.Align.center:
-                        return areaRemaining / 2 + this.i * (this.width + this.wPadding)
+                        return areaRemaining / 2 + this.indexInRow * (this.width + this.padding)
 
                 }
             case enums.Button_Sizing_Method.uniform:
-                return this.i * (this.width + this.wPadding)
+                return this.indexInRow * (this.width + this.padding)
             case enums.Button_Sizing_Method.dynamic:
-                return this.widthSoFar + this.i*this.wPadding
+                return this.widthSoFar + this.indexInRow * this.padding
         }
     }
 }
@@ -138,25 +173,25 @@ class Title {
     constructor(text: string, settings: VisualSettings, options: VisualUpdateOptions) {
         this.settings = settings
         this.text = text
-        this.options = options   
+        this.options = options
     }
 
-    get fill(): string{
+    get fill(): string {
         return this.settings.text.color
     }
-    get fill_opacity(): number{
+    get fill_opacity(): number {
         return 1 - this.settings.text.transparency / 100
     }
-    get align(): string{
-        return  this.settings.text.alignment
+    get align(): string {
+        return this.settings.text.alignment
     }
-    get font_size(): number{
+    get font_size(): number {
         return this.settings.text.fontSize
     }
-    get font_family(): string{
-        return  this.settings.text.fontFamily
+    get font_family(): string {
+        return this.settings.text.fontFamily
     }
-    get padding(): number{
+    get padding(): number {
         return this.settings.text.margin
     }
 }
@@ -188,22 +223,26 @@ export class Visual implements IVisual {
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
         if (settings.button.sizingMethod != enums.Button_Sizing_Method.fixed) {
-            delete settings.button.buttonSize;
+            delete settings.button.buttonWidth;
+            delete settings.button.buttonHeight;
             delete settings.button.buttonAlignment;
+        }
+        if (settings.button.layout != enums.Button_Layout.grid) {
+            delete settings.button.rowLength
         }
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
     private calcFrames(data: string[], settings: VisualSettings, options: VisualUpdateOptions): Frame[] {
         let frames: Frame[] = [];
-        for (let i = 0; i < data.length; i++) 
+        for (let i = 0; i < data.length; i++)
             frames.push(new Frame(i, data, settings, options))
         return frames;
     }
 
     private calcTitles(data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]): Title[] {
         let titles: Title[] = []
-        for (let i = 0; i < data.length; i++) 
+        for (let i = 0; i < data.length; i++)
             titles.push(new Title(data[i], settings, options))
         return titles
     }
@@ -265,6 +304,7 @@ export class Visual implements IVisual {
             .style("color", function (d) { return d.fill })
             .style("padding", function (d) { return d.padding + 'px' })
             .html(function (d) { return d.text });
+            
 
         // this.initialiseViz(this.target)
         // console.log('Visual update', options);

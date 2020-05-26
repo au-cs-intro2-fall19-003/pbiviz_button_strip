@@ -34,11 +34,14 @@ import * as enums from "./enums"
 
 export class ButtonSettings {
   public color: string = "#de6a73";
-  public padding: number = 10;
   public transparency: number = 0;
   public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
-  public buttonSize: number = 100;
+  public buttonWidth: number = 150;
+  public buttonHeight: number = 75;
   public buttonAlignment: enums.Align = enums.Align.left;
+  public layout: enums.Button_Layout = enums.Button_Layout.horizontal;
+  public rowLength: number = 2;
+  public padding: number = 10;
 }
 
 export class TextSettings{

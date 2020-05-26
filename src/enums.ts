@@ -9,3 +9,9 @@ export enum Button_Sizing_Method {
     fixed = "fixed",
     dynamic = "dynamic"
 }
+
+export enum Button_Layout {
+    horizontal = "horizontal",
+    vertical = "vertical",
+    grid = "grid"
+}
