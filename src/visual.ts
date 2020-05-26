@@ -46,30 +46,120 @@ import * as enums from "./enums"
 
 
 class Frame {
-    data: string
-    fill: string
-    fill_opacity: number
-    hPadding: number
-    wPadding: number
-    height: number
-    width: number
-    widthTakenSoFar: number
     textWidth: number
-    y_pos: number
-    x_pos: number
+    settings: VisualSettings;
+    i: number
+    n: number
+    options: VisualUpdateOptions
+    data: string[]
+    static widthSoFar: number = 0
+    widthSoFar: number; 
+    constructor(i: number, data: string[], settings: VisualSettings, options: VisualUpdateOptions) {
+        this.settings = settings
+        this.data = data
+        this.n = this.data.length
+        this.i = i
+        this.options = options
+        if (i == 0)
+            Frame.widthSoFar = 0
+        this.widthSoFar = Frame.widthSoFar
+        Frame.widthSoFar += this.width
+    }
+    public getTextWidth(text: string, font: string): number {
+        let canvas = document.createElement("canvas");
+        let context = canvas.getContext("2d");
+        context.font = font;
+        let metrics = context.measureText(text);
+        return metrics.width;
+    }
+    get text(): string {
+        return this.data[this.i]
+    }
+    get fill(): string {
+        return this.settings.button.color
+    }
+    get fill_opacity(): number {
+        return 1 - this.settings.button.transparency / 100
+    }
+    get wPadding(): number {
+        let wPadding = Math.max(0, this.settings.button.padding)
+        return Math.min(this.options.viewport.width / (4 * this.n), wPadding)
+    }
+    get height(): number {
+        return this.options.viewport.height
+    }
+    get width(): number {
+        switch (this.settings.button.sizingMethod) {
+            case enums.Button_Sizing_Method.uniform:
+                return (this.options.viewport.width - this.wPadding * (this.n - 1)) / (this.n)
+            case enums.Button_Sizing_Method.fixed:
+                return this.settings.button.buttonSize
+            case enums.Button_Sizing_Method.dynamic:
+                let totalPadding = (this.n - 1)*this.settings.button.padding;
+                let totalMargins = (this.n * 2)*this.settings.text.margin;
+                let viewportWidthForText = this.options.viewport.width - totalPadding - totalMargins;
+                let totalTextWidth = this.getTextWidth(this.data.join(""), this.settings.text.fontSize + "pt " + this.settings.text.fontFamily);
+                let textWidth = this.getTextWidth(this.text, this.settings.text.fontSize + "pt " + this.settings.text.fontFamily);
+                let buttonWidthScaleFactor = viewportWidthForText / totalTextWidth
+                let width = textWidth * buttonWidthScaleFactor + 2 * this.settings.text.margin
+                return width
+            }
+    }
+    get y_pos(): number {
+        return 0
+    }
+    get x_pos(): number {
+        switch (this.settings.button.sizingMethod) {
+            case enums.Button_Sizing_Method.fixed:
+                let areaTaken = this.data.length * this.width + (this.n - 1) * this.wPadding
+                let areaRemaining = this.options.viewport.width - areaTaken
+                switch (this.settings.button.buttonAlignment) {
+                    case enums.Align.left:
+                        return this.i * (this.width + this.wPadding)
+                    case enums.Align.right:
+                        return areaRemaining + this.i * (this.width + this.wPadding)
+                    case enums.Align.center:
+                        return areaRemaining / 2 + this.i * (this.width + this.wPadding)
+
+                }
+            case enums.Button_Sizing_Method.uniform:
+                return this.i * (this.width + this.wPadding)
+            case enums.Button_Sizing_Method.dynamic:
+                return this.widthSoFar + this.i*this.wPadding
+        }
+    }
 }
 
 class Title {
+    settings: VisualSettings;
+    n: number
+    options: VisualUpdateOptions
     text: string
-    fill: string
-    fill_opacity: number
-    align: enums.Align
-    font_size: number
-    font_family: string
-    padding: number
+    constructor(text: string, settings: VisualSettings, options: VisualUpdateOptions) {
+        this.settings = settings
+        this.text = text
+        this.options = options   
+    }
+
+    get fill(): string{
+        return this.settings.text.color
+    }
+    get fill_opacity(): number{
+        return 1 - this.settings.text.transparency / 100
+    }
+    get align(): string{
+        return  this.settings.text.alignment
+    }
+    get font_size(): number{
+        return this.settings.text.fontSize
+    }
+    get font_family(): string{
+        return  this.settings.text.fontFamily
+    }
+    get padding(): number{
+        return this.settings.text.margin
+    }
 }
-
-
 
 
 export class Visual implements IVisual {
@@ -85,7 +175,7 @@ export class Visual implements IVisual {
 
     constructor(options: VisualConstructorOptions) {
 
-        console.log('Visual constructor', options);
+        // console.log('Visual constructor', options);
 
         this.svg = d3.select(options.element)
             .append('svg')
@@ -104,94 +194,17 @@ export class Visual implements IVisual {
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
-
-    private calcPadding(padding: number, n: number, vw): number {
-        return Math.floor((Math.min(vw / (4 * n), Math.max(0, padding))))
-    }
-
-    private getTextWidth(text: string, font: string): number {
-        let canvas = document.createElement("canvas");
-        let context = canvas.getContext("2d");
-        context.font = font;
-        let metrics = context.measureText(text);
-        return metrics.width;
-    }
-
-
-
     private calcFrames(data: string[], settings: VisualSettings, options: VisualUpdateOptions): Frame[] {
         let frames: Frame[] = [];
-
-        let totalPadding = (data.length - 1) * settings.button.padding;
-        let totalMargins = data.length * 2 * settings.text.margin;
-        let viewportWidthForText = options.viewport.width - totalPadding - totalMargins;
-        let totalTextWidth = this.getTextWidth(data.join(""), settings.text.fontSize + "pt " + settings.text.fontFamily);
-        let buttonWidthScaleFactor = viewportWidthForText / totalTextWidth
-        let wPadding = this.calcPadding(settings.button.padding, data.length, options.viewport.width)
-        let widthTaken = 0
-        for (let i = 0; i < data.length; i++) {
-            let frame: Frame = {
-                data: data[i],
-                fill: settings.button.color,
-                fill_opacity: 1 - settings.button.transparency / 100,
-                hPadding: 50,
-                get height(): number {
-                    return options.viewport.height - this.hPadding
-                },
-                wPadding: wPadding,
-                textWidth: this.getTextWidth(data[i], settings.text.fontSize + "pt " + settings.text.fontFamily),
-                get width(): number {
-                    switch (settings.button.sizingMethod) {
-                        case enums.Button_Sizing_Method.uniform:
-                            return (options.viewport.width - this.wPadding * (data.length - 1)) / (data.length)
-                        case enums.Button_Sizing_Method.fixed:
-                            return settings.button.buttonSize
-                        case enums.Button_Sizing_Method.dynamic:
-                            return this.textWidth * buttonWidthScaleFactor + 2 * settings.text.margin
-                    }
-                },
-                get y_pos(): number {
-                    return this.hPadding / 2
-                },
-                widthTakenSoFar: widthTaken,
-                get x_pos(): number {
-                    if (settings.button.sizingMethod == enums.Button_Sizing_Method.fixed) {
-                        let areaTaken = data.length*this.width + (data.length-1)*this.wPadding
-                        let areaRemaining = options.viewport.width - areaTaken
-                        switch (settings.button.buttonAlignment) {
-                            case enums.Align.left:
-                                return i * (this.width + this.wPadding)
-                            case enums.Align.right:
-                                return areaRemaining + i*(this.width + this.wPadding)
-                            case enums.Align.center:
-                                return areaRemaining/2 + i*(this.width + this.wPadding)
-                        }
-                    } else {
-                        return this.widthTakenSoFar
-                    }
-                }
-            }
-            frames.push(frame)
-            widthTaken += frame.width + wPadding
-        }
+        for (let i = 0; i < data.length; i++) 
+            frames.push(new Frame(i, data, settings, options))
         return frames;
     }
 
     private calcTitles(data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]): Title[] {
         let titles: Title[] = []
-
-        for (let i = 0; i < data.length; i++) {
-            let title: Title = {
-                text: data[i],
-                fill: settings.text.color,
-                fill_opacity: 1 - settings.text.transparency / 100,
-                align: settings.text.alignment,
-                font_size: settings.text.fontSize,
-                font_family: settings.text.fontFamily,
-                padding: settings.text.margin
-            }
-            titles.push(title)
-        }
+        for (let i = 0; i < data.length; i++) 
+            titles.push(new Title(data[i], settings, options))
         return titles
     }
 
