@@ -59,7 +59,7 @@ class Frame {
         this.data = data
         this.n = this.data.length
         this.i = i
-        this.options = options 
+        this.options = options
         if (this.indexInRow == 0)
             Frame.widthSoFar = 0
         this.widthSoFar = Frame.widthSoFar
@@ -72,13 +72,13 @@ class Frame {
         let metrics = context.measureText(text);
         return metrics.width;
     }
-    get rowLength(): number{
-        switch(this.settings.button.layout){
-            case(enums.Button_Layout.horizontal):
+    get rowLength(): number {
+        switch (this.settings.button.layout) {
+            case (enums.Button_Layout.horizontal):
                 return this.n
-            case(enums.Button_Layout.vertical):
+            case (enums.Button_Layout.vertical):
                 return 1
-            case(enums.Button_Layout.grid):
+            case (enums.Button_Layout.grid):
                 return Math.max(1, this.settings.button.rowLength)
         }
     }
@@ -115,12 +115,12 @@ class Frame {
     }
     get height(): number {
         switch (this.settings.button.sizingMethod) {
-            case(enums.Button_Sizing_Method.fixed):
+            case (enums.Button_Sizing_Method.fixed):
                 return this.settings.button.buttonHeight
             default:
-                return (this.options.viewport.height - this.padding * (this.numRows-1))/ this.numRows
+                return (this.options.viewport.height - this.padding * (this.numRows - 1)) / this.numRows
         }
-        
+
     }
     get width(): number {
         switch (this.settings.button.sizingMethod) {
@@ -170,12 +170,20 @@ class Title {
     n: number
     options: VisualUpdateOptions
     text: string
-    constructor(text: string, settings: VisualSettings, options: VisualUpdateOptions) {
+    frameData: Frame
+    constructor(text: string, settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame) {
         this.settings = settings
         this.text = text
         this.options = options
+        this.frameData = frameData
     }
-
+    public getTextWidth(text: string, font: string): number {
+        let canvas = document.createElement("canvas");
+        let context = canvas.getContext("2d");
+        context.font = font;
+        let metrics = context.measureText(text);
+        return metrics.width;
+    }
     get fill(): string {
         return this.settings.text.color
     }
@@ -194,6 +202,47 @@ class Title {
     get padding(): number {
         return this.settings.text.margin
     }
+    get content(): HTMLDivElement {
+        let title = document.createElement('div')
+        title.className = "title"
+        title.style.display = 'inline-block'
+
+
+        let center = document.createElement('div')
+        center.className = 'center'
+        center.style.position = 'relative'
+        center.style.top = '50%'
+        center.style.transform = 'translateY(-50%)'
+        title.append(center)
+
+        let text = document.createElement('div')
+        text.className = 'text'
+        text.style.verticalAlign = 'middle'
+        text.style.display = 'inline-block'
+        text.textContent = this.text
+
+        if (this.settings.text.icons) {
+            let img = document.createElement('img')
+            img.className = 'icon'
+            img.style.verticalAlign = 'middle'
+            img.style.display = 'inline-block'
+
+            img.style.minWidth = this.settings.text.iconWidth + 'px'
+            img.src = "https://img.icons8.com/windows/32/000000/plus.png"
+
+            let maxTextWidth: number = this.frameData.width
+            maxTextWidth -= this.settings.text.iconWidth + this.settings.text.iconPadding + this.settings.text.margin
+            text.style.maxWidth = Math.floor(maxTextWidth) + 'px'
+            text.style.width = this.getTextWidth(this.text, this.settings.text.fontSize + "pt " + this.settings.text.fontFamily)
+                + this.settings.text.iconPadding + this.settings.text.margin >= Math.floor(maxTextWidth) ? 'min-content' : 'auto'
+            text.style.paddingLeft = this.settings.text.iconPadding + 'px'
+            title.append(img)
+        }
+
+        title.append(text)
+        return title
+    }
+
 }
 
 
@@ -230,6 +279,10 @@ export class Visual implements IVisual {
         if (settings.button.layout != enums.Button_Layout.grid) {
             delete settings.button.rowLength
         }
+        if (!settings.text.icons) {
+            delete settings.text.iconWidth
+            delete settings.text.iconPadding
+        }
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
@@ -243,7 +296,7 @@ export class Visual implements IVisual {
     private calcTitles(data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]): Title[] {
         let titles: Title[] = []
         for (let i = 0; i < data.length; i++)
-            titles.push(new Title(data[i], settings, options))
+            titles.push(new Title(data[i], settings, options, frameData[i]))
         return titles
     }
 
@@ -273,28 +326,35 @@ export class Visual implements IVisual {
             .attr("x", function (d) { return d.x_pos })
             .attr("y", function (d) { return d.y_pos })
 
-
-
-        let titlesFO = this.container.selectAll('foreignObject').data(titleData)
-        titlesFO.exit().remove()
-        titlesFO.enter().append('foreignObject')
+        let titleFOs = this.container.selectAll('foreignObject').data(titleData)
+        titleFOs.exit().remove()
+        titleFOs.enter().append('foreignObject')
             .attr("class", "titleForeignObject")
             .append("xhtml:div")
-            .attr("class", "titleContainer")
+            .attr("class", "titleTable")
             .append("xhtml:div")
-            .attr("class", "title")
+            .attr("class", "titleTableCell")
+            .append("xhtml:div")
+            .attr("class", "titleContainer")
+        // .select(function(d, i, n){return (<HTMLElement>n[i]).parentNode})
+        // .append("xhtml:img")
+        // .attr("class", "icon")
 
-        titlesFO = this.container.selectAll('foreignObject').data(titleData)
+
+
+        titleFOs = this.container.selectAll('foreignObject').data(titleData)
             .attr("height", function (d, i) { return frameData[i].height })
             .attr("width", function (d, i) { return frameData[i].width })
             .attr("x", function (d, i) { return frameData[i].x_pos })
             .attr("y", function (d, i) { return frameData[i].y_pos })
-        let titlesContaner = titlesFO.select('.titleContainer')
+
+
+        let titleTables = titleFOs.select('.titleTable')
             .style("height", "100%")
             .style("width", "100%")
             .style("display", "table")
 
-        let titles = titlesContaner.select(".title")
+        let titleTableCells = titleTables.select(".titleTableCell")
             .style("display", "table-cell")
             .style("vertical-align", "middle")
             .style("opacity", function (d) { return d.fill_opacity })
@@ -302,9 +362,22 @@ export class Visual implements IVisual {
             .style("font-family", function (d) { return d.font_family })
             .style("text-align", function (d) { return d.align })
             .style("color", function (d) { return d.fill })
-            .style("padding", function (d) { return d.padding + 'px' })
-            .html(function (d) { return d.text });
-            
+            .style("padding", function (d) { return '0 ' + d.padding + 'px' })
+
+        let titleContainers = titleTableCells.select(".titleContainer")
+            .style('display', 'inline-block')
+            .html("")
+            .append(function (d) { return d.content })
+
+
+
+        // let icons = titles.select(".icon")
+        //     .attr("src", "https://cdn0.iconfinder.com/data/icons/shift-free/32/Microsoft-512.png")
+        //     .style("width", "100px")
+        //     .style("height", "100px")
+        //     .style("x", 0)
+        //     .style("y", 0)
+
 
         // this.initialiseViz(this.target)
         // console.log('Visual update', options);

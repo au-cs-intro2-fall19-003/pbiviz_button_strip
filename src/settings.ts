@@ -47,10 +47,13 @@ export class ButtonSettings {
 export class TextSettings{
   public color: string = "#fff";
   public alignment: enums.Align = enums.Align.center;
+  public margin: number = 0;
   public fontSize: number = 14;
   public fontFamily: string = "wf_standard-font, helvetica, arial, sans-serif";
   public transparency: number = 0;
-  public margin: number = 0;
+  public icons: boolean = false;
+  public iconWidth: number = 40;
+  public iconPadding: number = 10;
 }
 
 export class VisualSettings extends DataViewObjectsParser {

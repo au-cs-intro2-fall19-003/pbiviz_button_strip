@@ -165,6 +165,27 @@
                     "type": {
                         "numeric": true
                     }
+                },
+                "icons": {
+                    "displayName": "Icons",
+                    "description": "Add an icon to each button",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "iconWidth": {
+                    "displayName": "Icon width",
+                    "description": "Width of each icon in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "iconPadding": {
+                    "displayName": "Icon padding",
+                    "description": "Padding between icon and text",
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         }
