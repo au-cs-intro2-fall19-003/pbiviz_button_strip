@@ -165,7 +165,13 @@
                     "type": {
                         "numeric": true
                     }
-                },
+                }
+            }
+            
+        },
+        "icon": {
+            "displayName": "Icons",
+            "properties": {
                 "icons": {
                     "displayName": "Icons",
                     "description": "Add an icon to each button",
@@ -173,15 +179,35 @@
                         "bool": true
                     }
                 },
-                "iconWidth": {
-                    "displayName": "Icon width",
+                "placement": {
+                    "displayName": "Placement",
+                    "description": "How buttons will be laid out.",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Left",
+                                "value": "left"
+                            },
+                            {
+                                "displayName": "Above",
+                                "value": "above"
+                            },
+                            {
+                                "displayName": "Below",
+                                "value": "below"
+                            }
+                        ]
+                    }
+                },
+                "width": {
+                    "displayName": "Width",
                     "description": "Width of each icon in pixels",
                     "type": {
                         "numeric": true
                     }
                 },
-                "iconPadding": {
-                    "displayName": "Icon padding",
+                "padding": {
+                    "displayName": "Padding",
                     "description": "Padding between icon and text",
                     "type": {
                         "numeric": true

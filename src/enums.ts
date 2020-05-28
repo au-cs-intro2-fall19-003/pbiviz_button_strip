@@ -15,3 +15,9 @@ export enum Button_Layout {
     vertical = "vertical",
     grid = "grid"
 }
+
+export enum Icon_Placement {
+    left = "left",
+    above = "above",
+    below = "below"
+}

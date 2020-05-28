@@ -65,12 +65,22 @@ class Frame {
         this.widthSoFar = Frame.widthSoFar
         Frame.widthSoFar += this.width
     }
-    public getTextWidth(text: string, font: string): number {
-        let canvas = document.createElement("canvas");
-        let context = canvas.getContext("2d");
-        context.font = font;
-        let metrics = context.measureText(text);
-        return metrics.width;
+    public calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): any {
+        var div = document.createElement('div');
+        div.style.fontFamily = fontFamily
+        div.style.fontSize = fontSize
+        div.style.width = width || 'auto'
+        div.style.whiteSpace = width ? "normal" : "nowrap"
+        div.style.position = "absolute";
+        div.innerHTML = text
+
+        document.body.appendChild(div);
+        var dimensions = {
+            width: div.offsetWidth,
+            height: div.offsetHeight
+        };
+        div.parentNode.removeChild(div);
+        return dimensions;
     }
     get rowLength(): number {
         switch (this.settings.button.layout) {
@@ -132,8 +142,8 @@ class Frame {
                 let totalPadding = (this.framesInRow - 1) * this.settings.button.padding;
                 let totalMargins = (this.framesInRow * 2) * this.settings.text.margin;
                 let viewportWidthForText = this.options.viewport.width - totalPadding - totalMargins;
-                let totalTextWidth = this.getTextWidth(this.rowData.join(""), this.settings.text.fontSize + "pt " + this.settings.text.fontFamily);
-                let textWidth = this.getTextWidth(this.text, this.settings.text.fontSize + "pt " + this.settings.text.fontFamily);
+                let totalTextWidth = this.calculateWordDimensions(this.rowData.join(""), this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
+                let textWidth = this.calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
                 let buttonWidthScaleFactor = viewportWidthForText / totalTextWidth
                 let width = textWidth * buttonWidthScaleFactor + 2 * this.settings.text.margin
                 return width
@@ -147,7 +157,6 @@ class Frame {
             case enums.Button_Sizing_Method.fixed:
                 let areaTaken = this.framesInRow * this.width + (this.framesInRow - 1) * this.padding
                 let areaRemaining = this.options.viewport.width - areaTaken
-                console.log(this.framesInRow)
                 switch (this.settings.button.buttonAlignment) {
                     case enums.Align.left:
                         return this.indexInRow * (this.width + this.padding)
@@ -166,16 +175,38 @@ class Frame {
 }
 
 class Title {
+    i: number
+    data: string[]
     settings: VisualSettings;
-    n: number
     options: VisualUpdateOptions
-    text: string
-    frameData: Frame
-    constructor(text: string, settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame) {
+    frameData: Frame[]
+    constructor(i: number, data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]) {
+        this.i = i
+        this.data = data
         this.settings = settings
-        this.text = text
         this.options = options
         this.frameData = frameData
+    }
+    public calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): { width: number, height: number } {
+        var div = document.createElement('div');
+        div.style.fontFamily = fontFamily
+        div.style.fontSize = fontSize
+        div.style.width = width || 'auto'
+        div.style.whiteSpace = width ? "normal" : "nowrap"
+        div.style.position = "absolute";
+        div.innerHTML = text
+
+        document.body.appendChild(div);
+        var dimensions = {
+            width: div.offsetWidth,
+            height: div.offsetHeight
+        };
+
+        div.parentNode.removeChild(div);
+
+        // console.log(text, width, dimensions.height)
+
+        return dimensions;
     }
     public getTextWidth(text: string, font: string): number {
         let canvas = document.createElement("canvas");
@@ -183,6 +214,9 @@ class Title {
         context.font = font;
         let metrics = context.measureText(text);
         return metrics.width;
+    }
+    get text(): string {
+        return this.data[this.i]
     }
     get fill(): string {
         return this.settings.text.color
@@ -203,44 +237,73 @@ class Title {
         return this.settings.text.margin
     }
     get content(): HTMLDivElement {
-        let title = document.createElement('div')
-        title.className = "title"
-        title.style.display = 'inline-block'
-
-
-        let center = document.createElement('div')
-        center.className = 'center'
-        center.style.position = 'relative'
-        center.style.top = '50%'
-        center.style.transform = 'translateY(-50%)'
-        title.append(center)
+        let titleContainer = document.createElement('div')
+        titleContainer.className = "titleContainer"
 
         let text = document.createElement('div')
         text.className = 'text'
-        text.style.verticalAlign = 'middle'
-        text.style.display = 'inline-block'
+
         text.textContent = this.text
 
-        if (this.settings.text.icons) {
-            let img = document.createElement('img')
+        if (this.settings.icon.icons) {
+            let img = document.createElement('div')
             img.className = 'icon'
-            img.style.verticalAlign = 'middle'
-            img.style.display = 'inline-block'
+            img.style.backgroundImage = "url(https://via.placeholder.com/150)"
+            img.style.backgroundRepeat = 'no-repeat'
+            img.style.backgroundSize = 'contain'
 
-            img.style.minWidth = this.settings.text.iconWidth + 'px'
-            img.src = "https://img.icons8.com/windows/32/000000/plus.png"
+            switch (this.settings.icon.placement) {
+                case enums.Icon_Placement.left:
+                    titleContainer.style.display = 'inline-block'
 
-            let maxTextWidth: number = this.frameData.width
-            maxTextWidth -= this.settings.text.iconWidth + this.settings.text.iconPadding + this.settings.text.margin
-            text.style.maxWidth = Math.floor(maxTextWidth) + 'px'
-            text.style.width = this.getTextWidth(this.text, this.settings.text.fontSize + "pt " + this.settings.text.fontFamily)
-                + this.settings.text.iconPadding + this.settings.text.margin >= Math.floor(maxTextWidth) ? 'min-content' : 'auto'
-            text.style.paddingLeft = this.settings.text.iconPadding + 'px'
-            title.append(img)
+                    img.style.minWidth = this.settings.icon.width + 'px'
+                    img.style.height = this.settings.icon.width + 'px'
+                    img.style.display = 'inline-block'
+                    img.style.verticalAlign = 'middle'
+
+                    text.style.paddingLeft = this.settings.icon.padding + 'px'
+                    text.style.display = 'inline-block'
+                    text.style.verticalAlign = 'middle'
+
+                    let maxTextWidth = this.frameData[this.i].width - this.settings.icon.width - this.settings.icon.padding - this.settings.text.margin
+                    text.style.maxWidth = Math.floor(maxTextWidth) + 'px'
+                    text.style.width = this.calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt ").width
+                        + this.settings.icon.padding + this.settings.text.margin >= Math.floor(maxTextWidth) ? 'min-content' : 'auto'
+
+                    titleContainer.append(img, text)
+                default:
+                    let maxTextHeight = Math.max.apply(Math, this.data.map((s, i) => {
+                        return this.calculateWordDimensions(s, this.settings.text.fontFamily, this.settings.text.fontSize + "pt", this.frameData[i].width - 4 + 'px').height; //TODO fix -4 bug
+                    }))
+                    img.style.width = (this.frameData[this.i].width - 2 * this.settings.text.margin) + 'px'
+                    img.style.height = (this.frameData[this.i].height - maxTextHeight - this.settings.icon.padding) + 'px'
+                    img.style.backgroundPosition = 'center'
+
+                    text.style.width = (this.frameData[this.i].width - 2 * this.settings.text.margin) + 'px'
+                    text.style.height = maxTextHeight + 'px'
+
+                    titleContainer.style.position = 'relative'
+                    titleContainer.style.height = this.frameData[this.i].height + 'px'
+
+                    switch (this.settings.icon.placement) {
+                        case enums.Icon_Placement.above:
+                            text.style.position = 'absolute'
+                            text.style.bottom = '0'
+                            titleContainer.append(img, text)
+                            break
+                        case enums.Icon_Placement.below:
+                            img.style.position = 'absolute'
+                            img.style.bottom = '0'
+                            titleContainer.append(text, img)
+                            break
+                    }
+            }
+
+        } else {
+            titleContainer.append(text)
         }
 
-        title.append(text)
-        return title
+        return titleContainer
     }
 
 }
@@ -279,9 +342,10 @@ export class Visual implements IVisual {
         if (settings.button.layout != enums.Button_Layout.grid) {
             delete settings.button.rowLength
         }
-        if (!settings.text.icons) {
-            delete settings.text.iconWidth
-            delete settings.text.iconPadding
+        if (!settings.icon.icons) {
+            delete settings.icon.placement
+            delete settings.icon.width
+            delete settings.icon.padding
         }
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
@@ -296,7 +360,7 @@ export class Visual implements IVisual {
     private calcTitles(data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]): Title[] {
         let titles: Title[] = []
         for (let i = 0; i < data.length; i++)
-            titles.push(new Title(data[i], settings, options, frameData[i]))
+            titles.push(new Title(i, data, settings, options, frameData))
         return titles
     }
 
@@ -336,11 +400,6 @@ export class Visual implements IVisual {
             .attr("class", "titleTableCell")
             .append("xhtml:div")
             .attr("class", "titleContainer")
-        // .select(function(d, i, n){return (<HTMLElement>n[i]).parentNode})
-        // .append("xhtml:img")
-        // .attr("class", "icon")
-
-
 
         titleFOs = this.container.selectAll('foreignObject').data(titleData)
             .attr("height", function (d, i) { return frameData[i].height })
@@ -363,20 +422,8 @@ export class Visual implements IVisual {
             .style("text-align", function (d) { return d.align })
             .style("color", function (d) { return d.fill })
             .style("padding", function (d) { return '0 ' + d.padding + 'px' })
-
-        let titleContainers = titleTableCells.select(".titleContainer")
-            .style('display', 'inline-block')
             .html("")
             .append(function (d) { return d.content })
-
-
-
-        // let icons = titles.select(".icon")
-        //     .attr("src", "https://cdn0.iconfinder.com/data/icons/shift-free/32/Microsoft-512.png")
-        //     .style("width", "100px")
-        //     .style("height", "100px")
-        //     .style("x", 0)
-        //     .style("y", 0)
 
 
         // this.initialiseViz(this.target)

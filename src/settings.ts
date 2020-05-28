@@ -51,14 +51,20 @@ export class TextSettings{
   public fontSize: number = 14;
   public fontFamily: string = "wf_standard-font, helvetica, arial, sans-serif";
   public transparency: number = 0;
+ 
+}
+
+export class IconSettings{
   public icons: boolean = false;
-  public iconWidth: number = 40;
-  public iconPadding: number = 10;
+  public placement: enums.Icon_Placement = enums.Icon_Placement.left;
+  public width: number = 40;
+  public padding: number = 10;
 }
 
 export class VisualSettings extends DataViewObjectsParser {
   public button: ButtonSettings = new ButtonSettings();
   public text: TextSettings = new TextSettings();
+  public icon: IconSettings = new IconSettings();
 }
 
 
