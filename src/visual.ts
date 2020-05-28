@@ -123,6 +123,14 @@ class Frame {
         let padding = Math.max(0, this.settings.button.padding)
         return Math.min(this.options.viewport.width / (4 * this.n), padding)
     }
+    get viewportWidthForAllText(): number{
+        let totalPadding = (this.framesInRow - 1) * this.settings.button.padding;
+        let totalMargins = (this.framesInRow * 2) * this.settings.text.margin;
+        return this.options.viewport.width - totalPadding - totalMargins;
+    }
+    get widthForText(): number{
+        return this.width - 2*this.settings.text.margin
+    }
     get height(): number {
         switch (this.settings.button.sizingMethod) {
             case (enums.Button_Sizing_Method.fixed):
@@ -139,12 +147,9 @@ class Frame {
             case enums.Button_Sizing_Method.fixed:
                 return this.settings.button.buttonWidth
             case enums.Button_Sizing_Method.dynamic:
-                let totalPadding = (this.framesInRow - 1) * this.settings.button.padding;
-                let totalMargins = (this.framesInRow * 2) * this.settings.text.margin;
-                let viewportWidthForText = this.options.viewport.width - totalPadding - totalMargins;
                 let totalTextWidth = this.calculateWordDimensions(this.rowData.join(""), this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
                 let textWidth = this.calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
-                let buttonWidthScaleFactor = viewportWidthForText / totalTextWidth
+                let buttonWidthScaleFactor = this.viewportWidthForAllText / totalTextWidth
                 let width = textWidth * buttonWidthScaleFactor + 2 * this.settings.text.margin
                 return width
         }
@@ -180,12 +185,18 @@ class Title {
     settings: VisualSettings;
     options: VisualUpdateOptions
     frameData: Frame[]
+    static maxTextHeight: number;
     constructor(i: number, data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]) {
         this.i = i
         this.data = data
         this.settings = settings
         this.options = options
         this.frameData = frameData
+        if (i==0 && this.settings.icon.icons){
+            Title.maxTextHeight = Math.max.apply(Math, this.data.map((s, i) => { //Todo fix -2 bug
+                return this.calculateWordDimensions(s, this.settings.text.fontFamily, this.settings.text.fontSize + "pt", (this.frameData[i].widthForText-2)+'px').height; 
+            }))
+        }
     }
     public calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): { width: number, height: number } {
         var div = document.createElement('div');
@@ -236,13 +247,19 @@ class Title {
     get padding(): number {
         return this.settings.text.margin
     }
+    get width(): number {
+        return this.frameData[this.i].widthForText
+    }
     get content(): HTMLDivElement {
         let titleContainer = document.createElement('div')
         titleContainer.className = "titleContainer"
 
-        let text = document.createElement('div')
-        text.className = 'text'
+        let textContainer = document.createElement('div')
+        textContainer.className = 'textContainer'
+        textContainer.style.position = 'relative'
 
+        let text = document.createElement('span')
+        text.className = 'text'
         text.textContent = this.text
 
         if (this.settings.icon.icons) {
@@ -261,46 +278,49 @@ class Title {
                     img.style.display = 'inline-block'
                     img.style.verticalAlign = 'middle'
 
-                    text.style.paddingLeft = this.settings.icon.padding + 'px'
-                    text.style.display = 'inline-block'
-                    text.style.verticalAlign = 'middle'
+                    textContainer.style.paddingLeft = this.settings.icon.padding + 'px'
+                    textContainer.style.display = 'inline-block'
+                    textContainer.style.verticalAlign = 'middle'
 
-                    let maxTextWidth = this.frameData[this.i].width - this.settings.icon.width - this.settings.icon.padding - this.settings.text.margin
-                    text.style.maxWidth = Math.floor(maxTextWidth) + 'px'
-                    text.style.width = this.calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt ").width
+                    let maxTextWidth = this.frameData[this.i].width - this.settings.icon.width - this.settings.icon.padding - 2*this.settings.text.margin
+                    textContainer.style.maxWidth = Math.floor(maxTextWidth) + 'px'
+                    textContainer.style.width = this.calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt ").width
                         + this.settings.icon.padding + this.settings.text.margin >= Math.floor(maxTextWidth) ? 'min-content' : 'auto'
 
-                    titleContainer.append(img, text)
+                    textContainer.append(text)
+                    titleContainer.append(img, textContainer)
+                    break
                 default:
-                    let maxTextHeight = Math.max.apply(Math, this.data.map((s, i) => {
-                        return this.calculateWordDimensions(s, this.settings.text.fontFamily, this.settings.text.fontSize + "pt", this.frameData[i].width - 4 + 'px').height; //TODO fix -4 bug
-                    }))
-                    img.style.width = (this.frameData[this.i].width - 2 * this.settings.text.margin) + 'px'
-                    img.style.height = (this.frameData[this.i].height - maxTextHeight - this.settings.icon.padding) + 'px'
-                    img.style.backgroundPosition = 'center'
-
-                    text.style.width = (this.frameData[this.i].width - 2 * this.settings.text.margin) + 'px'
-                    text.style.height = maxTextHeight + 'px'
-
                     titleContainer.style.position = 'relative'
                     titleContainer.style.height = this.frameData[this.i].height + 'px'
 
+                    img.style.width = this.width + 'px'
+                    img.style.height = (this.frameData[this.i].height - Title.maxTextHeight - this.settings.icon.padding) + 'px'
+                    img.style.backgroundPosition = 'center'
+
+                    textContainer.style.width = this.width + 'px'
+                    textContainer.style.height = Title.maxTextHeight + 'px'
                     switch (this.settings.icon.placement) {
                         case enums.Icon_Placement.above:
-                            text.style.position = 'absolute'
-                            text.style.bottom = '0'
-                            titleContainer.append(img, text)
+                            textContainer.style.position = 'absolute'
+                            textContainer.style.bottom = '0'
+                            textContainer.append(text)
+                            titleContainer.append(img, textContainer)
                             break
                         case enums.Icon_Placement.below:
                             img.style.position = 'absolute'
                             img.style.bottom = '0'
-                            titleContainer.append(text, img)
+                            text.style.position = 'absolute'
+                            text.style.bottom = '0'
+                            text.style.right = '0'
+                            textContainer.append(text)
+                            titleContainer.append(textContainer, img)
                             break
                     }
             }
 
         } else {
-            titleContainer.append(text)
+            titleContainer.append(textContainer)
         }
 
         return titleContainer
