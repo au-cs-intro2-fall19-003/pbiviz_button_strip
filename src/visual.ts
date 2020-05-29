@@ -65,23 +65,6 @@ class Frame {
         this.widthSoFar = Frame.widthSoFar
         Frame.widthSoFar += this.width
     }
-    public calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): any {
-        var div = document.createElement('div');
-        div.style.fontFamily = fontFamily
-        div.style.fontSize = fontSize
-        div.style.width = width || 'auto'
-        div.style.whiteSpace = width ? "normal" : "nowrap"
-        div.style.position = "absolute";
-        div.innerHTML = text
-
-        document.body.appendChild(div);
-        var dimensions = {
-            width: div.offsetWidth,
-            height: div.offsetHeight
-        };
-        div.parentNode.removeChild(div);
-        return dimensions;
-    }
     get rowLength(): number {
         switch (this.settings.button.layout) {
             case (enums.Button_Layout.horizontal):
@@ -119,17 +102,23 @@ class Frame {
     get fill_opacity(): number {
         return 1 - this.settings.button.transparency / 100
     }
+    get stroke(): string {
+        return this.settings.button.stroke
+    }
+    get strokeWidth(): number{
+        return this.settings.button.strokeWidth
+    }
     get padding(): number {
         let padding = Math.max(0, this.settings.button.padding)
         return Math.min(this.options.viewport.width / (4 * this.n), padding)
     }
     get viewportWidthForAllText(): number{
         let totalPadding = (this.framesInRow - 1) * this.settings.button.padding;
-        let totalMargins = (this.framesInRow * 2) * this.settings.text.margin;
+        let totalMargins = (this.framesInRow * 2) * this.settings.text.hmargin;
         return this.options.viewport.width - totalPadding - totalMargins;
     }
     get widthForText(): number{
-        return this.width - 2*this.settings.text.margin
+        return this.width - 2*this.settings.text.hmargin
     }
     get height(): number {
         switch (this.settings.button.sizingMethod) {
@@ -150,7 +139,7 @@ class Frame {
                 let totalTextWidth = this.calculateWordDimensions(this.rowData.join(""), this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
                 let textWidth = this.calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
                 let buttonWidthScaleFactor = this.viewportWidthForAllText / totalTextWidth
-                let width = textWidth * buttonWidthScaleFactor + 2 * this.settings.text.margin
+                let width = textWidth * buttonWidthScaleFactor + 2 * this.settings.text.hmargin
                 return width
         }
     }
@@ -177,6 +166,23 @@ class Frame {
                 return this.widthSoFar + this.indexInRow * this.padding
         }
     }
+    public calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): any {
+        var div = document.createElement('div');
+        div.style.fontFamily = fontFamily
+        div.style.fontSize = fontSize
+        div.style.width = width || 'auto'
+        div.style.whiteSpace = width ? "normal" : "nowrap"
+        div.style.position = "absolute";
+        div.innerHTML = text
+
+        document.body.appendChild(div);
+        var dimensions = {
+            width: div.offsetWidth,
+            height: div.offsetHeight
+        };
+        div.parentNode.removeChild(div);
+        return dimensions;
+    }
 }
 
 class Title {
@@ -185,13 +191,15 @@ class Title {
     settings: VisualSettings;
     options: VisualUpdateOptions
     frameData: Frame[]
+    icon: string
     static maxTextHeight: number;
-    constructor(i: number, data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]) {
+    constructor(i: number, data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[], icon?: string) {
         this.i = i
         this.data = data
         this.settings = settings
         this.options = options
         this.frameData = frameData
+        this.icon = icon
         if (i==0 && this.settings.icon.icons){
             Title.maxTextHeight = Math.max.apply(Math, this.data.map((s, i) => { //Todo fix -2 bug
                 return this.calculateWordDimensions(s, this.settings.text.fontFamily, this.settings.text.fontSize + "pt", (this.frameData[i].widthForText-2)+'px').height; 
@@ -206,25 +214,13 @@ class Title {
         div.style.whiteSpace = width ? "normal" : "nowrap"
         div.style.position = "absolute";
         div.innerHTML = text
-
         document.body.appendChild(div);
         var dimensions = {
             width: div.offsetWidth,
             height: div.offsetHeight
         };
-
         div.parentNode.removeChild(div);
-
-        // console.log(text, width, dimensions.height)
-
         return dimensions;
-    }
-    public getTextWidth(text: string, font: string): number {
-        let canvas = document.createElement("canvas");
-        let context = canvas.getContext("2d");
-        context.font = font;
-        let metrics = context.measureText(text);
-        return metrics.width;
     }
     get text(): string {
         return this.data[this.i]
@@ -245,10 +241,19 @@ class Title {
         return this.settings.text.fontFamily
     }
     get padding(): number {
-        return this.settings.text.margin
+        return this.settings.text.hmargin
     }
     get width(): number {
         return this.frameData[this.i].widthForText
+    }
+    get textContainerHeight(): number {
+        return Title.maxTextHeight + this.settings.text.vmargin
+    }
+    get iconWidth(): number {
+        return this.frameData[this.i].width - 2*this.settings.icon.hmargin
+    }
+    get maxInlineTextWidth(): number {
+        return Math.floor(this.frameData[this.i].width - this.settings.icon.width - this.settings.icon.padding - 2*this.settings.text.hmargin)
     }
     get content(): HTMLDivElement {
         let titleContainer = document.createElement('div')
@@ -257,6 +262,8 @@ class Title {
         let textContainer = document.createElement('div')
         textContainer.className = 'textContainer'
         textContainer.style.position = 'relative'
+        textContainer.style.paddingLeft = this.settings.text.hmargin + 'px'
+        textContainer.style.paddingRight = this.settings.text.hmargin + 'px'
 
         let text = document.createElement('span')
         text.className = 'text'
@@ -265,7 +272,9 @@ class Title {
         if (this.settings.icon.icons) {
             let img = document.createElement('div')
             img.className = 'icon'
-            img.style.backgroundImage = "url(https://via.placeholder.com/150)"
+            console.log("her")
+            console.log(this.icon)
+            img.style.backgroundImage = "url("+(this.icon || "https://via.placeholder.com/150") +")"
             img.style.backgroundRepeat = 'no-repeat'
             img.style.backgroundSize = 'contain'
 
@@ -282,10 +291,9 @@ class Title {
                     textContainer.style.display = 'inline-block'
                     textContainer.style.verticalAlign = 'middle'
 
-                    let maxTextWidth = this.frameData[this.i].width - this.settings.icon.width - this.settings.icon.padding - 2*this.settings.text.margin
-                    textContainer.style.maxWidth = Math.floor(maxTextWidth) + 'px'
-                    textContainer.style.width = this.calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt ").width
-                        + this.settings.icon.padding + this.settings.text.margin >= Math.floor(maxTextWidth) ? 'min-content' : 'auto'
+                    textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
+                    textContainer.style.width = this.calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
+                        + this.settings.icon.padding + this.settings.text.hmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
 
                     textContainer.append(text)
                     titleContainer.append(img, textContainer)
@@ -294,20 +302,25 @@ class Title {
                     titleContainer.style.position = 'relative'
                     titleContainer.style.height = this.frameData[this.i].height + 'px'
 
-                    img.style.width = this.width + 'px'
-                    img.style.height = (this.frameData[this.i].height - Title.maxTextHeight - this.settings.icon.padding) + 'px'
-                    img.style.backgroundPosition = 'center'
+                    img.style.width = this.iconWidth + 'px'
+                    img.style.marginLeft = this.settings.icon.hmargin + 'px'
+                    img.style.marginRight = this.settings.icon.hmargin + 'px' 
+                    img.style.height = (this.frameData[this.i].height - this.textContainerHeight - this.settings.icon.padding) + 'px'
 
                     textContainer.style.width = this.width + 'px'
-                    textContainer.style.height = Title.maxTextHeight + 'px'
+                    text.style.width = this.width + 'px'
+                    textContainer.style.height = this.textContainerHeight + 'px'
+                    console.log(Title.maxTextHeight, this.settings.text.vmargin, textContainer.style.height)
                     switch (this.settings.icon.placement) {
                         case enums.Icon_Placement.above:
+                            img.style.backgroundPosition = 'center bottom'
                             textContainer.style.position = 'absolute'
                             textContainer.style.bottom = '0'
                             textContainer.append(text)
                             titleContainer.append(img, textContainer)
                             break
                         case enums.Icon_Placement.below:
+                            // img.style.backgroundPosition = 'center top'
                             img.style.position = 'absolute'
                             img.style.bottom = '0'
                             text.style.position = 'absolute'
@@ -320,6 +333,7 @@ class Title {
             }
 
         } else {
+            textContainer.append(text)
             titleContainer.append(textContainer)
         }
 
@@ -333,7 +347,8 @@ export class Visual implements IVisual {
     private target: HTMLElement;
     private visualSettings: VisualSettings;
 
-    private pages: string[] = ["nothing in here yet"];
+    private pages: string[];
+    private icons: string[] = ["nothing in here yet"];
 
     // private host: IVisualHost;
     private svg: Selection<SVGElement>;
@@ -367,29 +382,33 @@ export class Visual implements IVisual {
             delete settings.icon.width
             delete settings.icon.padding
         }
+
+        if(settings.icon.placement != enums.Icon_Placement.left){
+            delete settings.icon.width
+        } else {
+            delete settings.icon.hmargin
+        }
+
+
         return VisualSettings.enumerateObjectInstances(settings, options);
-    }
-
-    private calcFrames(data: string[], settings: VisualSettings, options: VisualUpdateOptions): Frame[] {
-        let frames: Frame[] = [];
-        for (let i = 0; i < data.length; i++)
-            frames.push(new Frame(i, data, settings, options))
-        return frames;
-    }
-
-    private calcTitles(data: string[], settings: VisualSettings, options: VisualUpdateOptions, frameData: Frame[]): Title[] {
-        let titles: Title[] = []
-        for (let i = 0; i < data.length; i++)
-            titles.push(new Title(i, data, settings, options, frameData))
-        return titles
     }
 
     public update(options: VisualUpdateOptions) {
 
         this.visualSettings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
         this.pages = <string[]>options.dataViews[0].categorical.categories[0].values;
-        let frameData = this.calcFrames(this.pages, this.visualSettings, options)
-        let titleData = this.calcTitles(this.pages, this.visualSettings, options, frameData)
+        this.icons = <string[]>options.dataViews[0].categorical.categories[1].values;
+
+        console.log(options)
+
+
+        let frameData: Frame[] = [];
+        for (let i = 0; i < this.pages.length; i++)
+            frameData.push(new Frame(i, this.pages, this.visualSettings, options))
+        
+        let titleData: Title[] = []
+        for (let i = 0; i < this.pages.length; i++)
+            titleData.push(new Title(i, this.pages, this.visualSettings, options, frameData, this.icons[i]))
 
         this.svg
             .style('width', options.viewport.width)
@@ -405,6 +424,8 @@ export class Visual implements IVisual {
         frames
             .attr("fill", function (d) { return d.fill })
             .style("fill-opacity", function (d) { return d.fill_opacity })
+            .style("stroke", function(d){return d.stroke})
+            .style("stroke-width", function(d){return d.strokeWidth})
             .attr("height", function (d) { return d.height })
             .attr("width", function (d) { return d.width })
             .attr("x", function (d) { return d.x_pos })
@@ -441,7 +462,6 @@ export class Visual implements IVisual {
             .style("font-family", function (d) { return d.font_family })
             .style("text-align", function (d) { return d.align })
             .style("color", function (d) { return d.fill })
-            .style("padding", function (d) { return '0 ' + d.padding + 'px' })
             .html("")
             .append(function (d) { return d.content })
 

@@ -33,7 +33,9 @@ import * as enums from "./enums"
 
 
 export class ButtonSettings {
-  public color: string = "#de6a73";
+  public color: string = "#fff";
+  public stroke: string = "#000";
+  public strokeWidth: number = 2;
   public transparency: number = 0;
   public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
   public buttonWidth: number = 150;
@@ -45,9 +47,10 @@ export class ButtonSettings {
 }
 
 export class TextSettings{
-  public color: string = "#fff";
+  public color: string = "#000";
   public alignment: enums.Align = enums.Align.center;
-  public margin: number = 0;
+  public hmargin: number = 0;
+  public vmargin: number = 0;
   public fontSize: number = 14;
   public fontFamily: string = "wf_standard-font, helvetica, arial, sans-serif";
   public transparency: number = 0;
@@ -58,6 +61,7 @@ export class IconSettings{
   public icons: boolean = false;
   public placement: enums.Icon_Placement = enums.Icon_Placement.left;
   public width: number = 40;
+  public hmargin: number = 10;
   public padding: number = 10;
 }
 

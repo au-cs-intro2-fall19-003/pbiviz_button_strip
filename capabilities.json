@@ -3,12 +3,38 @@
         {
             "displayName": "Pages",
             "name": "pages",
-            "kind": "Grouping"
+            "kind": "Grouping",
+            "requiredTypes": [
+                {
+                    "text": true
+                },
+                {
+                    "numeric": true
+                },
+                {
+                    "integer": true
+                }
+            ],
+            "preferredTypes": [
+                {
+                    "text": true
+                }
+            ]
         },
         {
-            "displayName": "Page Number",
-            "name": "number",
-            "kind": "Measure"
+            "displayName": "Icons",
+            "name": "icons",
+            "kind": "Grouping",
+            "requiredTypes": [
+                {
+                    "text": true
+                }
+            ],
+            "preferredTypes": [
+                {
+                    "text": true
+                }
+            ]
         }
     ],
     "objects": {
@@ -24,6 +50,24 @@
                                 "color": true
                             }
                         }
+                    }
+                },
+                "stroke": {
+                    "displayName": "Border color",
+                    "description": "Border color for the buttons.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "strokeWidth": {
+                    "displayName": "Stroke width",
+                    "description": "The width of the stroke in pixels",
+                    "type": {
+                        "numeric": true
                     }
                 },
                 "transparency": {
@@ -159,15 +203,21 @@
                         "numeric": true
                     }
                 },
-                "margin": {
-                    "displayName": "Margin",
-                    "description": "Margin between text and button side",
+                "hmargin": {
+                    "displayName": "Horizontal margin",
+                    "description": "Margin between text and button left and right",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "vmargin": {
+                    "displayName": "Vertical margin",
+                    "description": "Margin between text and button top and bottom",
                     "type": {
                         "numeric": true
                     }
                 }
             }
-            
         },
         "icon": {
             "displayName": "Icons",
@@ -201,7 +251,14 @@
                 },
                 "width": {
                     "displayName": "Width",
-                    "description": "Width of each icon in pixels",
+                    "description": "Width of icon in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "hmargin": {
+                    "displayName": "Horizontal margin",
+                    "description": "Margin between icon and button left and right",
                     "type": {
                         "numeric": true
                     }
@@ -220,18 +277,15 @@
         {
             "categorical": {
                 "categories": {
-                    "for": {
-                        "in": "pages"
-                    },
-                    "dataReductionAlgorithm": {
-                        "top": {}
-                    }
-                },
-                "values": {
                     "select": [
                         {
-                            "bind": {
-                                "to": "number"
+                            "for": {
+                                "in": "pages"
+                            }
+                        },
+                        {
+                            "for": {
+                                "in": "icons"
                             }
                         }
                     ]
