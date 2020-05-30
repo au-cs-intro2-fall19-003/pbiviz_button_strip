@@ -6,9 +6,9 @@ import ISelectionManager = powerbi.extensibility.ISelectionManager;
 
 import { VisualSettings } from "./settings";
 import * as enums from "./enums"
-import {calculateWordDimensions} from './functions'
-import {Frame} from './frame'
-import {dataPoint} from './interfaces'
+import { calculateWordDimensions } from './functions'
+import { Frame } from './frame'
+import { dataPoint } from './interfaces'
 
 export class Title {
     i: number
@@ -17,27 +17,30 @@ export class Title {
     options: VisualUpdateOptions
     frameData: Frame
     static maxTextHeight: number;
-    static selectionId: powerbi.visuals.ISelectionId;
+    static selectionIdKey: string;
     constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, options: VisualUpdateOptions, frameData: Frame) {
         this.i = i
         this.dataPoints = dataPoints
         this.settings = settings
         this.options = options
         this.frameData = frameData
-        if(i == 0){
-            Title.selectionId = selectionManager.hasSelection() ? selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId : null
+        if (i == 0) {
+            if (selectionManager.hasSelection())
+                Title.selectionIdKey = (selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() || Title.selectionIdKey
+            else
+            Title.selectionIdKey = null
 
-            if (this.settings.icon.icons){
+            if (this.settings.icon.icons) {
                 Title.maxTextHeight = Math.max.apply(Math, this.dataPoints.map((dp, i) => { //Todo fix -2 bug
-                    return calculateWordDimensions(dp.value as string, this.settings.text.fontFamily, this.settings.text.fontSize + "pt", (this.frameData.widthForText-2)+'px').height; 
+                    return calculateWordDimensions(dp.value as string, this.settings.text.fontFamily, this.settings.text.fontSize + "pt", (this.frameData.widthForText - 2) + 'px').height;
                 }))
             }
         }
 
-        
+
     }
-    get isSelected(): boolean{
-        return Title.selectionId && Title.selectionId.getKey() == this.dataPoints[this.i].selectionId.getKey() 
+    get isSelected(): boolean {
+        return Title.selectionIdKey && Title.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
     }
     get text(): string {
         return this.dataPoints[this.i].value as string
@@ -67,10 +70,10 @@ export class Title {
         return Title.maxTextHeight + this.settings.text.vmargin
     }
     get iconWidth(): number {
-        return this.frameData.width - 2*this.settings.icon.hmargin
+        return this.frameData.width - 2 * this.settings.icon.hmargin
     }
     get maxInlineTextWidth(): number {
-        return Math.floor(this.frameData.width - this.settings.icon.width - this.settings.icon.padding - 2*this.settings.text.hmargin)
+        return Math.floor(this.frameData.width - this.settings.icon.width - this.settings.icon.padding - 2 * this.settings.text.hmargin)
     }
     get content(): HTMLDivElement {
         let titleContainer = document.createElement('div')
@@ -89,7 +92,7 @@ export class Title {
         if (this.settings.icon.icons) {
             let img = document.createElement('div')
             img.className = 'icon'
-            img.style.backgroundImage = "url("+(this.dataPoints[this.i].iconValue || "https://via.placeholder.com/150") +")"
+            img.style.backgroundImage = "url(" + (this.dataPoints[this.i].iconValue || "https://via.placeholder.com/150") + ")"
             img.style.backgroundRepeat = 'no-repeat'
             img.style.backgroundSize = 'contain'
 
@@ -119,7 +122,7 @@ export class Title {
 
                     img.style.width = this.iconWidth + 'px'
                     img.style.marginLeft = this.settings.icon.hmargin + 'px'
-                    img.style.marginRight = this.settings.icon.hmargin + 'px' 
+                    img.style.marginRight = this.settings.icon.hmargin + 'px'
                     img.style.height = (this.frameData.height - this.textContainerHeight - this.settings.icon.padding) + 'px'
 
                     textContainer.style.width = this.width + 'px'

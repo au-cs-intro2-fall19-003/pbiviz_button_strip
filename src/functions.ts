@@ -1,3 +1,5 @@
+import {  propertyStates } from './interfaces'
+
 export function calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): { width: number, height: number } {
     var div = document.createElement('div');
     div.style.fontFamily = fontFamily
@@ -13,4 +15,20 @@ export function calculateWordDimensions(text: string, fontFamily: string, fontSi
     }
     div.parentNode.removeChild(div);
         return dimensions;
+}
+
+export function getGroupedKeyNames(propKeys: string[]): propertyStates[]{
+    let groupedKeyNames: propertyStates[] = []
+
+    for(let i = 0; i < propKeys.length; i++){
+        if (propKeys[i].endsWith('A')){
+            groupedKeyNames.push({
+                all: propKeys[i],
+                selected: propKeys[i].replace(/.$/,"S"),
+                unselected: propKeys[i].replace(/.$/,"U")
+            })
+        }
+    }
+
+    return groupedKeyNames
 }

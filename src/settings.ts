@@ -33,7 +33,12 @@ import * as enums from "./enums"
 
 
 export class ButtonSettings {
-  public color: string = "#fff";
+  public state : enums.State = enums.State.all;
+  
+  public colorA: string = "";
+  public colorS: string = "";
+  public colorU: string = "";
+
   public stroke: string = "#000";
   public strokeWidth: number = 2;
   public transparency: number = 0;

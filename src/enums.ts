@@ -21,3 +21,9 @@ export enum Icon_Placement {
     above = "above",
     below = "below"
 }
+
+export enum State {
+    all = "all",
+    selected = "selected",
+    unselected = "unselected"
+}

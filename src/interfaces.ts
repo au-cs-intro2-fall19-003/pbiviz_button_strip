@@ -1,6 +1,22 @@
 import powerbi from "powerbi-visuals-api";
-export interface dataPoint{
+import * as enums from "./enums"
+
+export interface dataPoint {
     value: powerbi.PrimitiveValue,
     iconValue?: powerbi.PrimitiveValue,
     selectionId: powerbi.visuals.ISelectionId
+}
+
+export interface propertyStates {
+    all: string | number,
+    selected: string | number,
+    unselected: string | number,
+}
+
+export interface propertyStatesInput extends propertyStates {
+    state: enums.State
+}
+
+export interface propertyStatesOutput extends propertyStates {
+    didChange: boolean
 }

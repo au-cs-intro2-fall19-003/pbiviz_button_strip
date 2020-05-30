@@ -41,9 +41,51 @@
         "button": {
             "displayName": "Buttons",
             "properties": {
-                "color": {
+                "state": {
+                    "displayName": "State",
+                    "description": "What state to apply the styles to",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "All",
+                                "value": "all"
+                            },
+                            {
+                                "displayName": "Selected",
+                                "value": "selected"
+                            },
+                            {
+                                "displayName": "Unselected",
+                                "value": "unselected"
+                            }
+                        ]
+                    }
+                },
+                "colorA": {
                     "displayName": "Background color",
                     "description": "Background color for the buttons.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "colorS": {
+                    "displayName": "Background color (selected)",
+                    "description": "Background color for the selected button.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "colorU": {
+                    "displayName": "Background color (unselected)",
+                    "description": "Background color for the unselected buttons.",
                     "type": {
                         "fill": {
                             "solid": {
@@ -268,7 +310,7 @@
                     "description": "Padding between icon and text",
                     "type": {
                         "numeric": true
-                    }
+                    }  
                 }
             }
         }

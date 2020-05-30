@@ -18,7 +18,7 @@ export class Frame {
     dataPoints: dataPoint[]
     widthSoFar: number;
     static widthSoFar: number = 0
-    static selectionId: powerbi.visuals.ISelectionId;    
+    static selectionIdKey: string;    
     constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, options: VisualUpdateOptions) {
         this.settings = settings
         this.dataPoints = dataPoints
@@ -27,7 +27,10 @@ export class Frame {
         this.options = options
         if (this.indexInRow == 0){
             Frame.widthSoFar = 0
-            Frame.selectionId = selectionManager.hasSelection() ? selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId : null
+            if(selectionManager.hasSelection())
+                Frame.selectionIdKey = (selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() || Frame.selectionIdKey
+            else 
+                Frame.selectionIdKey = null
         }
             
         this.widthSoFar = Frame.widthSoFar
@@ -44,7 +47,7 @@ export class Frame {
         }
     }
     get isSelected(): boolean{
-        return Frame.selectionId && Frame.selectionId.getKey() == this.dataPoints[this.i].selectionId.getKey() 
+        return Frame.selectionIdKey == this.dataPoints[this.i].selectionId.getKey() 
     }
     get rowNumber(): number {
         return Math.floor(this.i / this.rowLength)
@@ -68,7 +71,10 @@ export class Frame {
         return this.dataPoints[this.i].value as string
     }
     get fill(): string {
-        return this.isSelected ? '#eeeded' : this.settings.button.color
+        if (this.isSelected)
+            return this.settings.button.colorS || this.settings.button.colorA
+        return this.settings.button.colorU || this.settings.button.colorA
+        
     }
     get fill_opacity(): number {
         return 1 - this.settings.button.transparency / 100
