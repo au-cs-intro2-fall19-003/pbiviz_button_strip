@@ -43,6 +43,9 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import * as d3 from "d3";
 import {Frame} from './frame'
 import {Title} from './title'
+
+import {dataPoint} from './interfaces'
+
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
 import * as enums from "./enums"
@@ -56,15 +59,16 @@ export class Visual implements IVisual {
     private visualSettings: VisualSettings;
     private selectionIdBuilder: ISelectionIdBuilder;
 
-    private pages: string[];
-    private icons: string[];
+    private dataPoints: dataPoint[];
     private svg: Selection<SVGElement>;
     private container: Selection<SVGElement>;
 
+
+
     constructor(options: VisualConstructorOptions) {
         this.selectionIdBuilder = options.host.createSelectionIdBuilder();
-        
-
+        this.selectionManager = options.host.createSelectionManager();
+        this.host = options.host;
         this.svg = d3.select(options.element)
             .append('svg')
             .classed('navigator', true);
@@ -89,10 +93,10 @@ export class Visual implements IVisual {
             delete settings.icon.padding
         }
 
-        if(settings.icon.placement != enums.Icon_Placement.left){
-            delete settings.icon.width
-        } else {
+        if(settings.icon.placement == enums.Icon_Placement.left){
             delete settings.icon.hmargin
+        } else {
+            delete settings.icon.width
         }
 
 
@@ -100,18 +104,31 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
+        this.dataPoints = []
+        const dataView = options.dataViews[0]
+        const categories = dataView.categorical.categories;
 
+        for (let categoryIndex = 0; categoryIndex < categories[0].values.length; categoryIndex++) { 
+            const pageValue: powerbi.PrimitiveValue = categories[0].values[categoryIndex];
+            const iconValue: powerbi.PrimitiveValue = categories[1].values[categoryIndex];
+            const categorySelectionId = this.host.createSelectionIdBuilder()
+                .withCategory(categories[0], categoryIndex) // we have only one category (`Page Name`)
+                .createSelectionId();
+            this.dataPoints.push({
+                value: pageValue,
+                iconValue: iconValue,
+                selectionId: categorySelectionId
+            }); 
+        }
         this.visualSettings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
-        this.pages = <string[]>options.dataViews[0].categorical.categories[0].values;
-        this.icons = <string[]>options.dataViews[0].categorical.categories[1].values;
-
-        let frameData: Frame[] = [];
-        for (let i = 0; i < this.pages.length; i++)
-            frameData.push(new Frame(i, this.pages, this.visualSettings, options))
         
+        let frameData: Frame[] = [];
         let titleData: Title[] = []
-        for (let i = 0; i < this.pages.length; i++)
-            titleData.push(new Title(i, this.pages, this.visualSettings, options, frameData, this.icons[i]))
+        for (let i = 0; i < this.dataPoints.length; i++){   
+            frameData.push(new Frame(i, this.dataPoints, this.visualSettings, this.selectionManager, options))
+            titleData.push(new Title(i, this.dataPoints, this.visualSettings, this.selectionManager, options, frameData[i]))
+        }
+
 
         this.svg
             .style('width', options.viewport.width)
@@ -133,7 +150,10 @@ export class Visual implements IVisual {
             .attr("width", function (d) { return d.width })
             .attr("x", function (d) { return d.x_pos })
             .attr("y", function (d) { return d.y_pos })
-            .on('click', function(d, i){ console.log("hey"); Frame.selectedIndex = i })
+            .on('click', (d, i)=>{ 
+                this.selectionManager.select(this.dataPoints[i].selectionId)
+                // console.log(d)
+             })
 
         let titleFOs = this.container.selectAll('foreignObject').data(titleData)
         titleFOs.exit().remove()
@@ -168,10 +188,13 @@ export class Visual implements IVisual {
             .style("color", function (d) { return d.fill })
             .html("")
             .append(function (d) { return d.content })
-            .on('click', function(d, i){ console.log("hey"); Frame.selectedIndex = i })
+            .on('click', (d, i)=>{ 
+                this.selectionManager.select(this.dataPoints[i].selectionId)
+                this.update(options)
+             })
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {
         return <VisualSettings>VisualSettings.parse(dataView);
     }
-}
+}   

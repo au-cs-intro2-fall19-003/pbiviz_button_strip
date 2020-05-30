@@ -2,10 +2,12 @@ import "core-js/stable";
 import "./../style/visual.less";
 import powerbi from "powerbi-visuals-api";
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
+import ISelectionManager = powerbi.extensibility.ISelectionManager;
 
 import { VisualSettings } from "./settings";
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
+import {dataPoint} from './interfaces'
 
 export class Frame {
     textWidth: number
@@ -13,18 +15,21 @@ export class Frame {
     i: number
     n: number
     options: VisualUpdateOptions
-    data: string[]
-    static widthSoFar: number = 0
-    static selectedIndex: number = 0;
+    dataPoints: dataPoint[]
     widthSoFar: number;
-    constructor(i: number, data: string[], settings: VisualSettings, options: VisualUpdateOptions) {
+    static widthSoFar: number = 0
+    static selectionId: powerbi.visuals.ISelectionId;    
+    constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, options: VisualUpdateOptions) {
         this.settings = settings
-        this.data = data
-        this.n = this.data.length
+        this.dataPoints = dataPoints
+        this.n = this.dataPoints.length
         this.i = i
         this.options = options
-        if (this.indexInRow == 0)
+        if (this.indexInRow == 0){
             Frame.widthSoFar = 0
+            Frame.selectionId = selectionManager.hasSelection() ? selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId : null
+        }
+            
         this.widthSoFar = Frame.widthSoFar
         Frame.widthSoFar += this.width
     }
@@ -39,7 +44,7 @@ export class Frame {
         }
     }
     get isSelected(): boolean{
-        return Frame.selectedIndex == this.i
+        return Frame.selectionId && Frame.selectionId.getKey() == this.dataPoints[this.i].selectionId.getKey() 
     }
     get rowNumber(): number {
         return Math.floor(this.i / this.rowLength)
@@ -56,11 +61,11 @@ export class Frame {
     get rowStartingIndex(): number {
         return this.rowNumber * this.rowLength
     }
-    get rowData(): string[] {
-        return this.data.slice(this.rowStartingIndex, this.rowStartingIndex + this.framesInRow)
+    get rowText(): string[] {
+        return this.dataPoints.slice(this.rowStartingIndex, this.rowStartingIndex + this.framesInRow).map(function(dp){return dp.value}) as string[]
     }
     get text(): string {
-        return this.data[this.i]
+        return this.dataPoints[this.i].value as string
     }
     get fill(): string {
         return this.isSelected ? '#eeeded' : this.settings.button.color
@@ -102,7 +107,7 @@ export class Frame {
             case enums.Button_Sizing_Method.fixed:
                 return this.settings.button.buttonWidth
             case enums.Button_Sizing_Method.dynamic:
-                let totalTextWidth = calculateWordDimensions(this.rowData.join(""), this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
+                let totalTextWidth = calculateWordDimensions(this.rowText.join(""), this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
                 let textWidth = calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
                 let buttonWidthScaleFactor = this.viewportWidthForAllText / totalTextWidth
                 let width = textWidth * buttonWidthScaleFactor + 2 * this.settings.text.hmargin
