@@ -94,7 +94,7 @@
                         }
                     }
                 },
-                "stroke": {
+                "strokeA": {
                     "displayName": "Border color",
                     "description": "Border color for the buttons.",
                     "type": {
@@ -105,6 +105,29 @@
                         }
                     }
                 },
+                "strokeS": {
+                    "displayName": "Border color (selected)",
+                    "description": "Border color for the buttons.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "strokeU": {
+                    "displayName": "Border color (unselected)",
+                    "description": "Border color for the buttons.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+
                 "strokeWidth": {
                     "displayName": "Stroke width",
                     "description": "The width of the stroke in pixels",

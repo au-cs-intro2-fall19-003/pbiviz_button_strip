@@ -38,8 +38,13 @@ export class ButtonSettings {
   public colorA: string = "";
   public colorS: string = "";
   public colorU: string = "";
+  public colorDefault: string = "#fff"
 
-  public stroke: string = "#000";
+  public strokeA: string = "";
+  public strokeS: string = "";
+  public strokeU: string = "";
+  public strokeDefault: string = "#000"
+
   public strokeWidth: number = 2;
   public transparency: number = 0;
   public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;

@@ -48,7 +48,7 @@ import { Frame } from './frame'
 import { Title } from './title'
 
 import { dataPoint, propertyStates, propertyStatesInput, propertyStatesOutput } from './interfaces'
-import { getGroupedKeyNames } from './functions'
+import { getGroupedKeyNames, levelProperties } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 const propertiesOf = <TObj>(_obj: (TObj | undefined) = undefined) => <T extends keyof TObj>(name: T): T => name;
@@ -86,20 +86,29 @@ export class Visual implements IVisual {
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
         console.log("enumerating")
-        switch (settings.button.state) {
-            case enums.State.all:
-                delete settings.button.colorS
-                delete settings.button.colorU
-                break
-            case enums.State.selected:
-                delete settings.button.colorA
-                delete settings.button.colorU
-                break
-            case enums.State.unselected:
-                delete settings.button.colorA
-                delete settings.button.colorS
-                break
-        }
+
+        let settingsKeys = Object.keys(settings)
+        for (let i = 0; i < settingsKeys.length; i++) {
+            let settingKey: string = settingsKeys[i]
+            let groupedKeyNamesArr: propertyStates[] = getGroupedKeyNames(Object.keys(settings[settingKey]))
+            for(let j=0; j<groupedKeyNamesArr.length; j++){
+                let groupedKeyNames: propertyStates = groupedKeyNamesArr[j]
+                switch (settings[settingKey].state) {
+                    case enums.State.all:
+                        delete settings[settingKey][groupedKeyNames.selected]
+                        delete settings[settingKey][groupedKeyNames.unselected]
+                        break
+                    case enums.State.selected:
+                        delete settings[settingKey][groupedKeyNames.all]
+                        delete settings[settingKey][groupedKeyNames.unselected]
+                        break
+                    case enums.State.unselected:
+                        delete settings[settingKey][groupedKeyNames.all]
+                        delete settings[settingKey][groupedKeyNames.selected]
+                        break
+                }
+            }
+        }    
 
 
         if (settings.button.sizingMethod != enums.Button_Sizing_Method.fixed) {
@@ -126,43 +135,14 @@ export class Visual implements IVisual {
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
-    public levelProperties(propertyStates: propertyStatesInput): propertyStatesOutput {
-        let _all = propertyStates.all
-        let _selected = propertyStates.selected
-        let _unselected = propertyStates.unselected
-        if (!_all && !_selected && !_unselected)
-            _all = '#fff'
-
-        if (propertyStates.state == enums.State.all && _all)
-            _selected = _unselected = _all
-
-        if (!_selected != !_unselected) { //xor
-            if (_selected)
-                _unselected = _all
-            else
-                _selected = _all
-            _all = ""
-        }
-
-        if (propertyStates.state != enums.State.all && _selected != _unselected)
-            _all = ""
-
-        return {
-            all: _all,
-            selected: _selected,
-            unselected: _unselected,
-            didChange: !(propertyStates.all == _all && propertyStates.selected == _selected && propertyStates.unselected == _unselected)
-        }
-    }
-
-
     public update(options: VisualUpdateOptions) {
         if (!(options && options.dataViews && options.dataViews[0]))
             return
 
 
         this.visualSettings = this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
-
+        // console.log("updating from...", this.visualSettings.button.strokeA, this.visualSettings.button.strokeS, this.visualSettings.button.strokeU)
+        console.log("updating from...", this.visualSettings.button.colorA, this.visualSettings.button.colorS, this.visualSettings.button.colorU)
         let objects: powerbi.VisualObjectInstancesToPersist = {
             merge: []
         }
@@ -171,8 +151,6 @@ export class Visual implements IVisual {
         for (let i = 0; i < objKeys.length; i++) {
             let objKey: string = objKeys[i]
             let propKeys: string[] = Object.keys(this.visualSettings[objKey])
-            console.log("getting prop keys")
-            console.log(propKeys)
             let groupedKeyNamesArr: propertyStates[] = getGroupedKeyNames(propKeys)
 
             let object: powerbi.VisualObjectInstance = {
@@ -188,9 +166,11 @@ export class Visual implements IVisual {
                     all: this.visualSettings[objKey][groupedKeyNames.all],
                     selected: this.visualSettings[objKey][groupedKeyNames.selected],
                     unselected: this.visualSettings[objKey][groupedKeyNames.unselected],
+                    defaultValue: this.visualSettings[objKey][groupedKeyNames.defaultValue],
                     state: this.visualSettings[objKey].state
                 }
-                let leveledPropertyState = this.levelProperties(propertyState)
+                console.log(propertyState)
+                let leveledPropertyState = levelProperties(propertyState)
 
                 if (leveledPropertyState.didChange) {
                     object.properties[groupedKeyNames.all] = leveledPropertyState.all
@@ -201,6 +181,7 @@ export class Visual implements IVisual {
             if (Object.keys(object.properties).length != 0)
                 objects.merge.push(object)
         }
+        console.log(objects)
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
 
@@ -287,12 +268,13 @@ export class Visual implements IVisual {
             .style("font-family", function (d) { return d.font_family })
             .style("text-align", function (d) { return d.align })
             .style("color", function (d) { return d.fill })
-            .html("")
-            .append(function (d) { return d.content })
             .on('click', (d, i) => {
+                console.log("you selected", i)
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 this.update(options)
             })
+            .html("")
+            .append(function (d) { return d.content })
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {

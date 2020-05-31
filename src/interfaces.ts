@@ -11,6 +11,7 @@ export interface propertyStates {
     all: string | number,
     selected: string | number,
     unselected: string | number,
+    defaultValue?: string | number
 }
 
 export interface propertyStatesInput extends propertyStates {

@@ -80,7 +80,9 @@ export class Frame {
         return 1 - this.settings.button.transparency / 100
     }
     get stroke(): string {
-        return this.settings.button.stroke
+        if (this.isSelected)
+            return this.settings.button.strokeS || this.settings.button.strokeA
+        return this.settings.button.strokeU || this.settings.button.strokeA
     }
     get strokeWidth(): number{
         return this.settings.button.strokeWidth
