@@ -50,13 +50,14 @@ export class ButtonSettings {
   public strokeWidthU: number = null;
   public strokeWidthDefault: number = 2;
 
+  public transparencyA: number = null;
+  public transparencyS: number = null;
+  public transparencyU: number = null;
+  public transparencyDefault: number = 0;
 
-  public transparency: number = 0;
-  public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
   public buttonWidth: number = 150;
   public buttonHeight: number = 75;
   public buttonAlignment: enums.Align = enums.Align.left;
-  public layout: enums.Button_Layout = enums.Button_Layout.horizontal;
   public rowLength: number = 2;
   public padding: number = 10;
 }
@@ -88,10 +89,16 @@ export class IconSettings{
   public padding: number = 10;
 }
 
+export class LayoutSettings{
+  public buttonLayout: enums.Button_Layout = enums.Button_Layout.horizontal;
+  public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
+}
+
 export class VisualSettings extends DataViewObjectsParser {
   public button: ButtonSettings = new ButtonSettings();
   public text: TextSettings = new TextSettings();
   public icon: IconSettings = new IconSettings();
+  public layout: LayoutSettings = new LayoutSettings();
 }
 
 

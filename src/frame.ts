@@ -37,7 +37,7 @@ export class Frame {
         Frame.widthSoFar += this.width
     }
     get rowLength(): number {
-        switch (this.settings.button.layout) {
+        switch (this.settings.layout.buttonLayout) {
             case (enums.Button_Layout.horizontal):
                 return this.n
             case (enums.Button_Layout.vertical):
@@ -74,7 +74,8 @@ export class Frame {
         return this.isSelected ? this.settings.button.colorS :  this.settings.button.colorU
     }
     get fill_opacity(): number {
-        return 1 - this.settings.button.transparency / 100
+        return 1 - (this.isSelected ? this.settings.button.transparencyS : this.settings.button.transparencyU) / 100
+        // return 1 - this.settings.button.transparency/100
     }
     get stroke(): string {
         return this.isSelected ? this.settings.button.strokeS :  this.settings.button.strokeU
@@ -95,7 +96,7 @@ export class Frame {
         return this.width - 2*this.settings.text.hmargin
     }
     get height(): number {
-        switch (this.settings.button.sizingMethod) {
+        switch (this.settings.layout.sizingMethod) {
             case (enums.Button_Sizing_Method.fixed):
                 return this.settings.button.buttonHeight
             default:
@@ -104,7 +105,7 @@ export class Frame {
 
     }
     get width(): number {
-        switch (this.settings.button.sizingMethod) {
+        switch (this.settings.layout.sizingMethod) {
             case enums.Button_Sizing_Method.uniform:
                 return (this.options.viewport.width - this.padding * (this.rowLength - 1)) / (this.rowLength)
             case enums.Button_Sizing_Method.fixed:
@@ -121,7 +122,7 @@ export class Frame {
         return this.rowNumber * (this.height + this.padding)
     }
     get x_pos(): number {
-        switch (this.settings.button.sizingMethod) {
+        switch (this.settings.layout.sizingMethod) {
             case enums.Button_Sizing_Method.fixed:
                 let areaTaken = this.framesInRow * this.width + (this.framesInRow - 1) * this.padding
                 let areaRemaining = this.options.viewport.width - areaTaken

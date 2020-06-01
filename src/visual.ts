@@ -37,6 +37,7 @@ import ISelectionIdBuilder = powerbi.extensibility.ISelectionIdBuilder;
 import DataView = powerbi.DataView;
 import VisualObjectInstancesToPersist = powerbi.VisualObjectInstancesToPersist
 import VisualObjectInstance = powerbi.VisualObjectInstance
+import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject
 
 
 import { VisualSettings } from "./settings";
@@ -47,7 +48,7 @@ import * as d3 from "d3";
 import { Frame } from './frame'
 import { Title } from './title'
 
-import { dataPoint, propertyStates, propertyStatesInput, propertyStatesOutput } from './interfaces'
+import { dataPoint, propertyStateName, propertyStateValue, propertyStatesInput, propertyStatesOutput } from './interfaces'
 import { getGroupedKeyNames, levelProperties } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
@@ -90,9 +91,9 @@ export class Visual implements IVisual {
         let settingsKeys = Object.keys(settings)
         for (let i = 0; i < settingsKeys.length; i++) {
             let settingKey: string = settingsKeys[i]
-            let groupedKeyNamesArr: propertyStates[] = getGroupedKeyNames(Object.keys(settings[settingKey]))
-            for(let j=0; j<groupedKeyNamesArr.length; j++){
-                let groupedKeyNames: propertyStates = groupedKeyNamesArr[j]
+            let groupedKeyNamesArr: propertyStateName[] = getGroupedKeyNames(Object.keys(settings[settingKey]))
+            for (let j = 0; j < groupedKeyNamesArr.length; j++) {
+                let groupedKeyNames: propertyStateName = groupedKeyNamesArr[j]
                 switch (settings[settingKey].state) {
                     case enums.State.all:
                         delete settings[settingKey][groupedKeyNames.selected]
@@ -108,15 +109,15 @@ export class Visual implements IVisual {
                         break
                 }
             }
-        }    
+        }
 
 
-        if (settings.button.sizingMethod != enums.Button_Sizing_Method.fixed) {
+        if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
             delete settings.button.buttonWidth;
             delete settings.button.buttonHeight;
             delete settings.button.buttonAlignment;
         }
-        if (settings.button.layout != enums.Button_Layout.grid) {
+        if (settings.layout.buttonLayout != enums.Button_Layout.grid) {
             delete settings.button.rowLength
         }
         if (!settings.icon.icons) {
@@ -130,8 +131,6 @@ export class Visual implements IVisual {
         } else {
             delete settings.icon.width
         }
-
-
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
@@ -140,9 +139,10 @@ export class Visual implements IVisual {
             return
 
 
-        this.visualSettings = this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
+        this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
         // console.log("updating from...", this.visualSettings.button.strokeA, this.visualSettings.button.strokeS, this.visualSettings.button.strokeU)
-        console.log("updating from...", this.visualSettings.button.strokeWidthA, this.visualSettings.button.strokeWidthS, this.visualSettings.button.strokeWidthU)
+        console.log(this.visualSettings)
+
         let objects: powerbi.VisualObjectInstancesToPersist = {
             merge: []
         }
@@ -151,7 +151,7 @@ export class Visual implements IVisual {
         for (let i = 0; i < objKeys.length; i++) {
             let objKey: string = objKeys[i]
             let propKeys: string[] = Object.keys(this.visualSettings[objKey])
-            let groupedKeyNamesArr: propertyStates[] = getGroupedKeyNames(propKeys)
+            let groupedKeyNamesArr: propertyStateName[] = getGroupedKeyNames(propKeys)
 
             let object: powerbi.VisualObjectInstance = {
                 objectName: objKey,
@@ -161,8 +161,8 @@ export class Visual implements IVisual {
             }
 
             for (let j = 0; j < groupedKeyNamesArr.length; j++) {
-                let groupedKeyNames: propertyStates = groupedKeyNamesArr[j]
-                let type  = typeof this.visualSettings[objKey][groupedKeyNames.all]
+                let groupedKeyNames: propertyStateName = groupedKeyNamesArr[j]
+                let type = typeof this.visualSettings[objKey][groupedKeyNames.all]
                 let propertyState: propertyStatesInput = {
                     all: this.visualSettings[objKey][groupedKeyNames.all],
                     selected: this.visualSettings[objKey][groupedKeyNames.selected],
@@ -170,7 +170,6 @@ export class Visual implements IVisual {
                     defaultValue: this.visualSettings[objKey][groupedKeyNames.defaultValue],
                     state: this.visualSettings[objKey].state
                 }
-                console.log(propertyState)
                 let leveledPropertyState = levelProperties(propertyState)
 
                 if (leveledPropertyState.didChange) {
@@ -182,7 +181,6 @@ export class Visual implements IVisual {
             if (Object.keys(object.properties).length != 0)
                 objects.merge.push(object)
         }
-        console.log(objects)
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
 
@@ -270,7 +268,6 @@ export class Visual implements IVisual {
             .style("text-align", function (d) { return d.align })
             .style("color", function (d) { return d.fill })
             .on('click', (d, i) => {
-                console.log("you selected", i)
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 this.update(options)
             })

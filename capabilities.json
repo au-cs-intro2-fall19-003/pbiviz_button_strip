@@ -148,31 +148,25 @@
                         "numeric": true
                     }
                 },
-                "transparency": {
+                "transparencyA": {
                     "displayName": "Transparency",
                     "description": "The transparency of the button.",
                     "type": {
                         "numeric": true
                     }
                 },
-                "sizingMethod": {
-                    "displayName": "Sizing method",
-                    "description": "How buttons will be sized based on their text.",
+                "transparencyS": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the button.",
                     "type": {
-                        "enumeration": [
-                            {
-                                "displayName": "Uniform",
-                                "value": "uniform"
-                            },
-                            {
-                                "displayName": "Fixed",
-                                "value": "fixed"
-                            },
-                            {
-                                "displayName": "Dynamic",
-                                "value": "dynamic"
-                            }
-                        ]
+                        "numeric": true
+                    }
+                },
+                "transparencyU": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the button.",
+                    "type": {
+                        "numeric": true
                     }
                 },
                 "buttonWidth": {
@@ -196,26 +190,6 @@
                         "formatting": {
                             "alignment": true
                         }
-                    }
-                },
-                "layout": {
-                    "displayName": "Layout",
-                    "description": "How buttons will be laid out.",
-                    "type": {
-                        "enumeration": [
-                            {
-                                "displayName": "Horizontal",
-                                "value": "horizontal"
-                            },
-                            {
-                                "displayName": "Vertical",
-                                "value": "vertical"
-                            },
-                            {
-                                "displayName": "Grid",
-                                "value": "grid"
-                            }
-                        ]
                     }
                 },
                 "rowLength": {
@@ -389,6 +363,51 @@
                     "type": {
                         "numeric": true
                     }  
+                }
+            }
+        },
+        "layout": {
+            "displayName": "Layout",
+            "properties": {
+                "sizingMethod": {
+                    "displayName": "Sizing method",
+                    "description": "How buttons will be sized based on their text.",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Uniform",
+                                "value": "uniform"
+                            },
+                            {
+                                "displayName": "Fixed",
+                                "value": "fixed"
+                            },
+                            {
+                                "displayName": "Dynamic",
+                                "value": "dynamic"
+                            }
+                        ]
+                    }
+                },
+                "buttonLayout": {
+                    "displayName": "Layout",
+                    "description": "How buttons will be laid out.",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Horizontal",
+                                "value": "horizontal"
+                            },
+                            {
+                                "displayName": "Vertical",
+                                "value": "vertical"
+                            },
+                            {
+                                "displayName": "Grid",
+                                "value": "grid"
+                            }
+                        ]
+                    }
                 }
             }
         }

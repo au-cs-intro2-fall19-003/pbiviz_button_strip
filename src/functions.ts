@@ -1,4 +1,4 @@
-import { propertyStates, propertyStatesInput, propertyStatesOutput } from './interfaces'
+import { propertyStateName, propertyStatesInput, propertyStatesOutput } from './interfaces'
 import * as enums from "./enums"
 
 
@@ -19,8 +19,8 @@ export function calculateWordDimensions(text: string, fontFamily: string, fontSi
     return dimensions;
 }
 
-export function getGroupedKeyNames(propKeys: string[]): propertyStates[] {
-    let groupedKeyNames: propertyStates[] = []
+export function getGroupedKeyNames(propKeys: string[]): propertyStateName[] {
+    let groupedKeyNames: propertyStateName[] = []
 
     for (let i = 0; i < propKeys.length; i++) {
         if (propKeys[i].endsWith('A')) {
@@ -28,11 +28,11 @@ export function getGroupedKeyNames(propKeys: string[]): propertyStates[] {
                 all: propKeys[i],
                 selected: propKeys[i].replace(/.$/, "S"),
                 unselected: propKeys[i].replace(/.$/, "U"),
-                defaultValue: propKeys[i].replace(/.$/, "Default")
+                defaultValue: propKeys[i].replace(/.$/, "Default"),
             })
         }
     }
-
+    // console.log(groupedKeyNames)
     return groupedKeyNames
 }
 
