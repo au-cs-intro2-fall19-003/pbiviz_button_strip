@@ -46,7 +46,9 @@ export class Title {
         return this.dataPoints[this.i].value as string
     }
     get fill(): string {
-        return this.settings.text.color
+        if (this.isSelected)
+            return this.settings.text.colorS || this.settings.text.colorA
+        return this.settings.text.colorU || this.settings.text.colorA
     }
     get fill_opacity(): number {
         return 1 - this.settings.text.transparency / 100

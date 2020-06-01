@@ -71,21 +71,16 @@ export class Frame {
         return this.dataPoints[this.i].value as string
     }
     get fill(): string {
-        if (this.isSelected)
-            return this.settings.button.colorS || this.settings.button.colorA
-        return this.settings.button.colorU || this.settings.button.colorA
-        
+        return this.isSelected ? this.settings.button.colorS :  this.settings.button.colorU
     }
     get fill_opacity(): number {
         return 1 - this.settings.button.transparency / 100
     }
     get stroke(): string {
-        if (this.isSelected)
-            return this.settings.button.strokeS || this.settings.button.strokeA
-        return this.settings.button.strokeU || this.settings.button.strokeA
+        return this.isSelected ? this.settings.button.strokeS :  this.settings.button.strokeU
     }
     get strokeWidth(): number{
-        return this.settings.button.strokeWidth
+        return this.isSelected ? this.settings.button.strokeWidthS :  this.settings.button.strokeWidthU
     }
     get padding(): number {
         let padding = Math.max(0, this.settings.button.padding)

@@ -142,7 +142,7 @@ export class Visual implements IVisual {
 
         this.visualSettings = this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
         // console.log("updating from...", this.visualSettings.button.strokeA, this.visualSettings.button.strokeS, this.visualSettings.button.strokeU)
-        console.log("updating from...", this.visualSettings.button.colorA, this.visualSettings.button.colorS, this.visualSettings.button.colorU)
+        console.log("updating from...", this.visualSettings.button.strokeWidthA, this.visualSettings.button.strokeWidthS, this.visualSettings.button.strokeWidthU)
         let objects: powerbi.VisualObjectInstancesToPersist = {
             merge: []
         }
@@ -162,6 +162,7 @@ export class Visual implements IVisual {
 
             for (let j = 0; j < groupedKeyNamesArr.length; j++) {
                 let groupedKeyNames: propertyStates = groupedKeyNamesArr[j]
+                let type  = typeof this.visualSettings[objKey][groupedKeyNames.all]
                 let propertyState: propertyStatesInput = {
                     all: this.visualSettings[objKey][groupedKeyNames.all],
                     selected: this.visualSettings[objKey][groupedKeyNames.selected],

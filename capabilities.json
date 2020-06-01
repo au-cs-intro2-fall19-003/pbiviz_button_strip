@@ -127,8 +127,21 @@
                         }
                     }
                 },
-
-                "strokeWidth": {
+                "strokeWidthA": {
+                    "displayName": "Stroke width",
+                    "description": "The width of the stroke in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "strokeWidthS": {
+                    "displayName": "Stroke width",
+                    "description": "The width of the stroke in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "strokeWidthU": {
                     "displayName": "Stroke width",
                     "description": "The width of the stroke in pixels",
                     "type": {
@@ -224,7 +237,49 @@
         "text": {
             "displayName": "Text",
             "properties": {
-                "color": {
+                "state": {
+                    "displayName": "State",
+                    "description": "What state to apply the styles to",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "All",
+                                "value": "all"
+                            },
+                            {
+                                "displayName": "Selected",
+                                "value": "selected"
+                            },
+                            {
+                                "displayName": "Unselected",
+                                "value": "unselected"
+                            }
+                        ]
+                    }
+                },
+                "colorA": {
+                    "displayName": "Font color",
+                    "description": "Font color for the text.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "colorS": {
+                    "displayName": "Font color",
+                    "description": "Font color for the text.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "colorU": {
                     "displayName": "Font color",
                     "description": "Font color for the text.",
                     "type": {

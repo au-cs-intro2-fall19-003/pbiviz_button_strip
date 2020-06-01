@@ -45,7 +45,12 @@ export class ButtonSettings {
   public strokeU: string = "";
   public strokeDefault: string = "#000"
 
-  public strokeWidth: number = 2;
+  public strokeWidthA: number = null;
+  public strokeWidthS: number = null;
+  public strokeWidthU: number = null;
+  public strokeWidthDefault: number = 2;
+
+
   public transparency: number = 0;
   public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
   public buttonWidth: number = 150;
@@ -57,7 +62,15 @@ export class ButtonSettings {
 }
 
 export class TextSettings{
-  public color: string = "#000";
+  public state : enums.State = enums.State.all;
+
+  public colorA: string = "";
+  public colorS: string = "";
+  public colorU: string = "";
+  public colorDefault: string = "#000"
+
+
+
   public alignment: enums.Align = enums.Align.center;
   public hmargin: number = 0;
   public vmargin: number = 0;

@@ -1,4 +1,4 @@
-import {  propertyStates, propertyStatesInput, propertyStatesOutput } from './interfaces'
+import { propertyStates, propertyStatesInput, propertyStatesOutput } from './interfaces'
 import * as enums from "./enums"
 
 
@@ -16,19 +16,19 @@ export function calculateWordDimensions(text: string, fontFamily: string, fontSi
         height: div.offsetHeight
     }
     div.parentNode.removeChild(div);
-        return dimensions;
+    return dimensions;
 }
 
-export function getGroupedKeyNames(propKeys: string[]): propertyStates[]{
+export function getGroupedKeyNames(propKeys: string[]): propertyStates[] {
     let groupedKeyNames: propertyStates[] = []
 
-    for(let i = 0; i < propKeys.length; i++){
-        if (propKeys[i].endsWith('A')){
+    for (let i = 0; i < propKeys.length; i++) {
+        if (propKeys[i].endsWith('A')) {
             groupedKeyNames.push({
                 all: propKeys[i],
-                selected: propKeys[i].replace(/.$/,"S"),
-                unselected: propKeys[i].replace(/.$/,"U"),
-                defaultValue: propKeys[i].replace(/.$/,"Default")
+                selected: propKeys[i].replace(/.$/, "S"),
+                unselected: propKeys[i].replace(/.$/, "U"),
+                defaultValue: propKeys[i].replace(/.$/, "Default")
             })
         }
     }
@@ -40,22 +40,15 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
     let _all = propertyStates.all
     let _selected = propertyStates.selected
     let _unselected = propertyStates.unselected
-    if (!_all && !_selected && !_unselected)
+    let _allExists: boolean = typeof _all == 'number' ? _all >= 0 : _all && _all.length > 0
+    let _nullValue = typeof _all == 'number' ? null : ""
+
+    if (!_allExists && !_selected && !_unselected)
         _all = propertyStates.defaultValue
-
-    if (propertyStates.state == enums.State.all && _all)
+    if (propertyStates.state == enums.State.all && _allExists)
         _selected = _unselected = _all
-
-    if (!_selected != !_unselected) { //xor
-        if (_selected)
-            _unselected = _all
-        else
-            _selected = _all
-        _all = ""
-    }
-
     if (propertyStates.state != enums.State.all && _selected != _unselected)
-        _all = ""
+        _all = _nullValue
 
     return {
         all: _all,
