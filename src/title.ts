@@ -16,7 +16,7 @@ export class Title {
     settings: VisualSettings;
     options: VisualUpdateOptions
     frameData: Frame
-    static maxTextHeight: number;
+    static maxTextHeight: number ;
     static selectionIdKey: string;
     constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, options: VisualUpdateOptions, frameData: Frame) {
         this.i = i
@@ -25,19 +25,16 @@ export class Title {
         this.options = options
         this.frameData = frameData
         if (i == 0) {
+            Title.maxTextHeight = 0
+
             if (selectionManager.hasSelection())
                 Title.selectionIdKey = (selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() || Title.selectionIdKey
             else
-            Title.selectionIdKey = null
-
-            if (this.settings.icon.icons) {
-                Title.maxTextHeight = Math.max.apply(Math, this.dataPoints.map((dp, i) => { //Todo fix -2 bug
-                    return calculateWordDimensions(dp.value as string, this.settings.text.fontFamily, this.settings.text.fontSize + "pt", (this.frameData.widthForText - 2) + 'px').height;
-                }))
-            }
+                Title.selectionIdKey = null
         }
-
-
+        let thisTextHeight = calculateWordDimensions(dataPoints[i].value as string, this.font_family, this.font_size + "pt", (this.frameData.widthForText - 2) + 'px').height;
+        Title.maxTextHeight = Math.max(thisTextHeight, Title.maxTextHeight)
+        console.log(Title.maxTextHeight)
     }
     get isSelected(): boolean {
         return Title.selectionIdKey && Title.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
@@ -46,36 +43,37 @@ export class Title {
         return this.dataPoints[this.i].value as string
     }
     get fill(): string {
-        if (this.isSelected)
-            return this.settings.text.colorS || this.settings.text.colorA
-        return this.settings.text.colorU || this.settings.text.colorA
+        return this.isSelected ? this.settings.text.colorS : this.settings.text.colorU
     }
     get fill_opacity(): number {
-        return 1 - this.settings.text.transparency / 100
+        return 1 - (this.isSelected ? this.settings.text.transparencyS : this.settings.text.transparencyU) / 100
     }
     get align(): string {
-        return this.settings.text.alignment
+        return this.isSelected ? this.settings.text.alignmentS : this.settings.text.alignmentU
     }
     get font_size(): number {
-        return this.settings.text.fontSize
+        return this.isSelected ? this.settings.text.fontSizeS : this.settings.text.fontSizeU
     }
     get font_family(): string {
-        return this.settings.text.fontFamily
+        return this.isSelected ? this.settings.text.fontFamilyS : this.settings.text.fontFamilyU
     }
-    get padding(): number {
-        return this.settings.text.hmargin
+    get hmargin(): number {
+        return this.isSelected ? this.settings.text.hmarginS : this.settings.text.hmarginU
+    }
+    get vmargin(): number {
+        return this.isSelected ? this.settings.text.vmarginS : this.settings.text.vmarginU
     }
     get width(): number {
         return this.frameData.widthForText
     }
     get textContainerHeight(): number {
-        return Title.maxTextHeight + this.settings.text.vmargin
+        return Title.maxTextHeight + this.vmargin
     }
     get iconWidth(): number {
         return this.frameData.width - 2 * this.settings.icon.hmargin
     }
     get maxInlineTextWidth(): number {
-        return Math.floor(this.frameData.width - this.settings.icon.width - this.settings.icon.padding - 2 * this.settings.text.hmargin)
+        return Math.floor(this.frameData.width - this.settings.icon.width - this.settings.icon.padding - 2 * this.hmargin)
     }
     get content(): HTMLDivElement {
         let titleContainer = document.createElement('div')
@@ -84,8 +82,8 @@ export class Title {
         let textContainer = document.createElement('div')
         textContainer.className = 'textContainer'
         textContainer.style.position = 'relative'
-        textContainer.style.paddingLeft = this.settings.text.hmargin + 'px'
-        textContainer.style.paddingRight = this.settings.text.hmargin + 'px'
+        textContainer.style.paddingLeft = this.hmargin + 'px'
+        textContainer.style.paddingRight = this.hmargin + 'px'
 
         let text = document.createElement('span')
         text.className = 'text'
@@ -112,8 +110,8 @@ export class Title {
                     textContainer.style.verticalAlign = 'middle'
 
                     textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
-                    textContainer.style.width = calculateWordDimensions(this.text, this.settings.text.fontFamily, this.settings.text.fontSize + "pt").width
-                        + this.settings.icon.padding + this.settings.text.hmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
+                    textContainer.style.width = calculateWordDimensions(this.text, this.font_family, this.font_size + "pt").width
+                        + this.settings.icon.padding + this.hmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
 
                     textContainer.append(text)
                     titleContainer.append(img, textContainer)

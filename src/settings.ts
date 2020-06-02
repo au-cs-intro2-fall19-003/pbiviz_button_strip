@@ -54,12 +54,6 @@ export class ButtonSettings {
   public transparencyS: number = null;
   public transparencyU: number = null;
   public transparencyDefault: number = 0;
-
-  public buttonWidth: number = 150;
-  public buttonHeight: number = 75;
-  public buttonAlignment: enums.Align = enums.Align.left;
-  public rowLength: number = 2;
-  public padding: number = 10;
 }
 
 export class TextSettings{
@@ -70,14 +64,35 @@ export class TextSettings{
   public colorU: string = "";
   public colorDefault: string = "#000"
 
+  public alignmentA: enums.Align = enums.Align.center;
+  public alignmentS: enums.Align = enums.Align.center;
+  public alignmentU: enums.Align = enums.Align.center;
+
+  public fontSizeA: number = null;
+  public fontSizeS: number = null;
+  public fontSizeU: number = null;
+  public fontSizeDefault: number = 14;
+
+  public fontFamilyA: string = "";
+  public fontFamilyS: string = "";
+  public fontFamilyU: string = "";
+  public fontFamilyDefault: string = "wf_standard-font, helvetica, arial, sans-serif";
+
+  public hmarginA: number = null;
+  public hmarginS: number = null;
+  public hmarginU: number = null;
+  public hmarginDefault: number = 0;
 
 
-  public alignment: enums.Align = enums.Align.center;
-  public hmargin: number = 0;
-  public vmargin: number = 0;
-  public fontSize: number = 14;
-  public fontFamily: string = "wf_standard-font, helvetica, arial, sans-serif";
-  public transparency: number = 0;
+  public vmarginA: number = null;
+  public vmarginS: number = null;
+  public vmarginU: number = null;
+  public vmarginDefault: number = 0;
+  
+  public transparencyA: number = null;
+  public transparencyS: number = null;
+  public transparencyU: number = null;
+  public transparencyDefault: number = 0;
  
 }
 
@@ -90,8 +105,13 @@ export class IconSettings{
 }
 
 export class LayoutSettings{
-  public buttonLayout: enums.Button_Layout = enums.Button_Layout.horizontal;
   public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
+  public buttonWidth: number = 150;
+  public buttonHeight: number = 75;
+  public buttonAlignment: enums.Align = enums.Align.left
+  public buttonLayout: enums.Button_Layout = enums.Button_Layout.horizontal;
+  public rowLength: number = 2;
+  public padding: number = 10;
 }
 
 export class VisualSettings extends DataViewObjectsParser {

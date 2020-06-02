@@ -42,14 +42,12 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
     let _unselected = propertyStates.unselected
     let _allExists: boolean = typeof _all == 'number' ? _all >= 0 : _all && _all.length > 0
     let _nullValue = typeof _all == 'number' ? null : ""
-
     if (!_allExists && !_selected && !_unselected)
         _all = propertyStates.defaultValue
     if (propertyStates.state == enums.State.all && _allExists)
         _selected = _unselected = _all
     if (propertyStates.state != enums.State.all && _selected != _unselected)
         _all = _nullValue
-
     return {
         all: _all,
         selected: _selected,

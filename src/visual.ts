@@ -113,12 +113,12 @@ export class Visual implements IVisual {
 
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
-            delete settings.button.buttonWidth;
-            delete settings.button.buttonHeight;
-            delete settings.button.buttonAlignment;
+            delete settings.layout.buttonWidth;
+            delete settings.layout.buttonHeight;
+            delete settings.layout.buttonAlignment;
         }
         if (settings.layout.buttonLayout != enums.Button_Layout.grid) {
-            delete settings.button.rowLength
+            delete settings.layout.rowLength
         }
         if (!settings.icon.icons) {
             delete settings.icon.placement
@@ -140,8 +140,8 @@ export class Visual implements IVisual {
 
 
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
-        // console.log("updating from...", this.visualSettings.button.strokeA, this.visualSettings.button.strokeS, this.visualSettings.button.strokeU)
-        console.log(this.visualSettings)
+        console.log("updating from...", this.visualSettings.text.fontSizeA, this.visualSettings.text.fontSizeS, this.visualSettings.text.fontSizeU)
+        // console.log(this.visualSettings)
 
         let objects: powerbi.VisualObjectInstancesToPersist = {
             merge: []

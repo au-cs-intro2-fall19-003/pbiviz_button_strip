@@ -168,43 +168,6 @@
                     "type": {
                         "numeric": true
                     }
-                },
-                "buttonWidth": {
-                    "displayName": "Button width",
-                    "description": "The width of each button.",
-                    "type": {
-                        "numeric": true
-                    }
-                },
-                "buttonHeight": {
-                    "displayName": "Button height",
-                    "description": "The height of each button.",
-                    "type": {
-                        "numeric": true
-                    }
-                },
-                "buttonAlignment": {
-                    "displayName": "Button alignment",
-                    "description": "Alignment for buttons in the visual",
-                    "type": {
-                        "formatting": {
-                            "alignment": true
-                        }
-                    }
-                },
-                "rowLength": {
-                    "displayName": "Buttons per row",
-                    "description": "Number of buttons in each row of the grid",
-                    "type": {
-                        "numeric": true
-                    }
-                },
-                "padding": {
-                    "displayName": "Padding",
-                    "description": "The padding between buttons.",
-                    "type": {
-                        "numeric": true
-                    }
                 }
             }
         },
@@ -264,7 +227,7 @@
                         }
                     }
                 },
-                "alignment": {
+                "alignmentA": {
                     "displayName": "Alignment",
                     "description": "Alignment position for the text",
                     "type": {
@@ -273,16 +236,46 @@
                         }
                     }
                 },
-                "fontSize": {
-                    "displayName": "Font size",
-                    "description": "The size of the font.",
+                "alignmentS": {
+                    "displayName": "Alignment",
+                    "description": "Alignment position for the text",
                     "type": {
                         "formatting": {
-                            "fontSize": true
+                            "alignment": true
                         }
                     }
                 },
-                "fontFamily": {
+                "alignmentU": {
+                    "displayName": "Alignment",
+                    "description": "Alignment position for the text",
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
+                    }
+                },
+                "fontSizeA": {
+                    "displayName": "Font size",
+                    "description": "The size of the font.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "fontSizeS": {
+                    "displayName": "Font size",
+                    "description": "The size of the font.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "fontSizeU": {
+                    "displayName": "Font size",
+                    "description": "The size of the font.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "fontFamilyA": {
                     "displayName": "Font family",
                     "type": {
                         "formatting": {
@@ -290,23 +283,81 @@
                         }
                     }
                 },
-                "transparency": {
-                    "displayName": "Transparency",
-                    "description": "The transparency of the font.",
+                "fontFamilyS": {
+                    "displayName": "Font family",
                     "type": {
-                        "numeric": true
+                        "formatting": {
+                            "fontFamily": true
+                        }
                     }
                 },
-                "hmargin": {
+                "fontFamilyU": {
+                    "displayName": "Font family",
+                    "type": {
+                        "formatting": {
+                            "fontFamily": true
+                        }
+                    }
+                },
+                "hmarginA": {
                     "displayName": "Horizontal margin",
                     "description": "Margin between text and button left and right",
                     "type": {
                         "numeric": true
                     }
                 },
-                "vmargin": {
+                "hmarginS": {
+                    "displayName": "Horizontal margin",
+                    "description": "Margin between text and button left and right",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "hmarginU": {
+                    "displayName": "Horizontal margin",
+                    "description": "Margin between text and button left and right",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "vmarginA": {
                     "displayName": "Vertical margin",
                     "description": "Margin between text and button top and bottom",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "vmarginS": {
+                    "displayName": "Vertical margin",
+                    "description": "Margin between text and button top and bottom",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "vmarginU": {
+                    "displayName": "Vertical margin",
+                    "description": "Margin between text and button top and bottom",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "transparencyA": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the font.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "transparencyS": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the font.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "transparencyU": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the font.",
                     "type": {
                         "numeric": true
                     }
@@ -407,6 +458,43 @@
                                 "value": "grid"
                             }
                         ]
+                    }
+                },
+                "buttonWidth": {
+                    "displayName": "Button width",
+                    "description": "The width of each button.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "buttonHeight": {
+                    "displayName": "Button height",
+                    "description": "The height of each button.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "buttonAlignment": {
+                    "displayName": "Button alignment",
+                    "description": "Alignment for buttons in the visual",
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
+                    }
+                },
+                "rowLength": {
+                    "displayName": "Buttons per row",
+                    "description": "Number of buttons in each row of the grid",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "padding": {
+                    "displayName": "Padding between buttons",
+                    "description": "The padding between buttons.",
+                    "type": {
+                        "numeric": true
                     }
                 }
             }
