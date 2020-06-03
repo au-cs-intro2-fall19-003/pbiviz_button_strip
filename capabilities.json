@@ -610,6 +610,24 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "shadowColor": {
+                    "displayName": "Color",
+                    "description": "Color of shadow",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "shadowTransparency": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
 

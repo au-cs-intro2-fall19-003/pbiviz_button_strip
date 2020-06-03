@@ -48,7 +48,7 @@ export class ButtonSettings {
   public strokeWidthA: number = null;
   public strokeWidthS: number = null;
   public strokeWidthU: number = null;
-  public strokeWidthDefault: number = 2;
+  public strokeWidthDefault: number = 0;
 
   public transparencyA: number = null;
   public transparencyS: number = null;
@@ -147,7 +147,9 @@ export class LayoutSettings{
 }
 
 export class EffectsSettings{
-  public shadow: boolean = false; 
+  public shadow: boolean = true;
+  public shadowColor: string = "#000"
+  public shadowTransparency: number = 70 
 }
 
 export class VisualSettings extends DataViewObjectsParser {
