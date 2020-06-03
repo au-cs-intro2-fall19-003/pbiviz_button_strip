@@ -86,8 +86,6 @@ export class Visual implements IVisual {
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
-        console.log("enumerating")
-
         let settingsKeys = Object.keys(settings)
         for (let i = 0; i < settingsKeys.length; i++) {
             let settingKey: string = settingsKeys[i]
@@ -111,6 +109,21 @@ export class Visual implements IVisual {
             }
         }
 
+        if (!settings.icon.icons) {
+            let iconSettingsKeys: string[] = Object.keys(settings.icon)
+            for(let i = 0; i < iconSettingsKeys.length; i++)
+                if(iconSettingsKeys[i] != 'icons')
+                    delete settings.icon[iconSettingsKeys[i]]
+        }
+        if (settings.icon.currentPlacement == enums.Icon_Placement.left) {
+            delete settings.icon.hmarginA
+            delete settings.icon.hmarginS
+            delete settings.icon.hmarginU
+        } else {
+            delete settings.icon.widthA
+            delete settings.icon.widthS
+            delete settings.icon.widthU
+        }
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
             delete settings.layout.buttonWidth;
@@ -120,29 +133,14 @@ export class Visual implements IVisual {
         if (settings.layout.buttonLayout != enums.Button_Layout.grid) {
             delete settings.layout.rowLength
         }
-        if (!settings.icon.icons) {
-            delete settings.icon.placement
-            delete settings.icon.width
-            delete settings.icon.padding
-        }
-
-        if (settings.icon.placement == enums.Icon_Placement.left) {
-            delete settings.icon.hmargin
-        } else {
-            delete settings.icon.width
-        }
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
     public update(options: VisualUpdateOptions) {
         if (!(options && options.dataViews && options.dataViews[0]))
             return
-
-
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
-        console.log("updating from...", this.visualSettings.text.fontSizeA, this.visualSettings.text.fontSizeS, this.visualSettings.text.fontSizeU)
-        // console.log(this.visualSettings)
-
+        console.log("updating from...", this.visualSettings.icon.placementA, this.visualSettings.icon.placementS, this.visualSettings.icon.placementU)
         let objects: powerbi.VisualObjectInstancesToPersist = {
             merge: []
         }

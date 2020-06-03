@@ -32,7 +32,6 @@ export function getGroupedKeyNames(propKeys: string[]): propertyStateName[] {
             })
         }
     }
-    // console.log(groupedKeyNames)
     return groupedKeyNames
 }
 

@@ -34,7 +34,6 @@ export class Title {
         }
         let thisTextHeight = calculateWordDimensions(dataPoints[i].value as string, this.font_family, this.font_size + "pt", (this.frameData.widthForText - 2) + 'px').height;
         Title.maxTextHeight = Math.max(thisTextHeight, Title.maxTextHeight)
-        console.log(Title.maxTextHeight)
     }
     get isSelected(): boolean {
         return Title.selectionIdKey && Title.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
@@ -70,10 +69,22 @@ export class Title {
         return Title.maxTextHeight + this.vmargin
     }
     get iconWidth(): number {
-        return this.frameData.width - 2 * this.settings.icon.hmargin
+        return this.isSelected ? this.settings.icon.widthS : this.settings.icon.widthU
+    }
+    get iconHmargin(): number {
+        return this.isSelected ? this.settings.icon.hmarginS : this.settings.icon.hmarginU
+    }
+    get spaceForIcon(): number {
+        return this.frameData.width - 2 * this.iconHmargin
+    }
+    get iconPlacement(): enums.Icon_Placement {
+        return this.isSelected ? this.settings.icon.placementS : this.settings.icon.placementU
+    }
+    get iconPadding(): number{
+        return this.isSelected ? this.settings.icon.paddingS : this.settings.icon.paddingU
     }
     get maxInlineTextWidth(): number {
-        return Math.floor(this.frameData.width - this.settings.icon.width - this.settings.icon.padding - 2 * this.hmargin)
+        return Math.floor(this.frameData.width - this.iconWidth - this.iconPadding - 2 * this.hmargin)
     }
     get content(): HTMLDivElement {
         let titleContainer = document.createElement('div')
@@ -82,8 +93,8 @@ export class Title {
         let textContainer = document.createElement('div')
         textContainer.className = 'textContainer'
         textContainer.style.position = 'relative'
-        textContainer.style.paddingLeft = this.hmargin + 'px'
-        textContainer.style.paddingRight = this.hmargin + 'px'
+        titleContainer.style.paddingLeft = this.hmargin + 'px'
+        titleContainer.style.paddingRight = this.hmargin + 'px'
 
         let text = document.createElement('span')
         text.className = 'text'
@@ -96,22 +107,23 @@ export class Title {
             img.style.backgroundRepeat = 'no-repeat'
             img.style.backgroundSize = 'contain'
 
-            switch (this.settings.icon.placement) {
+            switch (this.iconPlacement) {
                 case enums.Icon_Placement.left:
                     titleContainer.style.display = 'inline-block'
 
-                    img.style.minWidth = this.settings.icon.width + 'px'
-                    img.style.height = this.settings.icon.width + 'px'
+                    img.style.minWidth = this.iconWidth + 'px'
+                    img.style.height = this.iconWidth + 'px'
                     img.style.display = 'inline-block'
                     img.style.verticalAlign = 'middle'
+                    img.style.marginRight = this.iconPadding + 'px'
 
-                    textContainer.style.paddingLeft = this.settings.icon.padding + 'px'
+
                     textContainer.style.display = 'inline-block'
                     textContainer.style.verticalAlign = 'middle'
 
                     textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
                     textContainer.style.width = calculateWordDimensions(this.text, this.font_family, this.font_size + "pt").width
-                        + this.settings.icon.padding + this.hmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
+                        + this.iconPadding + this.hmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
 
                     textContainer.append(text)
                     titleContainer.append(img, textContainer)
@@ -120,15 +132,15 @@ export class Title {
                     titleContainer.style.position = 'relative'
                     titleContainer.style.height = this.frameData.height + 'px'
 
-                    img.style.width = this.iconWidth + 'px'
-                    img.style.marginLeft = this.settings.icon.hmargin + 'px'
-                    img.style.marginRight = this.settings.icon.hmargin + 'px'
-                    img.style.height = (this.frameData.height - this.textContainerHeight - this.settings.icon.padding) + 'px'
+                    img.style.width = this.spaceForIcon + 'px'
+                    img.style.marginLeft = this.iconHmargin + 'px'
+                    img.style.marginRight = this.iconHmargin + 'px'
+                    img.style.height = (this.frameData.height - this.textContainerHeight - this.iconPadding) + 'px'
 
                     textContainer.style.width = this.width + 'px'
                     text.style.width = this.width + 'px'
                     textContainer.style.height = this.textContainerHeight + 'px'
-                    switch (this.settings.icon.placement) {
+                    switch (this.iconPlacement) {
                         case enums.Icon_Placement.above:
                             img.style.backgroundPosition = 'center bottom'
                             textContainer.style.position = 'absolute'
@@ -137,7 +149,7 @@ export class Title {
                             titleContainer.append(img, textContainer)
                             break
                         case enums.Icon_Placement.below:
-                            // img.style.backgroundPosition = 'center top'
+                            img.style.backgroundPosition = 'center top'
                             img.style.position = 'absolute'
                             img.style.bottom = '0'
                             text.style.position = 'absolute'

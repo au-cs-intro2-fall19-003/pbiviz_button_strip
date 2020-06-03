@@ -98,10 +98,42 @@ export class TextSettings{
 
 export class IconSettings{
   public icons: boolean = false;
-  public placement: enums.Icon_Placement = enums.Icon_Placement.left;
-  public width: number = 40;
-  public hmargin: number = 10;
-  public padding: number = 10;
+  public state : enums.State = enums.State.all;
+
+  public placementA: enums.Icon_Placement = null;
+  public placementS: enums.Icon_Placement = null;
+  public placementU: enums.Icon_Placement = null;
+  public placementDefault: enums.Icon_Placement = enums.Icon_Placement.left;
+
+  public get currentPlacement(): enums.Icon_Placement{
+    switch(this.state){
+      case enums.State.all:
+        return this.placementA
+      case enums.State.selected:
+        return this.placementS
+      case enums.State.unselected:
+        return this.placementU
+    }
+  }
+
+
+  public widthA: number = null;
+  public widthS: number = null;
+  public widthU: number = null;
+  public widthDefault: number = 40;
+
+
+
+  public hmarginA: number = null;
+  public hmarginS: number = null;
+  public hmarginU: number = null;
+  public hmarginDefault: number = 10;
+
+
+  public paddingA: number = null;
+  public paddingS: number = null;
+  public paddingU: number = null;
+  public paddingDefault: number = 10;
 }
 
 export class LayoutSettings{
@@ -120,22 +152,3 @@ export class VisualSettings extends DataViewObjectsParser {
   public icon: IconSettings = new IconSettings();
   public layout: LayoutSettings = new LayoutSettings();
 }
-
-
-// export class VisualSettings extends DataViewObjectsParser {
-//       public dataPoint: dataPointSettings = new dataPointSettings();
-//       }
-
-//     export class dataPointSettings {
-//      // Default color
-//       public defaultColor: string = "";
-//      // Show all
-//       public showAllDataPoints: boolean = true;
-//      // Fill
-//       public fill: string = "";
-//      // Color saturation
-//       public fillRule: string = "";
-//      // Text Size
-//       public fontSize: number = 12;
-//      }
-

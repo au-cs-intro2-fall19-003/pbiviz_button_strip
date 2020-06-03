@@ -374,7 +374,47 @@
                         "bool": true
                     }
                 },
-                "placement": {
+                "state": {
+                    "displayName": "State",
+                    "description": "What state to apply the styles to",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "All",
+                                "value": "all"
+                            },
+                            {
+                                "displayName": "Selected",
+                                "value": "selected"
+                            },
+                            {
+                                "displayName": "Unselected",
+                                "value": "unselected"
+                            }
+                        ]
+                    }
+                },
+                "placementA": {
+                    "displayName": "Placement All",
+                    "description": "How buttons will be laid out.",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Left",
+                                "value": "left"
+                            },
+                            {
+                                "displayName": "Above",
+                                "value": "above"
+                            },
+                            {
+                                "displayName": "Below",
+                                "value": "below"
+                            }
+                        ]
+                    }
+                },
+                "placementS": {
                     "displayName": "Placement",
                     "description": "How buttons will be laid out.",
                     "type": {
@@ -394,21 +434,83 @@
                         ]
                     }
                 },
-                "width": {
+                "placementU": {
+                    "displayName": "Placement",
+                    "description": "How buttons will be laid out.",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Left",
+                                "value": "left"
+                            },
+                            {
+                                "displayName": "Above",
+                                "value": "above"
+                            },
+                            {
+                                "displayName": "Below",
+                                "value": "below"
+                            }
+                        ]
+                    }
+                },
+                "widthA": {
                     "displayName": "Width",
                     "description": "Width of icon in pixels",
                     "type": {
                         "numeric": true
                     }
                 },
-                "hmargin": {
+                "widthS": {
+                    "displayName": "Width",
+                    "description": "Width of icon in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "widthU": {
+                    "displayName": "Width",
+                    "description": "Width of icon in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "hmarginA": {
                     "displayName": "Horizontal margin",
                     "description": "Margin between icon and button left and right",
                     "type": {
                         "numeric": true
                     }
                 },
-                "padding": {
+                "hmarginS": {
+                    "displayName": "Horizontal margin",
+                    "description": "Margin between icon and button left and right",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "hmarginU": {
+                    "displayName": "Horizontal margin",
+                    "description": "Margin between icon and button left and right",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "paddingA": {
+                    "displayName": "Padding",
+                    "description": "Padding between icon and text",
+                    "type": {
+                        "numeric": true
+                    }  
+                },
+                "paddingS": {
+                    "displayName": "Padding",
+                    "description": "Padding between icon and text",
+                    "type": {
+                        "numeric": true
+                    }  
+                },
+                "paddingU": {
                     "displayName": "Padding",
                     "description": "Padding between icon and text",
                     "type": {
