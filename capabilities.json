@@ -600,6 +600,19 @@
                     }
                 }
             }
+        },
+        "effects": {
+            "displayName": "Effects",
+            "properties": {
+                "shadow": {
+                    "displayName": "Shadow",
+                    "description": "Add a shadow to each button",
+                    "type": {
+                        "bool": true
+                    }
+                }
+            }
+
         }
     },
     "dataViewMappings": [

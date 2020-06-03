@@ -80,6 +80,42 @@ export class Visual implements IVisual {
             .append('svg')
             .classed('navigator', true);
 
+        // filters go in defs element
+        let defs = this.svg.append("defs");
+
+        // create filter with id #drop-shadow
+        // height=130% so that the shadow is not clipped
+        var filter = defs.append("filter")
+            .attr("id", "drop-shadow")
+            .attr("height", "130%");
+
+        // SourceAlpha refers to opacity of graphic that this filter will be applied to
+        // convolve that with a Gaussian with standard deviation 3 and store result
+        // in blur
+        filter.append("feGaussianBlur")
+            .attr("in", "SourceAlpha")
+            .attr("stdDeviation", 3)
+
+        // translate output of Gaussian blur to the right and downwards with 2px
+        // store result in offsetBlur
+        filter.append("feOffset")
+            .attr("dx", 2)
+            .attr("dy", 2)
+            .attr("result", "offsetBlur");
+            
+        filter.append("feComponentTransfer")
+            .append("feFuncA")
+            .attr("type", "linear")
+            .attr("slope", 0.3)
+
+        // overlay original SourceGraphic over translated blurred opacity by using
+        // feMerge filter. Order of specifying inputs is important!
+        let feMerge = filter.append("feMerge");
+
+        feMerge.append("feMergeNode")
+        feMerge.append("feMergeNode")
+            .attr("in", "SourceGraphic");
+
         this.container = this.svg.append("g")
             .classed('container', true);
     }
@@ -111,8 +147,8 @@ export class Visual implements IVisual {
 
         if (!settings.icon.icons) {
             let iconSettingsKeys: string[] = Object.keys(settings.icon)
-            for(let i = 0; i < iconSettingsKeys.length; i++)
-                if(iconSettingsKeys[i] != 'icons')
+            for (let i = 0; i < iconSettingsKeys.length; i++)
+                if (iconSettingsKeys[i] != 'icons')
                     delete settings.icon[iconSettingsKeys[i]]
         }
         if (settings.icon.currentPlacement == enums.Icon_Placement.left) {
@@ -213,7 +249,6 @@ export class Visual implements IVisual {
             .style('width', options.viewport.width)
             .style('height', options.viewport.height)
 
-
         let frames = this.container.selectAll('rect').data(frameData)
         frames.exit().remove()
         frames.enter().append('rect')
@@ -225,6 +260,7 @@ export class Visual implements IVisual {
             .style("fill-opacity", function (d) { return d.fill_opacity })
             .style("stroke", function (d) { return d.stroke })
             .style("stroke-width", function (d) { return d.strokeWidth })
+            .style("filter", function(d){return d.filters})
             .attr("height", function (d) { return d.height })
             .attr("width", function (d) { return d.width })
             .attr("x", function (d) { return d.x_pos })

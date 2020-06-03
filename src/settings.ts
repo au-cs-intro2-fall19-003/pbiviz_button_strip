@@ -146,9 +146,14 @@ export class LayoutSettings{
   public padding: number = 10;
 }
 
+export class EffectsSettings{
+  public shadow: boolean = false; 
+}
+
 export class VisualSettings extends DataViewObjectsParser {
   public button: ButtonSettings = new ButtonSettings();
   public text: TextSettings = new TextSettings();
   public icon: IconSettings = new IconSettings();
   public layout: LayoutSettings = new LayoutSettings();
+  public effects: EffectsSettings = new EffectsSettings();
 }

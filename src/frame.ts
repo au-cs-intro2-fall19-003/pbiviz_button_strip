@@ -109,28 +109,28 @@ export class Frame {
     get height(): number {
         switch (this.settings.layout.sizingMethod) {
             case (enums.Button_Sizing_Method.fixed):
-                return this.settings.layout.buttonHeight
+                return this.settings.layout.buttonHeight - this.shadowSpace
             default:
-                return (this.options.viewport.height - this.padding * (this.numRows - 1)) / this.numRows
+                return ((this.options.viewport.height - this.padding * (this.numRows - 1)) / this.numRows) - this.shadowSpace
         }
 
     }
     get width(): number {
         switch (this.settings.layout.sizingMethod) {
             case enums.Button_Sizing_Method.uniform:
-                return (this.options.viewport.width - this.padding * (this.rowLength - 1)) / (this.rowLength)
+                return (this.options.viewport.width - this.padding * (this.rowLength - 1)) / (this.rowLength) - this.shadowSpace
             case enums.Button_Sizing_Method.fixed:
-                return this.settings.layout.buttonWidth
+                return this.settings.layout.buttonWidth - this.shadowSpace
             case enums.Button_Sizing_Method.dynamic:
                 let totalTextWidth = calculateWordDimensions(this.rowText.join(""), this.font_family, this.font_size + "pt").width
                 let textWidth = calculateWordDimensions(this.text, this.font_family, this.font_size + "pt").width
                 let buttonWidthScaleFactor = this.viewportWidthForAllText / totalTextWidth
-                let width = textWidth * buttonWidthScaleFactor + 2 * this.hmargin  
+                let width = textWidth * buttonWidthScaleFactor + 2 * this.hmargin - this.shadowSpace
                 return width
         }
     }
     get y_pos(): number {
-        return this.rowNumber * (this.height + this.padding)
+        return this.rowNumber * (this.height + this.padding + this.shadowSpace) + this.shadowSpace/2
     }
     get x_pos(): number {
         switch (this.settings.layout.sizingMethod) {
@@ -139,18 +139,28 @@ export class Frame {
                 let areaRemaining = this.options.viewport.width - areaTaken
                 switch (this.settings.layout.buttonAlignment) {
                     case enums.Align.left:
-                        return this.indexInRow * (this.width + this.padding)
+                        return this.indexInRow * (this.width + this.padding + this.shadowSpace) + this.shadowSpace/2
                     case enums.Align.right:
-                        return areaRemaining + this.indexInRow * (this.width + this.padding)
+                        return areaRemaining + this.indexInRow * (this.width + this.padding + this.shadowSpace) + this.shadowSpace/2
                     case enums.Align.center:
-                        return areaRemaining / 2 + this.indexInRow * (this.width + this.padding)
+                        return areaRemaining / 2 + this.indexInRow * (this.width + this.padding + this.shadowSpace) + this.shadowSpace/2
 
                 }
             case enums.Button_Sizing_Method.uniform:
-                return this.indexInRow * (this.width + this.padding)
+                return this.indexInRow * (this.width + this.padding + this.shadowSpace) + this.shadowSpace/2
             case enums.Button_Sizing_Method.dynamic:
-                return this.widthSoFar + this.indexInRow * this.padding
+                return this.widthSoFar + this.indexInRow * (this.padding + this.shadowSpace) + this.shadowSpace/2
         }
+    }
+
+    get shadowSpace(): number {
+        return this.settings.effects.shadow ? 10 : 0
+    }
+
+    get filters(): string{
+        let filters = ""
+        filters+= this.settings.effects.shadow ? "url(#drop-shadow)" : ""
+        return filters
     }
     
 }
