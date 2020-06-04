@@ -147,9 +147,32 @@ export class LayoutSettings{
 }
 
 export class EffectsSettings{
+  public state : enums.State = enums.State.all;
   public shadow: boolean = true;
-  public shadowColor: string = "#000"
-  public shadowTransparency: number = 70 
+
+  public shadowColorA: string = ""
+  public shadowColorS: string = ""
+  public shadowColorU: string = ""
+  public shadowColorDefault: string = "#000"
+
+  public shadowTransparencyA: number = null
+  public shadowTransparencyS: number = null 
+  public shadowTransparencyU: number = null
+  public shadowTransparencyDefault: number = 70
+
+  public shadowDirectionA: enums.Direction = enums.Direction.bottom_right
+  public shadowDirectionS: enums.Direction = enums.Direction.bottom_right
+  public shadowDirectionU: enums.Direction = enums.Direction.bottom_right
+
+  public shadowDistanceA: number = null
+  public shadowDistanceS: number = null
+  public shadowDistanceU: number = null
+  public shadowDistanceDefault: number = 2
+
+  public shadowStrengthA: number = null
+  public shadowStrengthS: number = null
+  public shadowStrengthU: number = null
+  public shadowStrengthDefault: number = 3
 }
 
 export class VisualSettings extends DataViewObjectsParser {

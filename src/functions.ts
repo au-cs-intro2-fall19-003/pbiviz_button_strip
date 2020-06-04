@@ -1,6 +1,6 @@
 import { propertyStateName, propertyStatesInput, propertyStatesOutput } from './interfaces'
 import * as enums from "./enums"
-
+import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 export function calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): { width: number, height: number } {
     var div = document.createElement('div');
@@ -53,4 +53,25 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
         unselected: _unselected,
         didChange: !(propertyStates.all == _all && propertyStates.selected == _selected && propertyStates.unselected == _unselected)
     }
+}
+
+export function addFilters(defs: d3.Selection<d3.BaseType, any, any, any>, pvs: ProcessedVisualSettings): void{
+    defs.html("")
+
+    let shadowS = defs.append("filter")
+            .attr("id", "drop-shadowS")
+            .append("feDropShadow")
+            .attr("dx", pvs.shadowDirectionCoordsS.x * pvs.shadowDistanceS)
+            .attr("dy", pvs.shadowDirectionCoordsS.y * pvs.shadowDistanceS)
+            .attr("stdDeviation", pvs.shadowStrengthS)
+            .attr("flood-color", pvs.shadowColorS)
+            .attr("flood-opacity", pvs.shadowTransparencyS)
+    let shadowU = defs.append("filter")
+            .attr("id", "drop-shadowU")
+            .append("feDropShadow")
+            .attr("dx", pvs.shadowDirectionCoordsU.x * pvs.shadowDistanceU)
+            .attr("dy", pvs.shadowDirectionCoordsU.y * pvs.shadowDistanceU)
+            .attr("stdDeviation", pvs.shadowStrengthU)
+            .attr("flood-color", pvs.shadowColorU)
+            .attr("flood-opacity", pvs.shadowTransparencyU)
 }

@@ -7,6 +7,7 @@ import { VisualSettings } from "./settings";
 import {dataPoint} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
+import { max } from "d3";
 
 export class ProcessedVisualSettings{
     i: number;
@@ -133,7 +134,6 @@ export class ProcessedVisualSettings{
         }
     }
     get rowNumber(): number {
-        console.log(this.i)
         return Math.floor(this.i / this.rowLength)
     }
     get indexInRow(): number {
@@ -176,11 +176,66 @@ export class ProcessedVisualSettings{
 
 
     get shadowSpace(): number {
-        return this.settings.effects.shadow ? 10 : 0
+        return this.settings.effects.shadow ? 3*(this.shadowMaxDistance+this.shadowMaxStrength) : 0
     }
+    get shadowColorS(): string {
+        return this.settings.effects.shadowColorS
+    }
+    get shadowColorU(): string {
+        return this.settings.effects.shadowColorU
+    }
+    get shadowTransparencyS(): number {
+        return 1 - this.settings.effects.shadowTransparencyS/100
+    }
+    get shadowTransparencyU(): number {
+        return 1 - this.settings.effects.shadowTransparencyU/100
+    }
+    get shadowTranslateS(): number{
+        return 0
+    }
+    getshadowDirectionCoords(direction: enums.Direction): {x: number, y:number}{
+        switch(direction){
+            case enums.Direction.bottom_right: return {x: 1, y:1}
+            case enums.Direction.bottom: return {x: 0, y:1}
+            case enums.Direction.bottom_left: return {x: -1, y:1}
+            case enums.Direction.left: return {x: -1, y:0}
+            case enums.Direction.center: return {x: 0, y:0}
+            case enums.Direction.top_left: return {x: -1, y:-1}
+            case enums.Direction.top: return {x: 0, y:-1}
+            case enums.Direction.top_right: return {x: 1, y:-1}  
+            case enums.Direction.right: return {x: 1, y:0}
+            case enums.Direction.custom: return {x: 0, y:0}  
+        }
+    }
+    get shadowDirectionCoordsS(): {x: number, y: number}{
+        return this.getshadowDirectionCoords(this.settings.effects.shadowDirectionS)
+    }
+    get shadowDirectionCoordsU(): {x: number, y: number}{
+        return this.getshadowDirectionCoords(this.settings.effects.shadowDirectionU)
+    }
+    get shadowDistanceS(): number {
+        return this.settings.effects.shadowDistanceS
+    } 
+    get shadowDistanceU(): number {
+        return this.settings.effects.shadowDistanceU
+    }
+    get shadowMaxDistance(): number {
+        return Math.max(this.shadowDistanceS, this.shadowDistanceU)
+    }
+    get shadowStrengthS(): number {
+        return this.settings.effects.shadowStrengthS
+    }
+    get shadowStrengthU(): number {
+        return this.settings.effects.shadowStrengthU
+    }
+    get shadowMaxStrength(): number{
+        return Math.max(this.shadowStrengthS, this.shadowStrengthU)
+    }
+    
     get filters(): string{
         let filters = ""
-        filters+= this.settings.effects.shadow ? "url(#drop-shadow)" : ""
+        if(this.settings.effects.shadow)
+            filters+= this.isSelected ? "url(#drop-shadowS)" : "url(#drop-shadowU)"
         return filters
     }
 

@@ -604,6 +604,26 @@
         "effects": {
             "displayName": "Effects",
             "properties": {
+                "state": {
+                    "displayName": "State",
+                    "description": "What state to apply the styles to",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "All",
+                                "value": "all"
+                            },
+                            {
+                                "displayName": "Selected",
+                                "value": "selected"
+                            },
+                            {
+                                "displayName": "Unselected",
+                                "value": "unselected"
+                            }
+                        ]
+                    }
+                },
                 "shadow": {
                     "displayName": "Shadow",
                     "description": "Add a shadow to each button",
@@ -611,7 +631,7 @@
                         "bool": true
                     }
                 },
-                "shadowColor": {
+                "shadowColorA": {
                     "displayName": "Color",
                     "description": "Color of shadow",
                     "type": {
@@ -622,9 +642,231 @@
                         }
                     }
                 },
-                "shadowTransparency": {
+                "shadowColorS": {
+                    "displayName": "Color",
+                    "description": "Color of shadow",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "shadowColorU": {
+                    "displayName": "Color",
+                    "description": "Color of shadow",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "shadowTransparencyA": {
                     "displayName": "Transparency",
                     "description": "Transparency of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowTransparencyS": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowTransparencyU": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowDirectionA": {
+                    "displayName": "Direction",
+                    "description": "Direction of the shadow",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Bottom Right",
+                                "value": "bottom_right"
+                            },
+                            {
+                                "displayName": "Bottom",
+                                "value": "bottom"
+                            },
+                            {
+                                "displayName": "Bottom Left",
+                                "value": "bottom_left"
+                            },
+                            {
+                                "displayName": "Left",
+                                "value": "left"
+                            },
+                            {
+                                "displayName": "Center",
+                                "value": "center"
+                            },
+                            {
+                                "displayName": "Top Left",
+                                "value": "top_left"
+                            },
+                            {
+                                "displayName": "Top",
+                                "value": "top"
+                            },
+                            {
+                                "displayName": "Top Right",
+                                "value": "top_right"
+                            },
+                            {
+                                "displayName": "Right",
+                                "value": "right"
+                            },
+                            {
+                                "displayName": "Custom",
+                                "value": "custom"
+                            }
+                        ]
+                    }
+                },
+                "shadowDirectionS": {
+                    "displayName": "Direction",
+                    "description": "Direction of the shadow",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Bottom Right",
+                                "value": "bottom_right"
+                            },
+                            {
+                                "displayName": "Bottom",
+                                "value": "bottom"
+                            },
+                            {
+                                "displayName": "Bottom Left",
+                                "value": "bottom_left"
+                            },
+                            {
+                                "displayName": "Left",
+                                "value": "left"
+                            },
+                            {
+                                "displayName": "Center",
+                                "value": "center"
+                            },
+                            {
+                                "displayName": "Top Left",
+                                "value": "top_left"
+                            },
+                            {
+                                "displayName": "Top",
+                                "value": "top"
+                            },
+                            {
+                                "displayName": "Top Right",
+                                "value": "top_right"
+                            },
+                            {
+                                "displayName": "Right",
+                                "value": "right"
+                            },
+                            {
+                                "displayName": "Custom",
+                                "value": "custom"
+                            }
+                        ]
+                    }
+                },
+                "shadowDirectionU": {
+                    "displayName": "Direction",
+                    "description": "Direction of the shadow",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Bottom Right",
+                                "value": "bottom_right"
+                            },
+                            {
+                                "displayName": "Bottom",
+                                "value": "bottom"
+                            },
+                            {
+                                "displayName": "Bottom Left",
+                                "value": "bottom_left"
+                            },
+                            {
+                                "displayName": "Left",
+                                "value": "left"
+                            },
+                            {
+                                "displayName": "Center",
+                                "value": "center"
+                            },
+                            {
+                                "displayName": "Top Left",
+                                "value": "top_left"
+                            },
+                            {
+                                "displayName": "Top",
+                                "value": "top"
+                            },
+                            {
+                                "displayName": "Top Right",
+                                "value": "top_right"
+                            },
+                            {
+                                "displayName": "Right",
+                                "value": "right"
+                            },
+                            {
+                                "displayName": "Custom",
+                                "value": "custom"
+                            }
+                        ]
+                    }
+                },
+                "shadowDistanceA": {
+                    "displayName": "Distance",
+                    "description": "Distance of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowDistanceS": {
+                    "displayName": "Distance",
+                    "description": "Distance of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowDistanceU": {
+                    "displayName": "Distance",
+                    "description": "Distance of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowStrengthA": {
+                    "displayName": "Strength",
+                    "description": "Strength of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowStrengthS": {
+                    "displayName": "Strength",
+                    "description": "Strength of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowStrengthU": {
+                    "displayName": "Strength",
+                    "description": "Strength of the shadow.",
                     "type": {
                         "numeric": true
                     }

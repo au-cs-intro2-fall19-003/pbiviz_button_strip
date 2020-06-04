@@ -48,7 +48,7 @@ import * as d3 from "d3";
 import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { dataPoint, propertyStateName, propertyStateValue, propertyStatesInput, propertyStatesOutput } from './interfaces'
-import { getGroupedKeyNames, levelProperties } from './functions'
+import { getGroupedKeyNames, levelProperties, addFilters } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 const propertiesOf = <TObj>(_obj: (TObj | undefined) = undefined) => <T extends keyof TObj>(name: T): T => name;
@@ -140,7 +140,6 @@ export class Visual implements IVisual {
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
-        console.log("updating from...", this.visualSettings.icon.placementA, this.visualSettings.icon.placementS, this.visualSettings.icon.placementU)
         let objects: powerbi.VisualObjectInstancesToPersist = {
             merge: []
         }
@@ -169,7 +168,6 @@ export class Visual implements IVisual {
                     state: this.visualSettings[objKey].state
                 }
                 let leveledPropertyState = levelProperties(propertyState)
-
                 if (leveledPropertyState.didChange) {
                     object.properties[groupedKeyNames.all] = leveledPropertyState.all
                     object.properties[groupedKeyNames.selected] = leveledPropertyState.selected
@@ -210,16 +208,7 @@ export class Visual implements IVisual {
             .style('width', options.viewport.width)
             .style('height', options.viewport.height)
 
-        let defs = this.svg.select("defs").html("")
-        let shadow = defs.append("filter")
-            .attr("id", "drop-shadow")
-            .attr("height", "130%")
-            .append("feDropShadow")
-            .attr("dx", 2)
-            .attr("dy", 2)
-            .attr("stdDeviation", 3)
-            .attr("flood-color", this.visualSettings.effects.shadowColor)
-            .attr("flood-opacity", 1 - this.visualSettings.effects.shadowTransparency/100)
+        addFilters(this.svg.select("defs"), data[0])
 
         let frames = this.container.selectAll('rect').data(data)
         frames.exit().remove()

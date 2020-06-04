@@ -27,3 +27,16 @@ export enum State {
     selected = "selected",
     unselected = "unselected"
 }
+
+export enum Direction {
+    bottom_right = "bottom_right",
+    bottom = "bottom",
+    bottom_left = "bottom_left",
+    left = "left",
+    center = "center",
+    top_left = "top_left",
+    top = "top",
+    top_right = "top_right",
+    right = "right",
+    custom = "custom"
+}
