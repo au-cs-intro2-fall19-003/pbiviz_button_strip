@@ -45,8 +45,7 @@ import VisualObjectInstanceEnumeration = powerbi.VisualObjectInstanceEnumeration
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 
 import * as d3 from "d3";
-import { Frame } from './frame'
-import { Title } from './title'
+import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { dataPoint, propertyStateName, propertyStateValue, propertyStatesInput, propertyStatesOutput } from './interfaces'
 import { getGroupedKeyNames, levelProperties } from './functions'
@@ -202,13 +201,10 @@ export class Visual implements IVisual {
             });
         }
 
-        let frameData: Frame[] = [];
-        let titleData: Title[] = []
-        for (let i = 0; i < this.dataPoints.length; i++) {
-            frameData.push(new Frame(i, this.dataPoints, this.visualSettings, this.selectionManager, options))
-            titleData.push(new Title(i, this.dataPoints, this.visualSettings, this.selectionManager, options, frameData[i]))
-        }
-
+        let data: ProcessedVisualSettings[] = [];
+        for (let i = 0; i < this.dataPoints.length; i++) 
+            data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, options))
+        
 
         this.svg
             .style('width', options.viewport.width)
@@ -225,28 +221,28 @@ export class Visual implements IVisual {
             .attr("flood-color", this.visualSettings.effects.shadowColor)
             .attr("flood-opacity", 1 - this.visualSettings.effects.shadowTransparency/100)
 
-        let frames = this.container.selectAll('rect').data(frameData)
+        let frames = this.container.selectAll('rect').data(data)
         frames.exit().remove()
         frames.enter().append('rect')
             .attr("class", "frame");
 
-        frames = this.container.selectAll('rect').data(frameData)
+        frames = this.container.selectAll('rect').data(data)
         frames
-            .attr("fill", function (d) { return d.fill })
-            .style("fill-opacity", function (d) { return d.fill_opacity })
-            .style("stroke", function (d) { return d.stroke })
-            .style("stroke-width", function (d) { return d.strokeWidth })
+            .attr("fill", function (d) { return d.buttonFill })
+            .style("fill-opacity", function (d) { return d.buttonFillOpacity })
+            .style("stroke", function (d) { return d.buttonStroke })
+            .style("stroke-width", function (d) { return d.buttonStrokeWidth })
             .style("filter", function(d){return d.filters})
-            .attr("height", function (d) { return d.height })
-            .attr("width", function (d) { return d.width })
-            .attr("x", function (d) { return d.x_pos })
-            .attr("y", function (d) { return d.y_pos })
+            .attr("height", function (d) { return d.buttonHeight })
+            .attr("width", function (d) { return d.buttonWidth })
+            .attr("x", function (d) { return d.buttonXpos })
+            .attr("y", function (d) { return d.buttonYpos})
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 this.update(options)
             })
 
-        let titleFOs = this.container.selectAll('foreignObject').data(titleData)
+        let titleFOs = this.container.selectAll('foreignObject').data(data)
         titleFOs.exit().remove()
         titleFOs.enter().append('foreignObject')
             .attr("class", "titleForeignObject")
@@ -257,11 +253,11 @@ export class Visual implements IVisual {
             .append("xhtml:div")
             .attr("class", "titleContainer")
 
-        titleFOs = this.container.selectAll('foreignObject').data(titleData)
-            .attr("height", function (d, i) { return frameData[i].height })
-            .attr("width", function (d, i) { return frameData[i].width })
-            .attr("x", function (d, i) { return frameData[i].x_pos })
-            .attr("y", function (d, i) { return frameData[i].y_pos })
+        titleFOs = this.container.selectAll('foreignObject').data(data)
+            .attr("height", function (d) { return d.buttonHeight })
+            .attr("width", function (d) { return d.buttonWidth })
+            .attr("x", function (d) { return d.buttonXpos })
+            .attr("y", function (d) { return d.buttonYpos })
 
 
         let titleTables = titleFOs.select('.titleTable')
@@ -272,17 +268,17 @@ export class Visual implements IVisual {
         let titleTableCells = titleTables.select(".titleTableCell")
             .style("display", "table-cell")
             .style("vertical-align", "middle")
-            .style("opacity", function (d) { return d.fill_opacity })
-            .style("font-size", function (d) { return d.font_size + "pt" })
-            .style("font-family", function (d) { return d.font_family })
-            .style("text-align", function (d) { return d.align })
-            .style("color", function (d) { return d.fill })
+            .style("opacity", function (d) { return d.textFillOpacity })
+            .style("font-size", function (d) { return d.fontSize + "pt" })
+            .style("font-family", function (d) { return d.fontFamily })
+            .style("text-align", function (d) { return d.textAlign })
+            .style("color", function (d) { return d.textFill })
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 this.update(options)
             })
             .html("")
-            .append(function (d) { return d.content })
+            .append(function (d) { return d.titleContent })
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {
