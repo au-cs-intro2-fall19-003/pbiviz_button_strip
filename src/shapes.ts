@@ -10,6 +10,9 @@ export class shape{
         this.width = width
         this.height = height
     }
+    get alterPadding(): number{
+        return 0
+    }
 }
 
 export interface shape{
@@ -19,6 +22,7 @@ export interface shape{
     height: number
     shapePoints: number[][]
     titleFOPoints: containerProperties
+    alterPadding: number
 }
 
 
@@ -46,7 +50,7 @@ export class rectangle extends shape implements shape{
     }
 }
 
-export class slanted_rectangle extends shape implements shape{
+export class parallelogram extends shape implements shape{
     z: number
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number){
         super(xPos, yPos, width, height)
@@ -54,6 +58,7 @@ export class slanted_rectangle extends shape implements shape{
     }
 
     get shapePoints(): number[][]{
+        console.log("getting points")
         let points: number[][]= [] 
         points.push([this.xPos + this.z, this.yPos])
         points.push([this.xPos+ this.width, this.yPos])
@@ -69,5 +74,8 @@ export class slanted_rectangle extends shape implements shape{
             width: this.width - 2*this.z,
             height: this.height
         }
+    }
+    get alterPadding(): number{
+        return -1*this.z
     }
 }

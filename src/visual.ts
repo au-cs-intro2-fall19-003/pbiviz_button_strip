@@ -134,8 +134,8 @@ export class Visual implements IVisual {
             delete settings.layout.rowLength
         }
 
-        if(settings.layout.buttonShape != enums.Button_Shape.slanted_rectangle){
-            delete settings.layout.slanted_rectangleAngle
+        if(settings.layout.buttonShape != enums.Button_Shape.parallelogram){
+            delete settings.layout.parallelogramAngle
         }
 
         return VisualSettings.enumerateObjectInstances(settings, options);

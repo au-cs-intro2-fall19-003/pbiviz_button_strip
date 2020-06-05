@@ -532,15 +532,15 @@
                                 "value": "rectangle"
                             },
                             {
-                                "displayName": "Slanted rectangle",
-                                "value": "slanted_rectangle"
+                                "displayName": "Parallelogram",
+                                "value": "parallelogram"
                             }
                         ]
                     }
                 },
-                "slanted_rectangleAngle": {
+                "parallelogramAngle": {
                     "displayName": "Angle",
-                    "description": "The slant's angle",
+                    "description": "The parallelogram's angle",
                     "type": {
                         "numeric": true
                     }

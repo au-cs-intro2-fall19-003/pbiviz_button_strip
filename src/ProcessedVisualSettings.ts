@@ -8,7 +8,7 @@ import {dataPoint} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
 import { max } from "d3";
-import {shape, rectangle, slanted_rectangle} from "./shapes"
+import {shape, rectangle, parallelogram} from "./shapes"
 
 export class ProcessedVisualSettings{
     i: number;
@@ -16,7 +16,6 @@ export class ProcessedVisualSettings{
     settings: VisualSettings;
     options: VisualUpdateOptions
     widthSoFar: number;
-    shape: shape;
     static widthSoFar: number; 
     static selectionIdKey: string;
     static totalTextHmargin: number;
@@ -38,10 +37,9 @@ export class ProcessedVisualSettings{
             ProcessedVisualSettings.totalTextHmargin = 0
             ProcessedVisualSettings.maxTextHeight = 0
         }
+        ProcessedVisualSettings.totalTextHmargin += 2*this.textHmargin
         this.widthSoFar = ProcessedVisualSettings.widthSoFar
         ProcessedVisualSettings.widthSoFar += this.buttonWidth
-        ProcessedVisualSettings.totalTextHmargin += 2*this.textHmargin
-        this.shape = this.createShape()
         ProcessedVisualSettings.maxTextHeight = Math.max(this.textHeight, ProcessedVisualSettings.maxTextHeight)
     }
 
@@ -121,6 +119,12 @@ export class ProcessedVisualSettings{
     }
     get buttonPadding(): number {
         return this.settings.layout.padding
+    }
+    get buttonHPadding(): number {
+        return this.buttonPadding + this.alterPadding
+    }
+    get buttonVPadding(): number {
+        return this.buttonPadding
     }
 
     get n(): number {
@@ -246,7 +250,7 @@ export class ProcessedVisualSettings{
     get buttonWidth(): number {
         switch (this.settings.layout.sizingMethod) {
             case enums.Button_Sizing_Method.uniform:
-                return (this.options.viewport.width - this.buttonPadding * (this.rowLength - 1)) / (this.rowLength) - this.shadowSpace
+                return (this.options.viewport.width - this.buttonHPadding * (this.rowLength - 1)) / (this.rowLength) - this.shadowSpace
             case enums.Button_Sizing_Method.fixed:
                 return this.settings.layout.buttonWidth - this.shadowSpace
             case enums.Button_Sizing_Method.dynamic:
@@ -260,32 +264,32 @@ export class ProcessedVisualSettings{
             case (enums.Button_Sizing_Method.fixed):
                 return this.settings.layout.buttonHeight - this.shadowSpace
             default:
-                return ((this.viewportHeight - this.buttonPadding * (this.numRows - 1)) / this.numRows) - this.shadowSpace
+                return ((this.viewportHeight - this.buttonVPadding * (this.numRows - 1)) / this.numRows) - this.shadowSpace
         }
 
     }
     get buttonXpos(): number {
         switch (this.settings.layout.sizingMethod) {
             case enums.Button_Sizing_Method.fixed:
-                let areaTaken = this.framesInRow * this.buttonWidth + (this.framesInRow - 1) * this.buttonPadding
+                let areaTaken = this.framesInRow * this.buttonWidth + (this.framesInRow - 1) * this.buttonHPadding
                 let areaRemaining = this.viewportWidth - areaTaken
                 switch (this.settings.layout.buttonAlignment) {
                     case enums.Align.left:
-                        return this.indexInRow * (this.buttonWidth + this.buttonPadding + this.shadowSpace) + this.shadowSpace/2
+                        return this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
                     case enums.Align.right:
-                        return areaRemaining + this.indexInRow * (this.buttonWidth + this.buttonPadding + this.shadowSpace) + this.shadowSpace/2
+                        return areaRemaining + this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
                     case enums.Align.center:
-                        return areaRemaining / 2 + this.indexInRow * (this.buttonWidth + this.buttonPadding + this.shadowSpace) + this.shadowSpace/2
+                        return areaRemaining / 2 + this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
 
                 }
             case enums.Button_Sizing_Method.uniform:
-                return this.indexInRow * (this.buttonWidth + this.buttonPadding + this.shadowSpace) + this.shadowSpace/2
+                return this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
             case enums.Button_Sizing_Method.dynamic:
-                return this.widthSoFar + this.indexInRow * (this.buttonPadding + this.shadowSpace) + this.shadowSpace/2
+                return this.widthSoFar + this.indexInRow * (this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
         }
     }
     get buttonYpos(): number {
-        return this.rowNumber * (this.buttonHeight + this.buttonPadding + this.shadowSpace) + this.shadowSpace/2
+        return this.rowNumber * (this.buttonHeight + this.buttonVPadding + this.shadowSpace) + this.shadowSpace/2
     }
 
     get titleContent(): HTMLDivElement {
@@ -374,16 +378,24 @@ export class ProcessedVisualSettings{
         return this.settings.layout.buttonShape
     }
 
-    get slanted_rectangleAngle(): number{
-        return this.settings.layout.slanted_rectangleAngle
+    get parallelogramAngle(): number{
+        return this.settings.layout.parallelogramAngle
     }
 
-    createShape(): shape{
+    get shape(): shape{
         switch(this.buttonShape){
             case enums.Button_Shape.rectangle:
                 return new rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
-            case enums.Button_Shape.slanted_rectangle:
-                return new slanted_rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.slanted_rectangleAngle)
+            case enums.Button_Shape.parallelogram:
+                return new parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle)
+        }
+    }
+    get alterPadding(): number {
+        switch(this.buttonShape){
+            case enums.Button_Shape.parallelogram:
+                return -1*this.buttonHeight/Math.tan(this.parallelogramAngle * (Math.PI / 180))
+            default:
+                return 0
         }
     }
 
