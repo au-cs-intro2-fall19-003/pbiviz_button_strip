@@ -545,6 +545,13 @@
                         "numeric": true
                     }
                 },
+                "shapeRoundedCornerRadius": {
+                    "displayName": "Rounded corner radius",
+                    "description": "Radius for shape's rounded corner",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "sizingMethod": {
                     "displayName": "Sizing method",
                     "description": "How buttons will be sized based on their text.",

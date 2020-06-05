@@ -377,17 +377,18 @@ export class ProcessedVisualSettings{
     get buttonShape(): enums.Button_Shape{
         return this.settings.layout.buttonShape
     }
-
     get parallelogramAngle(): number{
         return this.settings.layout.parallelogramAngle
     }
-
+    get shapeRoundedCornerRadius(): number{
+        return this.settings.layout.shapeRoundedCornerRadius
+    }
     get shape(): shape{
         switch(this.buttonShape){
             case enums.Button_Shape.rectangle:
-                return new rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
+                return new rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.parallelogram:
-                return new parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle)
+                return new parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
         }
     }
     get alterPadding(): number {
@@ -414,7 +415,7 @@ export class ProcessedVisualSettings{
         return this.shape.titleFOPoints.yPos
     }
 
-    get polyPoints(): number[][]{
-        return this.shape.shapePoints
+    get shapePath(): string{
+        return this.shape.shapePath
     }
 }

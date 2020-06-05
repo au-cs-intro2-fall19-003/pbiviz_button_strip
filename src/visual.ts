@@ -222,13 +222,11 @@ export class Visual implements IVisual {
 
         let frames = this.container.selectAll('.frame').data(data)
         frames.exit().remove()
-        frames.enter().append('polygon')
+        frames.enter().append('path')
             .attr("class", "frame " + this.visualSettings.layout.buttonShape)
         frames = this.container.selectAll('.frame').data(data)
         frames
-            .attr("points", function (d) {
-                return d.polyPoints.join(" ")
-            })
+            .attr("d", function (d) { return d.shapePath })
             .attr("fill", function (d) { return d.buttonFill })
             .style("fill-opacity", function (d) { return d.buttonFillOpacity })
             .style("stroke", function (d) { return d.buttonStroke })
