@@ -522,6 +522,29 @@
         "layout": {
             "displayName": "Layout",
             "properties": {
+                "buttonShape": {
+                    "displayName": "Shape",
+                    "description": "The shape of the buttons",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Rectangle",
+                                "value": "rectangle"
+                            },
+                            {
+                                "displayName": "Slanted rectangle",
+                                "value": "slanted_rectangle"
+                            }
+                        ]
+                    }
+                },
+                "slanted_rectangleAngle": {
+                    "displayName": "Angle",
+                    "description": "The slant's angle",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "sizingMethod": {
                     "displayName": "Sizing method",
                     "description": "How buttons will be sized based on their text.",

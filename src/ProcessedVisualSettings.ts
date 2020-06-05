@@ -8,6 +8,7 @@ import {dataPoint} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
 import { max } from "d3";
+import {shape, rectangle, slanted_rectangle} from "./shapes"
 
 export class ProcessedVisualSettings{
     i: number;
@@ -15,6 +16,7 @@ export class ProcessedVisualSettings{
     settings: VisualSettings;
     options: VisualUpdateOptions
     widthSoFar: number;
+    shape: shape;
     static widthSoFar: number; 
     static selectionIdKey: string;
     static totalTextHmargin: number;
@@ -26,7 +28,8 @@ export class ProcessedVisualSettings{
         this.i = i
         if (i == 0){
             if(selectionManager.hasSelection())
-                ProcessedVisualSettings.selectionIdKey = (selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() || ProcessedVisualSettings.selectionIdKey
+                ProcessedVisualSettings.selectionIdKey = (selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() 
+                || ProcessedVisualSettings.selectionIdKey
             else 
                 ProcessedVisualSettings.selectionIdKey = null
         }
@@ -38,6 +41,7 @@ export class ProcessedVisualSettings{
         this.widthSoFar = ProcessedVisualSettings.widthSoFar
         ProcessedVisualSettings.widthSoFar += this.buttonWidth
         ProcessedVisualSettings.totalTextHmargin += 2*this.textHmargin
+        this.shape = this.createShape()
         ProcessedVisualSettings.maxTextHeight = Math.max(this.textHeight, ProcessedVisualSettings.maxTextHeight)
     }
 
@@ -84,7 +88,7 @@ export class ProcessedVisualSettings{
         return calculateWordDimensions(this.rowText.join(""), this.fontFamily, this.fontSize + "pt").width
     }
     get widthSpaceForText(): number{
-        return this.buttonWidth - 2*this.textHmargin
+        return this.titleFOWidth - 2*this.textHmargin
     }
     get textWidth(): number{
         return calculateWordDimensions(this.text, this.fontFamily, this.fontSize + "pt").width
@@ -96,7 +100,7 @@ export class ProcessedVisualSettings{
         return ProcessedVisualSettings.maxTextHeight + this.textVmargin
     }
     get maxInlineTextWidth(): number {
-        return Math.floor(this.buttonWidth - this.iconWidth - this.iconPadding - 2*this.textHmargin)
+        return Math.floor(this.titleFOWidth - this.iconWidth - this.iconPadding - 2*this.textHmargin)
     }
     get textContainerWidthByIcon(): string {
         return this.textWidth + this.textHmargin + this.iconPadding >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
@@ -116,8 +120,7 @@ export class ProcessedVisualSettings{
         return this.isSelected ? this.settings.button.strokeWidthS :  this.settings.button.strokeWidthU
     }
     get buttonPadding(): number {
-        let padding = Math.max(0, this.settings.layout.padding)
-        return Math.min(this.options.viewport.width / (4 * this.n), padding)
+        return this.settings.layout.padding
     }
 
     get n(): number {
@@ -165,7 +168,7 @@ export class ProcessedVisualSettings{
         return this.isSelected ? this.settings.icon.paddingS : this.settings.icon.paddingU
     }
     get spaceForIcon(): number {
-        return this.buttonWidth - 2*this.iconHmargin
+        return this.titleFOWidth - 2*this.iconHmargin
     }
     get iconPlacement(): enums.Icon_Placement {
         return this.isSelected ? this.settings.icon.placementS : this.settings.icon.placementU
@@ -365,5 +368,41 @@ export class ProcessedVisualSettings{
         }
 
         return titleContainer
+    }
+
+    get buttonShape(): enums.Button_Shape{
+        return this.settings.layout.buttonShape
+    }
+
+    get slanted_rectangleAngle(): number{
+        return this.settings.layout.slanted_rectangleAngle
+    }
+
+    createShape(): shape{
+        switch(this.buttonShape){
+            case enums.Button_Shape.rectangle:
+                return new rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
+            case enums.Button_Shape.slanted_rectangle:
+                return new slanted_rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.slanted_rectangleAngle)
+        }
+    }
+
+    get titleFOHeight(): number {
+        return this.shape.titleFOPoints.height
+    }
+    get titleFOWidth(): number {
+        return this.shape.titleFOPoints.width
+    }
+
+    get titleFOXPos(): number {
+        return this.shape.titleFOPoints.xPos
+    }
+
+    get titleFOYPos(): number {
+        return this.shape.titleFOPoints.yPos
+    }
+
+    get polyPoints(): number[][]{
+        return this.shape.shapePoints
     }
 }

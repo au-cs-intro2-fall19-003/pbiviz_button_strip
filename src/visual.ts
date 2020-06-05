@@ -133,6 +133,11 @@ export class Visual implements IVisual {
         if (settings.layout.buttonLayout != enums.Button_Layout.grid) {
             delete settings.layout.rowLength
         }
+
+        if(settings.layout.buttonShape != enums.Button_Shape.slanted_rectangle){
+            delete settings.layout.slanted_rectangleAngle
+        }
+
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
@@ -200,9 +205,9 @@ export class Visual implements IVisual {
         }
 
         let data: ProcessedVisualSettings[] = [];
-        for (let i = 0; i < this.dataPoints.length; i++) 
+        for (let i = 0; i < this.dataPoints.length; i++)
             data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, options))
-        
+
 
         this.svg
             .style('width', options.viewport.width)
@@ -210,22 +215,25 @@ export class Visual implements IVisual {
 
         addFilters(this.svg.select("defs"), data[0])
 
-        let frames = this.container.selectAll('rect').data(data)
-        frames.exit().remove()
-        frames.enter().append('rect')
-            .attr("class", "frame");
+        this.container.selectAll(".frame, .titleForeignObject").filter((d, i, nodes: Element[]) => {
+            return !nodes[i].classList.contains(this.visualSettings.layout.buttonShape)
+        }).remove()
 
-        frames = this.container.selectAll('rect').data(data)
+
+        let frames = this.container.selectAll('.frame').data(data)
+        frames.exit().remove()
+        frames.enter().append('polygon')
+            .attr("class", "frame " + this.visualSettings.layout.buttonShape)
+        frames = this.container.selectAll('.frame').data(data)
         frames
+            .attr("points", function (d) {
+                return d.polyPoints.join(" ")
+            })
             .attr("fill", function (d) { return d.buttonFill })
             .style("fill-opacity", function (d) { return d.buttonFillOpacity })
             .style("stroke", function (d) { return d.buttonStroke })
             .style("stroke-width", function (d) { return d.buttonStrokeWidth })
-            .style("filter", function(d){return d.filters})
-            .attr("height", function (d) { return d.buttonHeight })
-            .attr("width", function (d) { return d.buttonWidth })
-            .attr("x", function (d) { return d.buttonXpos })
-            .attr("y", function (d) { return d.buttonYpos})
+            .style("filter", function (d) { return d.filters })
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 this.update(options)
@@ -234,7 +242,7 @@ export class Visual implements IVisual {
         let titleFOs = this.container.selectAll('foreignObject').data(data)
         titleFOs.exit().remove()
         titleFOs.enter().append('foreignObject')
-            .attr("class", "titleForeignObject")
+            .attr("class", "titleForeignObject " + this.visualSettings.layout.buttonShape)
             .append("xhtml:div")
             .attr("class", "titleTable")
             .append("xhtml:div")
@@ -243,10 +251,10 @@ export class Visual implements IVisual {
             .attr("class", "titleContainer")
 
         titleFOs = this.container.selectAll('foreignObject').data(data)
-            .attr("height", function (d) { return d.buttonHeight })
-            .attr("width", function (d) { return d.buttonWidth })
-            .attr("x", function (d) { return d.buttonXpos })
-            .attr("y", function (d) { return d.buttonYpos })
+            .attr("height", function (d) { return d.titleFOHeight })
+            .attr("width", function (d) { return d.titleFOWidth })
+            .attr("x", function (d) { return d.titleFOXPos })
+            .attr("y", function (d) { return d.titleFOYPos })
 
 
         let titleTables = titleFOs.select('.titleTable')

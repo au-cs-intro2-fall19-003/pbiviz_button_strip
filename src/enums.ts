@@ -40,3 +40,8 @@ export enum Direction {
     right = "right",
     custom = "custom"
 }
+
+export enum Button_Shape {
+    rectangle = "rectangle",
+    slanted_rectangle = "slanted_rectangle"
+}

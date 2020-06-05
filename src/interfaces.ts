@@ -28,3 +28,10 @@ export interface propertyStatesInput extends propertyStateValue {
 export interface propertyStatesOutput extends propertyStateValue {
     didChange: boolean
 }
+
+export interface containerProperties{
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number
+}
