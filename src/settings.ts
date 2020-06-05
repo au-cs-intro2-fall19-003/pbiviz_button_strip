@@ -36,63 +36,52 @@ export class ButtonSettings {
   public state : enums.State = enums.State.all;
   
   public colorA: string = "";
-  public colorS: string = "";
-  public colorU: string = "";
-  public colorDefault: string = "#fff"
+  public colorS: string = "#fff";
+  public colorU: string = "#fff";
 
   public strokeA: string = "";
-  public strokeS: string = "";
-  public strokeU: string = "";
-  public strokeDefault: string = "#000"
+  public strokeS: string = "#000";
+  public strokeU: string = "#000";
 
   public strokeWidthA: number = null;
-  public strokeWidthS: number = null;
-  public strokeWidthU: number = null;
-  public strokeWidthDefault: number = 0;
+  public strokeWidthS: number = 0;
+  public strokeWidthU: number = 0;
 
   public transparencyA: number = null;
-  public transparencyS: number = null;
-  public transparencyU: number = null;
-  public transparencyDefault: number = 0;
+  public transparencyS: number = 0;
+  public transparencyU: number = 0;
 }
 
 export class TextSettings{
   public state : enums.State = enums.State.all;
 
   public colorA: string = "";
-  public colorS: string = "";
-  public colorU: string = "";
-  public colorDefault: string = "#000"
+  public colorS: string = "#000";
+  public colorU: string = "#000";
 
   public alignmentA: enums.Align = enums.Align.center;
   public alignmentS: enums.Align = enums.Align.center;
   public alignmentU: enums.Align = enums.Align.center;
 
   public fontSizeA: number = null;
-  public fontSizeS: number = null;
-  public fontSizeU: number = null;
-  public fontSizeDefault: number = 14;
+  public fontSizeS: number = 14;
+  public fontSizeU: number = 14;
 
   public fontFamilyA: string = "";
-  public fontFamilyS: string = "";
-  public fontFamilyU: string = "";
-  public fontFamilyDefault: string = "wf_standard-font, helvetica, arial, sans-serif";
+  public fontFamilyS: string = "wf_standard-font, helvetica, arial, sans-serif";
+  public fontFamilyU: string = "wf_standard-font, helvetica, arial, sans-serif";
 
   public hmarginA: number = null;
-  public hmarginS: number = null;
-  public hmarginU: number = null;
-  public hmarginDefault: number = 0;
-
+  public hmarginS: number = 0;
+  public hmarginU: number = 0;
 
   public vmarginA: number = null;
-  public vmarginS: number = null;
-  public vmarginU: number = null;
-  public vmarginDefault: number = 0;
+  public vmarginS: number = 0;
+  public vmarginU: number = 0;
   
   public transparencyA: number = null;
-  public transparencyS: number = null;
-  public transparencyU: number = null;
-  public transparencyDefault: number = 0;
+  public transparencyS: number = 0;
+  public transparencyU: number = 0;
  
 }
 
@@ -101,9 +90,8 @@ export class IconSettings{
   public state : enums.State = enums.State.all;
 
   public placementA: enums.Icon_Placement = null;
-  public placementS: enums.Icon_Placement = null;
-  public placementU: enums.Icon_Placement = null;
-  public placementDefault: enums.Icon_Placement = enums.Icon_Placement.left;
+  public placementS: enums.Icon_Placement = enums.Icon_Placement.left;
+  public placementU: enums.Icon_Placement = enums.Icon_Placement.left;
 
   public get currentPlacement(): enums.Icon_Placement{
     switch(this.state){
@@ -118,28 +106,22 @@ export class IconSettings{
 
 
   public widthA: number = null;
-  public widthS: number = null;
-  public widthU: number = null;
-  public widthDefault: number = 40;
-
-
+  public widthS: number = 40;
+  public widthU: number = 40;
 
   public hmarginA: number = null;
-  public hmarginS: number = null;
-  public hmarginU: number = null;
-  public hmarginDefault: number = 10;
-
+  public hmarginS: number = 10;
+  public hmarginU: number = 10;
 
   public paddingA: number = null;
-  public paddingS: number = null;
-  public paddingU: number = null;
-  public paddingDefault: number = 10;
+  public paddingS: number = 10;
+  public paddingU: number = 10;
 }
 
 export class LayoutSettings{
   public buttonShape: enums.Button_Shape = enums.Button_Shape.rectangle
   public parallelogramAngle: number = 80
-  public shapeRoundedCornerRadius: number = 0
+  public shapeRoundedCornerRadius: number = 0 
   public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
   public buttonWidth: number = 150;
   public buttonHeight: number = 75;
@@ -154,28 +136,24 @@ export class EffectsSettings{
   public shadow: boolean = true;
 
   public shadowColorA: string = ""
-  public shadowColorS: string = ""
-  public shadowColorU: string = ""
-  public shadowColorDefault: string = "#000"
+  public shadowColorS: string = "#000"
+  public shadowColorU: string = "#000"
 
   public shadowTransparencyA: number = null
-  public shadowTransparencyS: number = null 
-  public shadowTransparencyU: number = null
-  public shadowTransparencyDefault: number = 70
+  public shadowTransparencyS: number = 70 
+  public shadowTransparencyU: number = 70
 
-  public shadowDirectionA: enums.Direction = enums.Direction.bottom_right
+  public shadowDirectionA: enums.Direction = null
   public shadowDirectionS: enums.Direction = enums.Direction.bottom_right
   public shadowDirectionU: enums.Direction = enums.Direction.bottom_right
 
   public shadowDistanceA: number = null
-  public shadowDistanceS: number = null
-  public shadowDistanceU: number = null
-  public shadowDistanceDefault: number = 2
+  public shadowDistanceS: number = 1
+  public shadowDistanceU: number = 2
 
   public shadowStrengthA: number = null
-  public shadowStrengthS: number = null
-  public shadowStrengthU: number = null
-  public shadowStrengthDefault: number = 3
+  public shadowStrengthS: number = 2
+  public shadowStrengthU: number = 4
 }
 
 export class VisualSettings extends DataViewObjectsParser {

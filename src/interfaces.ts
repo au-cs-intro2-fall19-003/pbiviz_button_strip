@@ -11,14 +11,12 @@ export interface propertyStateName {
     all: string,
     selected: string,
     unselected: string,
-    defaultValue?: string,
 }
 
 export interface propertyStateValue {
     all: string | number,
     selected: string | number,
     unselected: string | number,
-    defaultValue?: string | number,
 }
 
 export interface propertyStatesInput extends propertyStateValue {

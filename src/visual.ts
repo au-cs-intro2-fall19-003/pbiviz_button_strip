@@ -169,7 +169,6 @@ export class Visual implements IVisual {
                     all: this.visualSettings[objKey][groupedKeyNames.all],
                     selected: this.visualSettings[objKey][groupedKeyNames.selected],
                     unselected: this.visualSettings[objKey][groupedKeyNames.unselected],
-                    defaultValue: this.visualSettings[objKey][groupedKeyNames.defaultValue],
                     state: this.visualSettings[objKey].state
                 }
                 let leveledPropertyState = levelProperties(propertyState)
