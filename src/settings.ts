@@ -157,6 +157,20 @@ export class EffectsSettings{
   public shadowStrengthA: number = null
   public shadowStrengthS: number = 2
   public shadowStrengthU: number = 4
+
+  public glow: boolean = true;
+
+  public glowColorA: string = ""
+  public glowColorS: string = "#3380FF"
+  public glowColorU: string = "#3380FF"
+
+  public glowTransparencyA: number = null
+  public glowTransparencyS: number = 0 
+  public glowTransparencyU: number = 0
+  
+  public glowStrengthA: number = null
+  public glowStrengthS: number = 8
+  public glowStrengthU: number = 2
 }
 
 export class VisualSettings extends DataViewObjectsParser {

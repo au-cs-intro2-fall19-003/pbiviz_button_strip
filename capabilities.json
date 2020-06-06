@@ -949,6 +949,88 @@
                     "type": {
                         "numeric": true
                     }
+                },
+                "glow": {
+                    "displayName": "Glow",
+                    "description": "Add a glow to each button",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "glowColorA": {
+                    "displayName": "Color",
+                    "description": "Color of glow",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "glowColorS": {
+                    "displayName": "Color",
+                    "description": "Color of glow",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "glowColorU": {
+                    "displayName": "Color",
+                    "description": "Color of glow",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "glowTransparencyA": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of the glow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "glowTransparencyS": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of the glow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "glowTransparencyU": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of the glow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "glowStrengthA": {
+                    "displayName": "Strength",
+                    "description": "Strength of the glow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "glowStrengthS": {
+                    "displayName": "Strength",
+                    "description": "Strength of the glow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "glowStrengthU": {
+                    "displayName": "Strength",
+                    "description": "Strength of the glow.",
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
 

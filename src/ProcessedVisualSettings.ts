@@ -238,11 +238,41 @@ export class ProcessedVisualSettings{
     get shadowMaxStrength(): number{
         return Math.max(this.shadowStrengthS, this.shadowStrengthU)
     }
-    
+
+    get glowColorS(): string {
+        return this.settings.effects.glowColorS
+    }
+    get glowColorU(): string {
+        return this.settings.effects.glowColorU
+    }
+    get glowTransparencyS(): number {
+        return 1 - this.settings.effects.glowTransparencyS/100
+    }
+    get glowTransparencyU(): number {
+        return 1 - this.settings.effects.glowTransparencyU/100
+    }
+    get glowStrengthS(): number {
+        return this.settings.effects.glowStrengthS
+    }
+    get glowStrengthU(): number {
+        return this.settings.effects.glowStrengthU
+    }
+    get glowMaxStrength(): number{
+        return Math.max(this.glowStrengthS, this.glowStrengthU)
+    }
+    get glowSpace(): number {
+        return this.settings.effects.glow ? 3*(this.glowMaxStrength) : 0
+    }
+
+    get effectSpace(): number {
+        return Math.max(this.shadowSpace, this.glowSpace)
+    }
     get filters(): string{
         let filters = ""
         if(this.settings.effects.shadow)
-            filters+= this.isSelected ? "url(#drop-shadowS)" : "url(#drop-shadowU)"
+            filters+= this.isSelected ? " url(#drop-shadowS)" : " url(#drop-shadowU)"
+        if(this.settings.effects.glow)
+            filters+= this.isSelected ? " url(#glowS)" : " url(#glowU)"
         return filters
     }
 
@@ -250,21 +280,21 @@ export class ProcessedVisualSettings{
     get buttonWidth(): number {
         switch (this.settings.layout.sizingMethod) {
             case enums.Button_Sizing_Method.uniform:
-                return (this.options.viewport.width - this.buttonHPadding * (this.rowLength - 1)) / (this.rowLength) - this.shadowSpace
+                return (this.options.viewport.width - this.buttonHPadding * (this.rowLength - 1)) / (this.rowLength) - this.effectSpace
             case enums.Button_Sizing_Method.fixed:
-                return this.settings.layout.buttonWidth - this.shadowSpace
+                return this.settings.layout.buttonWidth - this.effectSpace
             case enums.Button_Sizing_Method.dynamic:
                 let buttonWidthScaleFactor = this.widthSpaceForAllText / this.allTextWidth
-                let width = this.textWidth * buttonWidthScaleFactor + 2 * this.textHmargin - this.shadowSpace
+                let width = this.textWidth * buttonWidthScaleFactor + 2 * this.textHmargin - this.effectSpace
                 return width
         }
     }
     get buttonHeight(): number {
         switch (this.settings.layout.sizingMethod) {
             case (enums.Button_Sizing_Method.fixed):
-                return this.settings.layout.buttonHeight - this.shadowSpace
+                return this.settings.layout.buttonHeight - this.effectSpace
             default:
-                return ((this.viewportHeight - this.buttonVPadding * (this.numRows - 1)) / this.numRows) - this.shadowSpace
+                return ((this.viewportHeight - this.buttonVPadding * (this.numRows - 1)) / this.numRows) - this.effectSpace
         }
 
     }
@@ -275,21 +305,21 @@ export class ProcessedVisualSettings{
                 let areaRemaining = this.viewportWidth - areaTaken
                 switch (this.settings.layout.buttonAlignment) {
                     case enums.Align.left:
-                        return this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
+                        return this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.effectSpace) + this.effectSpace/2
                     case enums.Align.right:
-                        return areaRemaining + this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
+                        return areaRemaining + this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.effectSpace) + this.effectSpace/2
                     case enums.Align.center:
-                        return areaRemaining / 2 + this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
+                        return areaRemaining / 2 + this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.effectSpace) + this.effectSpace/2
 
                 }
             case enums.Button_Sizing_Method.uniform:
-                return this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
+                return this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.effectSpace) + this.effectSpace/2
             case enums.Button_Sizing_Method.dynamic:
-                return this.widthSoFar + this.indexInRow * (this.buttonHPadding + this.shadowSpace) + this.shadowSpace/2
+                return this.widthSoFar + this.indexInRow * (this.buttonHPadding + this.effectSpace) + this.effectSpace/2
         }
     }
     get buttonYpos(): number {
-        return this.rowNumber * (this.buttonHeight + this.buttonVPadding + this.shadowSpace) + this.shadowSpace/2
+        return this.rowNumber * (this.buttonHeight + this.buttonVPadding + this.effectSpace) + this.effectSpace/2
     }
 
     get titleContent(): HTMLDivElement {
