@@ -13,6 +13,10 @@ export class Shape{
         this.height = height
         this.radius = radius
     }
+
+    get strokePath(): string{
+        return this.shapePath
+    }
 }
 
 export interface Shape{
@@ -21,6 +25,7 @@ export interface Shape{
     width: number
     height: number
     shapePath: string
+    strokePath: string
     titleFOPoints: containerProperties
 }
 
@@ -252,22 +257,27 @@ export class Tab_RoundedCorners extends Shape implements Shape{
             height: this.height
         }
     }
+    get strokePath(): string {
+        let strokePath: Path = new Path(this.shapePath)
+        strokePath.removeClose()
+        return strokePath.toString()
+    }
 }
 export class Tab_CutCorners extends Shape implements Shape{
     z: number
-    constructor(xPos: number, yPos: number, width: number, height: number){
+    constructor(xPos: number, yPos: number, width: number, height: number, length: number){
         super(xPos, yPos, width, height)
-        this.z = 0.2*width
+        this.z = length
     }
 
     get shapePath(): string{
         let path = new Path()
-        path.MoveTo(this.xPos, this.yPos + this.z)
+        path.MoveTo(this.xPos, this.yPos + this.height)
+        path.DrawTo(this.xPos, this.yPos + this.z)
         path.DrawTo(this.xPos + this.z, this.yPos)
         path.DrawTo(this.xPos + this.width - this.z, this.yPos)
         path.DrawTo(this.xPos + this.width, this.yPos + this.z)
         path.DrawTo(this.xPos + this.width, this.yPos + this.height)
-        path.DrawTo(this.xPos, this.yPos + this.height)
         path.close()
         return path.toString()
     }
@@ -279,22 +289,27 @@ export class Tab_CutCorners extends Shape implements Shape{
             width: this.width,
             height: this.height
         }
+    }
+    get strokePath(): string {
+        let strokePath: Path = new Path(this.shapePath)
+        strokePath.removeClose()
+        return strokePath.toString()
     }
 }
 export class Tab_CutCorner extends Shape implements Shape{
     z: number
-    constructor(xPos: number, yPos: number, width: number, height: number){
+    constructor(xPos: number, yPos: number, width: number, height: number, length: number){
         super(xPos, yPos, width, height)
-        this.z = 0.2*width
+        this.z = length
     }
 
     get shapePath(): string{
         let path = new Path()
-        path.MoveTo(this.xPos, this.yPos)
+        path.MoveTo(this.xPos, this.yPos + this.height)
+        path.DrawTo(this.xPos, this.yPos)
         path.DrawTo(this.xPos + this.width - this.z, this.yPos)
         path.DrawTo(this.xPos + this.width, this.yPos + this.z)
         path.DrawTo(this.xPos + this.width, this.yPos + this.height)
-        path.DrawTo(this.xPos, this.yPos + this.height)
         path.close()
         return path.toString()
     }
@@ -307,10 +322,18 @@ export class Tab_CutCorner extends Shape implements Shape{
             height: this.height
         }
     }
+    get strokePath(): string {
+        let strokePath: Path = new Path(this.shapePath)
+        strokePath.removeClose()
+        return strokePath.toString()
+    }
 }
 
 class Path{
-    path: string = "";
+    path: string;
+    constructor(path?: string){
+        this.path = path || ""
+    }
     public MoveTo(x, y): void{
         this.path+= ["M",x,y].join(" ") + " "
     }
@@ -332,6 +355,10 @@ class Path{
     }
     public close(): void{
         this.path += 'Z'
+    }
+    public removeClose(): void{
+        if(this.path.endsWith('Z'))
+            this.path = this.path.substring(0,  this.path.length-1)
     }
     public toString(): string{
         return this.path

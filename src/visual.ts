@@ -140,6 +140,19 @@ export class Visual implements IVisual {
         if(settings.layout.buttonShape != enums.Button_Shape.chevron){
             delete settings.layout.chevronAngle
         }
+        if(settings.layout.buttonShape != enums.Button_Shape.pentagon){
+            delete settings.layout.pentagonAngle
+        }
+        if(settings.layout.buttonShape != enums.Button_Shape.hexagon){
+            delete settings.layout.hexagonAngle
+        }
+        if(settings.layout.buttonShape != enums.Button_Shape.tab_cutCorners){
+            delete settings.layout.tab_cutCornersLength
+        }
+        if(settings.layout.buttonShape != enums.Button_Shape.tab_cutCorner){
+            delete settings.layout.tab_cutCornerLength
+        }
+        
 
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
@@ -217,23 +230,35 @@ export class Visual implements IVisual {
 
         addFilters(this.svg.select("defs"), data[0])
 
-        this.container.selectAll(".frame, .titleForeignObject").filter((d, i, nodes: Element[]) => {
+        this.container.selectAll(".frameContainer, .titleForeignObject").filter((d, i, nodes: Element[]) => {
+            console.log(nodes[i].classList)
             return !nodes[i].classList.contains(this.visualSettings.layout.buttonShape)
         }).remove()
 
 
-        let frames = this.container.selectAll('.frame').data(data)
-        frames.exit().remove()
-        frames.enter().append('path')
-            .attr("class", "frame " + this.visualSettings.layout.buttonShape)
-        frames = this.container.selectAll('.frame').data(data)
-        frames
+        let framesContainer = this.container.selectAll('.frameContainer').data(data)
+        framesContainer.exit().remove()
+        let framesContainerEnter = framesContainer.enter().append('g')
+            .attr("class", "frameContainer " + this.visualSettings.layout.buttonShape)
+        framesContainerEnter.append('path').attr("class", "fill")
+        framesContainerEnter.append('path').attr("class", "stroke")
+        framesContainer = this.container.selectAll('.frameContainer').data(data)
+        
+        framesContainer.select(".fill")
             .attr("d", function (d) { return d.shapePath })
             .attr("fill", function (d) { return d.buttonFill })
             .style("fill-opacity", function (d) { return d.buttonFillOpacity })
+            .style("filter", function (d) { return d.filters })
+            .on('click', (d, i) => {
+                this.selectionManager.select(this.dataPoints[i].selectionId)
+                this.update(options)
+            })
+
+        framesContainer.select(".stroke")
+            .attr("d", function (d) { return d.strokePath })
+            .style("fill-opacity", 0)
             .style("stroke", function (d) { return d.buttonStroke })
             .style("stroke-width", function (d) { return d.buttonStrokeWidth })
-            .style("filter", function (d) { return d.filters })
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 this.update(options)

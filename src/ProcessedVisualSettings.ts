@@ -265,7 +265,7 @@ export class ProcessedVisualSettings{
     }
 
     get effectSpace(): number {
-        return Math.max(this.shadowSpace, this.glowSpace)
+        return Math.max(this.shadowSpace, this.glowSpace, this.buttonStrokeWidth)
     }
     get filters(): string{
         let filters = ""
@@ -419,6 +419,12 @@ export class ProcessedVisualSettings{
     get hexagonAngle(): number{
         return this.settings.layout.hexagonAngle
     }
+    get tab_cutCornersLength(): number{
+        return this.settings.layout.tab_cutCornersLength
+    }
+    get tab_cutCornerLength(): number{
+        return this.settings.layout.tab_cutCornerLength
+    }
 
     get shapeRoundedCornerRadius(): number{
         return this.settings.effects.shapeRoundedCornerRadius
@@ -443,9 +449,9 @@ export class ProcessedVisualSettings{
             case enums.Button_Shape.tab_roundedCorners:
                 return new Tab_RoundedCorners(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
             case enums.Button_Shape.tab_cutCorners:
-                return new Tab_CutCorners(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
+                return new Tab_CutCorners(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.tab_cutCornersLength)
             case enums.Button_Shape.tab_cutCorner:
-                return new Tab_CutCorner(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
+                return new Tab_CutCorner(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.tab_cutCornerLength)
         }
     }
     get alterHorizontalPadding(): number {
@@ -487,5 +493,8 @@ export class ProcessedVisualSettings{
 
     get shapePath(): string{
         return this.shape.shapePath
+    }
+    get strokePath(): string{
+        return this.shape.strokePath
     }
 }

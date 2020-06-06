@@ -594,6 +594,20 @@
                         "numeric": true
                     }
                 },
+                "tab_cutCornersLength": {
+                    "displayName": "Length",
+                    "description": "How much to cut out of the tab",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "tab_cutCornerLength": {
+                    "displayName": "Length",
+                    "description": "How much to cut out of the tab",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "sizingMethod": {
                     "displayName": "Sizing method",
                     "description": "How buttons will be sized based on their text.",
