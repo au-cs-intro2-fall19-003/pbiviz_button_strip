@@ -8,7 +8,7 @@ import {dataPoint} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
 import { max } from "d3";
-import {Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon} from "./shapes"
+import {Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon, Tab_RoundedCorners, Tab_CutCorners, Tab_CutCorner, ChevronVertical} from "./shapes"
 
 export class ProcessedVisualSettings{
     i: number;
@@ -121,10 +121,10 @@ export class ProcessedVisualSettings{
         return this.settings.layout.padding
     }
     get buttonHPadding(): number {
-        return this.buttonPadding + this.alterPadding
+        return this.buttonPadding + this.alterHorizontalPadding
     }
     get buttonVPadding(): number {
-        return this.buttonPadding
+        return this.buttonPadding + this.alterVerticalPadding
     }
 
     get n(): number {
@@ -400,21 +400,41 @@ export class ProcessedVisualSettings{
             case enums.Button_Shape.parallelogram:
                 return new Parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.chevron:
-                return new Chevron(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
+                if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
+                    return new Chevron(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
+                else
+                    return new ChevronVertical(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.ellipse:
                 return new Ellipse(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
             case enums.Button_Shape.pentagon:
                 return new Pentagon(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.pentagonAngle, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.hexagon:
                 return new Hexagon(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.hexagonAngle, this.shapeRoundedCornerRadius)
+            case enums.Button_Shape.tab_roundedCorners:
+                return new Tab_RoundedCorners(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
+            case enums.Button_Shape.tab_cutCorners:
+                return new Tab_CutCorners(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
+            case enums.Button_Shape.tab_cutCorner:
+                return new Tab_CutCorner(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
         }
     }
-    get alterPadding(): number {
+    get alterHorizontalPadding(): number {
         switch(this.buttonShape){
             case enums.Button_Shape.parallelogram:
                 return -1*this.buttonHeight/Math.tan(this.parallelogramAngle * (Math.PI / 180))
             case enums.Button_Shape.chevron:
-                return -0.5*this.buttonHeight/Math.tan(this.chevronAngle * (Math.PI / 180))
+                if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
+                    return -0.5*this.buttonHeight/Math.tan(this.chevronAngle * (Math.PI / 180))
+            default:
+                return 0
+        }
+    }
+
+    get alterVerticalPadding(): number {
+        switch(this.buttonShape){
+            case enums.Button_Shape.chevron:
+                if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
+                    return -0.5*this.buttonWidth/Math.tan(this.chevronAngle * (Math.PI / 180))
             default:
                 return 0
         }

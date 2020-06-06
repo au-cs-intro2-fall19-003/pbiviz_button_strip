@@ -550,6 +550,18 @@
                             {
                                 "displayName": "Hexagon",
                                 "value": "hexagon"
+                            },
+                            {
+                                "displayName": "Tab: Rounded Corners",
+                                "value": "tab_roundedCorners"
+                            },
+                            {
+                                "displayName": "Tab: Cut Corners",
+                                "value": "tab_cutCorners"
+                            },
+                            {
+                                "displayName": "Tab: Cut Corner",
+                                "value": "tab_cutCorner"
                             }
                         ]
                     }

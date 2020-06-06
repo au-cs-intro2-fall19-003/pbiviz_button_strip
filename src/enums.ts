@@ -47,5 +47,8 @@ export enum Button_Shape {
     chevron = "chevron",
     ellipse = "ellipse",
     pentagon = "pentagon",
-    hexagon = "hexagon"
+    hexagon = "hexagon",
+    tab_roundedCorners = "tab_roundedCorners",
+    tab_cutCorners = "tab_cutCorners",
+    tab_cutCorner = "tab_cutCorner"
 }
