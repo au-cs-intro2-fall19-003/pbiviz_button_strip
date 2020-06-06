@@ -6,7 +6,7 @@ export class Shape{
     width: number
     height: number
     radius: number
-    constructor(xPos: number, yPos: number, width: number, height: number, radius: number){
+    constructor(xPos: number, yPos: number, width: number, height: number, radius?: number){
         this.xPos = xPos
         this.yPos = yPos
         this.width = width
@@ -109,6 +109,36 @@ export class Chevron extends Shape implements Shape{
     }
 }
 
+export class Ellipse extends Shape implements Shape{
+    constructor(xPos: number, yPos: number, width: number, height: number){
+        super(xPos, yPos, width, height)
+    }
+
+    get shapePath(): string{
+        let rx =  0.5*this.width
+        let ry = 0.5*this.height
+        let cx = this.xPos + rx
+        let cy = this.yPos + ry
+        let path = new Path()
+        path.MoveTo(cx-rx, cy)
+        path.arc(rx, ry, 0, 1, 0, 2*rx, 0)
+        path.arc(rx, ry, 0, 1, 0, -2*rx, 0)
+        path.close()
+        console.log(rx, ry, cx, cy)
+        console.log(path.toString())
+        return path.toString()
+    }
+
+    get titleFOPoints(): containerProperties{
+        return {
+            xPos: this.xPos,
+            yPos: this.yPos,
+            width: this.width,
+            height: this.height
+        }
+    }
+}
+
 class Path{
     path: string = "";
     public MoveTo(x, y): void{
@@ -123,6 +153,10 @@ class Path{
     public drawTo(x, y): void{
         this.path+= ["l",x,y].join(" ")+ " "
     }
+    public arc(rx: number, ry:number, rotation: number, arc:number, sweep: number, eX: number, eY: number){
+        this.path+= ["a",rx,ry,rotation,arc,sweep,eX,eY].join(" ")+ " "
+    }
+    
     public roundCorners(radius): void{
         this.path = roundPathCorners(this.path, radius, false)
     }

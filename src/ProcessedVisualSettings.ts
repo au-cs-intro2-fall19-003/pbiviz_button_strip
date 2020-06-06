@@ -8,7 +8,7 @@ import {dataPoint} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
 import { max } from "d3";
-import {Shape, Rectangle, Parallelogram, Chevron} from "./shapes"
+import {Shape, Rectangle, Parallelogram, Chevron, Ellipse} from "./shapes"
 
 export class ProcessedVisualSettings{
     i: number;
@@ -394,6 +394,8 @@ export class ProcessedVisualSettings{
                 return new Parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.chevron:
                 return new Chevron(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
+            case enums.Button_Shape.ellipse:
+                return new Ellipse(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
         }
     }
     get alterPadding(): number {

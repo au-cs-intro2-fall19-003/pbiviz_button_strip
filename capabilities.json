@@ -538,6 +538,10 @@
                             {
                                 "displayName": "Chevron",
                                 "value": "chevron"
+                            },
+                            {
+                                "displayName": "Ellipse",
+                                "value": "ellipse"
                             }
                         ]
                     }
