@@ -1,6 +1,6 @@
 import {containerProperties} from "./interfaces"
 import {roundPathCorners} from "./rounding"
-export class shape{
+export class Shape{
     xPos: number
     yPos: number
     width: number
@@ -13,23 +13,19 @@ export class shape{
         this.height = height
         this.radius = radius
     }
-    get alterPadding(): number{
-        return 0
-    }
 }
 
-export interface shape{
+export interface Shape{
     xPos: number
     yPos: number
     width: number
     height: number
     shapePath: string
     titleFOPoints: containerProperties
-    alterPadding: number
 }
 
 
-export class rectangle extends shape implements shape{
+export class Rectangle extends Shape implements Shape{
     constructor(xPos: number, yPos: number, width: number, height: number, radius: number){
         super(xPos, yPos, width, height, radius)
     }
@@ -55,7 +51,7 @@ export class rectangle extends shape implements shape{
     }
 }
 
-export class parallelogram extends shape implements shape{
+export class Parallelogram extends Shape implements Shape{
     z: number
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
@@ -81,8 +77,35 @@ export class parallelogram extends shape implements shape{
             height: this.height
         }
     }
-    get alterPadding(): number{
-        return -1*this.z
+}
+
+export class Chevron extends Shape implements Shape{
+    z: number
+    constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
+        super(xPos, yPos, width, height, radius)
+        this.z = (0.5*this.height)/Math.tan(angle * (Math.PI / 180))
+    }
+
+    get shapePath(): string{
+        let path = new Path()
+        path.MoveTo(this.xPos, this.yPos)
+        path.DrawTo(this.xPos + this.width - this.z, this.yPos)
+        path.DrawTo(this.xPos + this.width, this.yPos + 0.5*this.height)
+        path.DrawTo(this.xPos + this.width - this.z, this.yPos + this.height)
+        path.DrawTo(this.xPos, this.yPos + this.height)
+        path.DrawTo(this.xPos + this.z, this.yPos + 0.5*this.height)
+        path.close()
+        path.roundCorners(this.radius)
+        return path.toString()
+    }
+
+    get titleFOPoints(): containerProperties{
+        return {
+            xPos: this.xPos + this.z,
+            yPos: this.yPos,
+            width: this.width - 2*this.z,
+            height: this.height
+        }
     }
 }
 

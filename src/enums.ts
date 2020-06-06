@@ -43,5 +43,6 @@ export enum Direction {
 
 export enum Button_Shape {
     rectangle = "rectangle",
-    parallelogram = "parallelogram"
+    parallelogram = "parallelogram",
+    chevron = "chevron"
 }

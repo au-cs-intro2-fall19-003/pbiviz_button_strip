@@ -121,7 +121,7 @@ export class IconSettings{
 export class LayoutSettings{
   public buttonShape: enums.Button_Shape = enums.Button_Shape.rectangle
   public parallelogramAngle: number = 80
-  public shapeRoundedCornerRadius: number = 0 
+  public chevronAngle: number = 45
   public sizingMethod: enums.Button_Sizing_Method = enums.Button_Sizing_Method.uniform;
   public buttonWidth: number = 150;
   public buttonHeight: number = 75;
@@ -132,6 +132,7 @@ export class LayoutSettings{
 }
 
 export class EffectsSettings{
+  public shapeRoundedCornerRadius: number = 0 
   public state : enums.State = enums.State.all;
   public shadow: boolean = true;
 

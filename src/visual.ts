@@ -137,6 +137,9 @@ export class Visual implements IVisual {
         if(settings.layout.buttonShape != enums.Button_Shape.parallelogram){
             delete settings.layout.parallelogramAngle
         }
+        if(settings.layout.buttonShape != enums.Button_Shape.chevron){
+            delete settings.layout.chevronAngle
+        }
 
         return VisualSettings.enumerateObjectInstances(settings, options);
     }

@@ -8,7 +8,7 @@ import {dataPoint} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
 import { max } from "d3";
-import {shape, rectangle, parallelogram} from "./shapes"
+import {Shape, Rectangle, Parallelogram, Chevron} from "./shapes"
 
 export class ProcessedVisualSettings{
     i: number;
@@ -380,21 +380,28 @@ export class ProcessedVisualSettings{
     get parallelogramAngle(): number{
         return this.settings.layout.parallelogramAngle
     }
-    get shapeRoundedCornerRadius(): number{
-        return this.settings.layout.shapeRoundedCornerRadius
+    get chevronAngle(): number{
+        return this.settings.layout.chevronAngle
     }
-    get shape(): shape{
+    get shapeRoundedCornerRadius(): number{
+        return this.settings.effects.shapeRoundedCornerRadius
+    }
+    get shape(): Shape{
         switch(this.buttonShape){
             case enums.Button_Shape.rectangle:
-                return new rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.shapeRoundedCornerRadius)
+                return new Rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.parallelogram:
-                return new parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
+                return new Parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
+            case enums.Button_Shape.chevron:
+                return new Chevron(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
         }
     }
     get alterPadding(): number {
         switch(this.buttonShape){
             case enums.Button_Shape.parallelogram:
                 return -1*this.buttonHeight/Math.tan(this.parallelogramAngle * (Math.PI / 180))
+            case enums.Button_Shape.chevron:
+                return -0.5*this.buttonHeight/Math.tan(this.chevronAngle * (Math.PI / 180))
             default:
                 return 0
         }

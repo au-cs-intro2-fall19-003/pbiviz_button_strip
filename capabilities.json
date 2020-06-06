@@ -534,6 +534,10 @@
                             {
                                 "displayName": "Parallelogram",
                                 "value": "parallelogram"
+                            },
+                            {
+                                "displayName": "Chevron",
+                                "value": "chevron"
                             }
                         ]
                     }
@@ -545,9 +549,9 @@
                         "numeric": true
                     }
                 },
-                "shapeRoundedCornerRadius": {
-                    "displayName": "Rounded corner radius",
-                    "description": "Radius for shape's rounded corner",
+                "chevronAngle": {
+                    "displayName": "Angle",
+                    "description": "The chevron's angle",
                     "type": {
                         "numeric": true
                     }
@@ -652,6 +656,13 @@
                                 "value": "unselected"
                             }
                         ]
+                    }
+                },
+                "shapeRoundedCornerRadius": {
+                    "displayName": "Rounded corner radius",
+                    "description": "Radius for shape's rounded corner",
+                    "type": {
+                        "numeric": true
                     }
                 },
                 "shadow": {
