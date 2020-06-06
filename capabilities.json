@@ -496,23 +496,44 @@
                         "numeric": true
                     }
                 },
-                "paddingA": {
-                    "displayName": "Padding",
-                    "description": "Padding between icon and text",
+                "topMarginA": {
+                    "displayName": "Top margin",
+                    "description": "Top margin for the icon",
                     "type": {
                         "numeric": true
                     }  
                 },
-                "paddingS": {
-                    "displayName": "Padding",
-                    "description": "Padding between icon and text",
+                "topMarginS": {
+                    "displayName": "Top margin",
+                    "description": "Top margin for the icon",
                     "type": {
                         "numeric": true
                     }  
                 },
-                "paddingU": {
-                    "displayName": "Padding",
-                    "description": "Padding between icon and text",
+                "topMarginU": {
+                    "displayName": "Top margin",
+                    "description": "Top margin for the icon",
+                    "type": {
+                        "numeric": true
+                    }  
+                },
+                "bottomMarginA": {
+                    "displayName": "Bottom margin",
+                    "description": "Bottom margin for the icon",
+                    "type": {
+                        "numeric": true
+                    }  
+                },
+                "bottomMarginS": {
+                    "displayName": "Bottom margin",
+                    "description": "Bottom margin for the icon",
+                    "type": {
+                        "numeric": true
+                    }  
+                },
+                "bottomMarginU": {
+                    "displayName": "Bottom margin",
+                    "description": "Bottom margin for the icon",
                     "type": {
                         "numeric": true
                     }  

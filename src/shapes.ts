@@ -84,6 +84,34 @@ export class Parallelogram extends Shape implements Shape{
     }
 }
 
+export class ParallelogramVertical extends Shape implements Shape{
+    z: number
+    constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
+        super(xPos, yPos, width, height, radius)
+        this.z = this.width/Math.tan(angle * (Math.PI / 180))
+    }
+
+    get shapePath(): string{
+        let path = new Path()
+        path.MoveTo(this.xPos, this.yPos)
+        path.DrawTo(this.xPos + this.width, this.yPos + this.z)
+        path.DrawTo(this.xPos + this.width , this.yPos + this.height)
+        path.DrawTo(this.xPos, this.yPos + this.height -  this.z)
+        path.close()
+        path.roundCorners(this.radius)
+        return path.toString()
+    }
+
+    get titleFOPoints(): containerProperties{
+        return {
+            xPos: this.xPos,
+            yPos: this.yPos + this.z,
+            width: this.width,
+            height: this.height - 2*this.z
+        }
+    }
+}
+
 export class Chevron extends Shape implements Shape{
     z: number
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){

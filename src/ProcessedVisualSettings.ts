@@ -8,7 +8,7 @@ import {dataPoint} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
 import { max } from "d3";
-import {Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon, Tab_RoundedCorners, Tab_CutCorners, Tab_CutCorner, ChevronVertical} from "./shapes"
+import {Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon, Tab_RoundedCorners, Tab_CutCorners, Tab_CutCorner, ChevronVertical, ParallelogramVertical} from "./shapes"
 
 export class ProcessedVisualSettings{
     i: number;
@@ -98,10 +98,10 @@ export class ProcessedVisualSettings{
         return ProcessedVisualSettings.maxTextHeight + this.textVmargin
     }
     get maxInlineTextWidth(): number {
-        return Math.floor(this.titleFOWidth - this.iconWidth - this.iconPadding - 2*this.textHmargin)
+        return Math.floor(this.titleFOWidth - this.iconWidth - this.iconHmargin - 2*this.textHmargin)
     }
     get textContainerWidthByIcon(): string {
-        return this.textWidth + this.textHmargin + this.iconPadding >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
+        return this.textWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
     }
 
 
@@ -168,8 +168,11 @@ export class ProcessedVisualSettings{
     get iconHmargin(): number {
         return this.isSelected ? this.settings.icon.hmarginS : this.settings.icon.hmarginU
     }
-    get iconPadding(): number{
-        return this.isSelected ? this.settings.icon.paddingS : this.settings.icon.paddingU
+    get iconTopMargin(): number{
+        return this.isSelected ? this.settings.icon.topMarginS : this.settings.icon.topMarginU
+    }
+    get iconBottomMargin(): number{
+        return this.isSelected ? this.settings.icon.bottomMarginS : this.settings.icon.bottomMarginU
     }
     get spaceForIcon(): number {
         return this.titleFOWidth - 2*this.iconHmargin
@@ -178,7 +181,7 @@ export class ProcessedVisualSettings{
         return this.isSelected ? this.settings.icon.placementS : this.settings.icon.placementU
     }
     get iconHeight(): number {
-        return this.buttonHeight - this.textContainerHeight - this.iconPadding
+        return this.titleFOHeight - this.textContainerHeight - this.iconTopMargin - this.iconBottomMargin
     }
 
 
@@ -351,7 +354,7 @@ export class ProcessedVisualSettings{
                     img.style.height = this.iconWidth + 'px'
                     img.style.display = 'inline-block'
                     img.style.verticalAlign = 'middle'
-                    img.style.marginRight = this.iconPadding + 'px'
+                    img.style.marginRight = this.iconHmargin + 'px'
 
 
                     textContainer.style.display = 'inline-block'
@@ -364,12 +367,15 @@ export class ProcessedVisualSettings{
                     titleContainer.append(img, textContainer)
                     break
                 default:
-                    titleContainer.style.position = 'relative'
-                    titleContainer.style.height = this.buttonHeight + 'px'
+                    // titleContainer.style.position = 'relative'
+                    titleContainer.style.height = this.titleFOHeight + 'px'
+                    titleContainer.style.maxHeight = this.titleFOHeight + 'px'
 
                     img.style.width = this.spaceForIcon + 'px'
                     img.style.marginLeft = this.iconHmargin + 'px'
                     img.style.marginRight = this.iconHmargin + 'px'
+                    img.style.marginTop = this.iconTopMargin + 'px'
+                    img.style.marginBottom = this.iconBottomMargin + 'px'
                     img.style.height = this.iconHeight + 'px'
 
                     textContainer.style.width = this.widthSpaceForText + 'px'
@@ -434,7 +440,10 @@ export class ProcessedVisualSettings{
             case enums.Button_Shape.rectangle:
                 return new Rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.parallelogram:
-                return new Parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
+                if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
+                    return new Parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
+                else
+                    return new ParallelogramVertical(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.chevron:
                 if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
                     return new Chevron(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
@@ -457,7 +466,8 @@ export class ProcessedVisualSettings{
     get alterHorizontalPadding(): number {
         switch(this.buttonShape){
             case enums.Button_Shape.parallelogram:
-                return -1*this.buttonHeight/Math.tan(this.parallelogramAngle * (Math.PI / 180))
+                if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
+                    return -1*this.buttonHeight/Math.tan(this.parallelogramAngle * (Math.PI / 180))
             case enums.Button_Shape.chevron:
                 if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
                     return -0.5*this.buttonHeight/Math.tan(this.chevronAngle * (Math.PI / 180))
@@ -468,6 +478,9 @@ export class ProcessedVisualSettings{
 
     get alterVerticalPadding(): number {
         switch(this.buttonShape){
+            case enums.Button_Shape.parallelogram:
+                if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
+                    return -1*this.buttonWidth/Math.tan(this.parallelogramAngle * (Math.PI / 180))
             case enums.Button_Shape.chevron:
                 if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
                     return -0.5*this.buttonWidth/Math.tan(this.chevronAngle * (Math.PI / 180))

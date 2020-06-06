@@ -115,15 +115,15 @@ export class Visual implements IVisual {
                 if (iconSettingsKeys[i] != 'icons')
                     delete settings.icon[iconSettingsKeys[i]]
         }
-        if (settings.icon.currentPlacement == enums.Icon_Placement.left) {
-            delete settings.icon.hmarginA
-            delete settings.icon.hmarginS
-            delete settings.icon.hmarginU
-        } else {
-            delete settings.icon.widthA
-            delete settings.icon.widthS
-            delete settings.icon.widthU
-        }
+        // if (settings.icon.currentPlacement == enums.Icon_Placement.left) {
+        //     delete settings.icon.hmarginA
+        //     delete settings.icon.hmarginS
+        //     delete settings.icon.hmarginU
+        // } else {
+        //     delete settings.icon.widthA
+        //     delete settings.icon.widthS
+        //     delete settings.icon.widthU
+        // }
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
             delete settings.layout.buttonWidth;

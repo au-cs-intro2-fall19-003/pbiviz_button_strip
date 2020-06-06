@@ -113,9 +113,13 @@ export class IconSettings{
   public hmarginS: number = 10;
   public hmarginU: number = 10;
 
-  public paddingA: number = null;
-  public paddingS: number = 10;
-  public paddingU: number = 10;
+  public topMarginA: number = null;
+  public topMarginS: number = 10;
+  public topMarginU: number = 10;
+
+  public bottomMarginA: number = null;
+  public bottomMarginS: number = 10;
+  public bottomMarginU: number = 10;
 }
 
 export class LayoutSettings{
