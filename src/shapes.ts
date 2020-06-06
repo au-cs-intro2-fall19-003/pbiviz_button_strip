@@ -109,6 +109,65 @@ export class Chevron extends Shape implements Shape{
     }
 }
 
+export class Pentagon extends Shape implements Shape{
+    z: number
+    constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
+        super(xPos, yPos, width, height, radius)
+        this.z = (0.5*this.height)/Math.tan(angle * (Math.PI / 180))
+    }
+
+    get shapePath(): string{
+        let path = new Path()
+        path.MoveTo(this.xPos, this.yPos)
+        path.DrawTo(this.xPos + this.width - this.z, this.yPos)
+        path.DrawTo(this.xPos + this.width, this.yPos + 0.5*this.height)
+        path.DrawTo(this.xPos + this.width - this.z, this.yPos + this.height)
+        path.DrawTo(this.xPos, this.yPos + this.height)
+        path.close()
+        path.roundCorners(this.radius)
+        return path.toString()
+    }
+
+    get titleFOPoints(): containerProperties{
+        return {
+            xPos: this.xPos,
+            yPos: this.yPos,
+            width: this.width - this.z,
+            height: this.height
+        }
+    }
+}
+
+export class Hexagon extends Shape implements Shape{
+    z: number
+    constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
+        super(xPos, yPos, width, height, radius)
+        this.z = (0.5*this.height)/Math.tan(angle * (Math.PI / 180))
+    }
+
+    get shapePath(): string{
+        let path = new Path()
+        path.MoveTo(this.xPos + this.z, this.yPos)
+        path.DrawTo(this.xPos + this.width - this.z, this.yPos)
+        path.DrawTo(this.xPos + this.width, this.yPos + 0.5*this.height)
+        path.DrawTo(this.xPos + this.width - this.z, this.yPos + this.height)
+        path.DrawTo(this.xPos + this.z, this.yPos + this.height)
+        path.DrawTo(this.xPos, this.yPos + 0.5*this.height)
+        path.close()
+        path.roundCorners(this.radius)
+        return path.toString()
+    }
+
+    get titleFOPoints(): containerProperties{
+        return {
+            xPos: this.xPos + this.z,
+            yPos: this.yPos,
+            width: this.width - 2*this.z,
+            height: this.height
+        }
+    }
+}
+
 export class Ellipse extends Shape implements Shape{
     constructor(xPos: number, yPos: number, width: number, height: number){
         super(xPos, yPos, width, height)

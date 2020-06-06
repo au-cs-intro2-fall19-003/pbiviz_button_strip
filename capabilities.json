@@ -542,11 +542,19 @@
                             {
                                 "displayName": "Ellipse",
                                 "value": "ellipse"
+                            },
+                            {
+                                "displayName": "Pentagon",
+                                "value": "pentagon"
+                            },
+                            {
+                                "displayName": "Hexagon",
+                                "value": "hexagon"
                             }
                         ]
                     }
                 },
-                "parallelogramAngle": {
+                "shapeAngle": {
                     "displayName": "Angle",
                     "description": "The parallelogram's angle",
                     "type": {
@@ -556,6 +564,20 @@
                 "chevronAngle": {
                     "displayName": "Angle",
                     "description": "The chevron's angle",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "pentagonAngle": {
+                    "displayName": "Angle",
+                    "description": "The pentagon's angle",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "hexagonAngle": {
+                    "displayName": "Angle",
+                    "description": "The pentagon's angle",
                     "type": {
                         "numeric": true
                     }

@@ -45,5 +45,7 @@ export enum Button_Shape {
     rectangle = "rectangle",
     parallelogram = "parallelogram",
     chevron = "chevron",
-    ellipse = "ellipse"
+    ellipse = "ellipse",
+    pentagon = "pentagon",
+    hexagon = "hexagon"
 }

@@ -8,7 +8,7 @@ import {dataPoint} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions} from './functions'
 import { max } from "d3";
-import {Shape, Rectangle, Parallelogram, Chevron, Ellipse} from "./shapes"
+import {Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon} from "./shapes"
 
 export class ProcessedVisualSettings{
     i: number;
@@ -383,6 +383,13 @@ export class ProcessedVisualSettings{
     get chevronAngle(): number{
         return this.settings.layout.chevronAngle
     }
+    get pentagonAngle(): number{
+        return this.settings.layout.pentagonAngle
+    }
+    get hexagonAngle(): number{
+        return this.settings.layout.hexagonAngle
+    }
+
     get shapeRoundedCornerRadius(): number{
         return this.settings.effects.shapeRoundedCornerRadius
     }
@@ -396,6 +403,10 @@ export class ProcessedVisualSettings{
                 return new Chevron(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.ellipse:
                 return new Ellipse(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight)
+            case enums.Button_Shape.pentagon:
+                return new Pentagon(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.pentagonAngle, this.shapeRoundedCornerRadius)
+            case enums.Button_Shape.hexagon:
+                return new Hexagon(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.hexagonAngle, this.shapeRoundedCornerRadius)
         }
     }
     get alterPadding(): number {
