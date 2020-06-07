@@ -271,12 +271,7 @@ export class ProcessedVisualSettings{
         return Math.max(this.shadowSpace, this.glowSpace, this.buttonStrokeWidth)
     }
     get filters(): string{
-        let filters = ""
-        if(this.settings.effects.shadow)
-            filters+= this.isSelected ? " url(#drop-shadowS)" : " url(#drop-shadowU)"
-        if(this.settings.effects.glow)
-            filters+= this.isSelected ? " url(#glowS)" : " url(#glowU)"
-        return filters
+        return this.isSelected ? "url(#selected)" : "url(#unselected)"
     }
 
 

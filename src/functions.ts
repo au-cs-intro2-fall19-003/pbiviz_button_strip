@@ -43,7 +43,7 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
     let _nullValue = typeof _all == 'number' ? null : ""
     if (propertyStates.state == enums.State.all && _allExists)
         _selected = _unselected = _all
-    if( _selectedExists && _selected == _unselected)
+    if (_selectedExists && _selected == _unselected)
         _all = _selected
     if (propertyStates.state != enums.State.all && _selected != _unselected)
         _all = _nullValue
@@ -55,40 +55,60 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
     }
 }
 
-export function addFilters(defs: d3.Selection<d3.BaseType, any, any, any>, pvs: ProcessedVisualSettings): void{
+export function addFilters(defs: d3.Selection<d3.BaseType, any, any, any>, pvs: ProcessedVisualSettings): void {
     defs.html("")
 
-    let shadowS = defs.append("filter")
-            .attr("id", "drop-shadowS")
+    let selected = defs.append("filter")
+        .attr("id", "selected")
+    let unselected = defs.append("filter")
+        .attr("id", "unselected")
+    if (pvs.settings.effects.shadow) {
+        selected
             .append("feDropShadow")
             .attr("dx", pvs.shadowDirectionCoordsS.x * pvs.shadowDistanceS)
             .attr("dy", pvs.shadowDirectionCoordsS.y * pvs.shadowDistanceS)
             .attr("stdDeviation", pvs.shadowStrengthS)
             .attr("flood-color", pvs.shadowColorS)
             .attr("flood-opacity", pvs.shadowTransparencyS)
-    let shadowU = defs.append("filter")
-            .attr("id", "drop-shadowU")
+            .attr("result", "dropshadow")
+
+        unselected
             .append("feDropShadow")
             .attr("dx", pvs.shadowDirectionCoordsU.x * pvs.shadowDistanceU)
             .attr("dy", pvs.shadowDirectionCoordsU.y * pvs.shadowDistanceU)
             .attr("stdDeviation", pvs.shadowStrengthU)
             .attr("flood-color", pvs.shadowColorU)
             .attr("flood-opacity", pvs.shadowTransparencyU)
-    
-    let glowS = defs.append("filter")
-            .attr("id", "glowS")
+            .attr("result", "dropshadow")
+    }
+
+    if (pvs.settings.effects.glow) {
+        selected
             .append("feDropShadow")
             .attr("dx", 0)
             .attr("dy", 0)
             .attr("stdDeviation", pvs.glowStrengthS)
             .attr("flood-color", pvs.glowColorS)
             .attr("flood-opacity", pvs.glowTransparencyS)
-    let glowU = defs.append("filter")
-            .attr("id", "glowU")
+            .attr("result", "glow")
+
+        unselected
             .append("feDropShadow")
             .attr("dx", 0)
             .attr("dy", 0)
             .attr("stdDeviation", pvs.glowStrengthU)
             .attr("flood-color", pvs.glowColorU)
             .attr("flood-opacity", pvs.glowTransparencyU)
+            .attr("result", "glow")
+    }
+
+
+
+    let feMergeS = selected.append("feMerge")
+    feMergeS.append("feMergeNode").attr("in", "dropshadow")
+    feMergeS.append("feMergeNode").attr("in", "glow")
+    let feMergeU = unselected.append("feMerge")
+    feMergeU.append("feMergeNode").attr("in", "dropshadow")
+    feMergeU.append("feMergeNode").attr("in", "glow")
+
 }
