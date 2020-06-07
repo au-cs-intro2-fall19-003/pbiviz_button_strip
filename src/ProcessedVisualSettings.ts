@@ -47,10 +47,10 @@ export class ProcessedVisualSettings{
         return ProcessedVisualSettings.selectionIdKey && ProcessedVisualSettings.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
     }
     get viewportWidth(): number {
-        return this.options.viewport.width
+        return this.options.viewport.width - this.effectSpace
     }
     get viewportHeight(): number {
-        return this.options.viewport.height
+        return this.options.viewport.height - this.effectSpace
     }
 
 
@@ -278,46 +278,46 @@ export class ProcessedVisualSettings{
     get buttonWidth(): number {
         switch (this.settings.layout.sizingMethod) {
             case enums.Button_Sizing_Method.uniform:
-                return (this.options.viewport.width - this.buttonHPadding * (this.rowLength - 1)) / (this.rowLength) - this.effectSpace
+                return (this.viewportWidth - this.buttonHPadding * (this.rowLength - 1)) / (this.rowLength)
             case enums.Button_Sizing_Method.fixed:
-                return this.settings.layout.buttonWidth - this.effectSpace
+                return this.settings.layout.buttonWidth
             case enums.Button_Sizing_Method.dynamic:
                 let buttonWidthScaleFactor = this.widthSpaceForAllText / this.allTextWidth
-                let width = this.textWidth * buttonWidthScaleFactor + 2 * this.textHmargin - this.effectSpace
+                let width = this.textWidth * buttonWidthScaleFactor + 2 * this.textHmargin
                 return width
         }
     }
     get buttonHeight(): number {
         switch (this.settings.layout.sizingMethod) {
             case (enums.Button_Sizing_Method.fixed):
-                return this.settings.layout.buttonHeight - this.effectSpace
+                return this.settings.layout.buttonHeight
             default:
-                return ((this.viewportHeight - this.buttonVPadding * (this.numRows - 1)) / this.numRows) - this.effectSpace
+                return ((this.viewportHeight - this.buttonVPadding * (this.numRows - 1)) / this.numRows)
         }
 
     }
     get buttonXpos(): number {
         switch (this.settings.layout.sizingMethod) {
             case enums.Button_Sizing_Method.fixed:
-                let areaTaken = this.framesInRow * this.buttonWidth + (this.framesInRow - 1) * this.buttonHPadding
+                let areaTaken = this.framesInRow * this.buttonWidth + (this.framesInRow - 1) * this.buttonHPadding 
                 let areaRemaining = this.viewportWidth - areaTaken
                 switch (this.settings.layout.buttonAlignment) {
                     case enums.Align.left:
-                        return this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.effectSpace) + this.effectSpace/2
+                        return this.indexInRow * (this.buttonWidth + this.buttonHPadding) + this.effectSpace/2
                     case enums.Align.right:
-                        return areaRemaining + this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.effectSpace) + this.effectSpace/2
+                        return areaRemaining + this.indexInRow * (this.buttonWidth + this.buttonHPadding) + this.effectSpace/2
                     case enums.Align.center:
-                        return areaRemaining / 2 + this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.effectSpace) + this.effectSpace/2
+                        return areaRemaining / 2 + this.indexInRow * (this.buttonWidth + this.buttonHPadding)  + this.effectSpace/2
 
                 }
             case enums.Button_Sizing_Method.uniform:
-                return this.indexInRow * (this.buttonWidth + this.buttonHPadding + this.effectSpace) + this.effectSpace/2
+                return this.indexInRow * (this.buttonWidth + this.buttonHPadding) + this.effectSpace/2
             case enums.Button_Sizing_Method.dynamic:
-                return this.widthSoFar + this.indexInRow * (this.buttonHPadding + this.effectSpace) + this.effectSpace/2
+                return this.widthSoFar + this.indexInRow * (this.buttonHPadding) + this.effectSpace/2
         }
     }
     get buttonYpos(): number {
-        return this.rowNumber * (this.buttonHeight + this.buttonVPadding + this.effectSpace) + this.effectSpace/2
+        return this.rowNumber * (this.buttonHeight + this.buttonVPadding) + this.effectSpace/2
     }
 
     get titleContent(): HTMLDivElement {

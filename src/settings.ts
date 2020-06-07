@@ -159,11 +159,11 @@ export class EffectsSettings{
   public shadowDirectionU: enums.Direction = enums.Direction.bottom_right
 
   public shadowDistanceA: number = null
-  public shadowDistanceS: number = 1
+  public shadowDistanceS: number = 2
   public shadowDistanceU: number = 2
 
   public shadowStrengthA: number = null
-  public shadowStrengthS: number = 2
+  public shadowStrengthS: number = 4
   public shadowStrengthU: number = 4
 
   public glow: boolean = true;
@@ -177,7 +177,7 @@ export class EffectsSettings{
   public glowTransparencyU: number = 0
   
   public glowStrengthA: number = null
-  public glowStrengthS: number = 8
+  public glowStrengthS: number = 2
   public glowStrengthU: number = 2
 }
 

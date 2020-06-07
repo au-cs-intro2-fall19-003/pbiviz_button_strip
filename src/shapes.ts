@@ -246,8 +246,6 @@ export class Ellipse extends Shape implements Shape{
         path.arc(rx, ry, 0, 1, 0, 2*rx, 0)
         path.arc(rx, ry, 0, 1, 0, -2*rx, 0)
         path.close()
-        console.log(rx, ry, cx, cy)
-        console.log(path.toString())
         return path.toString()
     }
 

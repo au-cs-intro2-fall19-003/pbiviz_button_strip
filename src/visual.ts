@@ -201,7 +201,6 @@ export class Visual implements IVisual {
             this.host.persistProperties(objects);
 
 
-
         this.dataPoints = []
         const dataView = options.dataViews[0]
         const categories = dataView.categorical.categories;
@@ -231,7 +230,6 @@ export class Visual implements IVisual {
         addFilters(this.svg.select("defs"), data[0])
 
         this.container.selectAll(".frameContainer, .titleForeignObject").filter((d, i, nodes: Element[]) => {
-            console.log(nodes[i].classList)
             return !nodes[i].classList.contains(this.visualSettings.layout.buttonShape)
         }).remove()
 
