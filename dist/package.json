@@ -1,0 +1,17 @@
+{
+    "version": "1.0.0",
+    "author": {"name":"Ethan Netz","email":"ethanjnetz@gmail.com"},
+    "resources": [
+        {
+            "resourceId": "rId0",
+            "sourceType": 5,
+            "file": "resources/rocketsE9D7B5E2197F4868970D16E2455AB0AD.pbiviz.json"
+        }
+    ],
+    "visual": {"name":"button_strip","displayName":"Button Strip","guid":"rocketsE9D7B5E2197F4868970D16E2455AB0AD","visualClassName":"Visual","version":"1.0.0","description":"Create a heavily customizable button strip","supportUrl":"https://www.google.com/","gitHubUrl":"https://github.com/Ethernetz/pbiviz_button_strip"},
+    "metadata": {
+        "pbivizjson": {
+            "resourceId": "rId0"
+        }
+    }  
+}

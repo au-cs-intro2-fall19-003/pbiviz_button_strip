@@ -36,8 +36,8 @@ export class ButtonSettings {
   public state : enums.State = enums.State.all;
   
   public colorA: string = "";
-  public colorS: string = "#fff";
-  public colorU: string = "#fff";
+  public colorS: string = "#252423";
+  public colorU: string = "#252423";
 
   public strokeA: string = "";
   public strokeS: string = "#000";
@@ -56,8 +56,8 @@ export class TextSettings{
   public state : enums.State = enums.State.all;
 
   public colorA: string = "";
-  public colorS: string = "#000";
-  public colorU: string = "#000";
+  public colorS: string = "#fff";
+  public colorU: string = "#fff";
 
   public alignmentA: enums.Align = enums.Align.center;
   public alignmentS: enums.Align = enums.Align.center;
@@ -120,6 +120,10 @@ export class IconSettings{
   public bottomMarginA: number = null;
   public bottomMarginS: number = 10;
   public bottomMarginU: number = 10;
+
+  public transparencyA: number = null;
+  public transparencyS: number = 0;
+  public transparencyU: number = 0;
 }
 
 export class LayoutSettings{
@@ -144,7 +148,7 @@ export class LayoutSettings{
 export class EffectsSettings{
   public shapeRoundedCornerRadius: number = 0 
   public state : enums.State = enums.State.all;
-  public shadow: boolean = true;
+  public shadow: boolean = false;
 
   public shadowColorA: string = ""
   public shadowColorS: string = "#000"
@@ -166,7 +170,7 @@ export class EffectsSettings{
   public shadowStrengthS: number = 4
   public shadowStrengthU: number = 4
 
-  public glow: boolean = true;
+  public glow: boolean = false;
 
   public glowColorA: string = ""
   public glowColorS: string = "#3380FF"

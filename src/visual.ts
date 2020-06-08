@@ -115,15 +115,6 @@ export class Visual implements IVisual {
                 if (iconSettingsKeys[i] != 'icons')
                     delete settings.icon[iconSettingsKeys[i]]
         }
-        // if (settings.icon.currentPlacement == enums.Icon_Placement.left) {
-        //     delete settings.icon.hmarginA
-        //     delete settings.icon.hmarginS
-        //     delete settings.icon.hmarginU
-        // } else {
-        //     delete settings.icon.widthA
-        //     delete settings.icon.widthS
-        //     delete settings.icon.widthU
-        // }
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
             delete settings.layout.buttonWidth;
@@ -151,6 +142,34 @@ export class Visual implements IVisual {
         }
         if(settings.layout.buttonShape != enums.Button_Shape.tab_cutCorner){
             delete settings.layout.tab_cutCornerLength
+        }
+        if(!settings.effects.shadow){
+            delete settings.effects.shadowColorA
+            delete settings.effects.shadowColorS
+            delete settings.effects.shadowColorU
+            delete settings.effects.shadowDirectionA
+            delete settings.effects.shadowDirectionS
+            delete settings.effects.shadowDirectionU
+            delete settings.effects.shadowDistanceA
+            delete settings.effects.shadowDistanceS
+            delete settings.effects.shadowDistanceU
+            delete settings.effects.shadowTransparencyA
+            delete settings.effects.shadowTransparencyS
+            delete settings.effects.shadowTransparencyU
+            delete settings.effects.shadowStrengthA
+            delete settings.effects.shadowStrengthS
+            delete settings.effects.shadowStrengthU
+        }
+        if(!settings.effects.glow){
+            delete settings.effects.glowColorA
+            delete settings.effects.glowColorS
+            delete settings.effects.glowColorU
+            delete settings.effects.glowTransparencyA
+            delete settings.effects.glowTransparencyS
+            delete settings.effects.glowTransparencyU
+            delete settings.effects.glowStrengthA
+            delete settings.effects.glowStrengthS
+            delete settings.effects.glowStrengthU
         }
         
 

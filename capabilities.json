@@ -537,6 +537,27 @@
                     "type": {
                         "numeric": true
                     }  
+                },
+                "transparencyA": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of icon",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "transparencyS": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of icon",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "transparencyU": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of icon",
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },

@@ -183,6 +183,9 @@ export class ProcessedVisualSettings{
     get iconHeight(): number {
         return this.titleFOHeight - this.textContainerHeight - this.iconTopMargin - this.iconBottomMargin
     }
+    get iconOpacity(): number {
+        return 1 - (this.isSelected ? this.settings.icon.transparencyS : this.settings.icon.transparencyU)/100
+    }
 
 
     get shadowSpace(): number {
@@ -340,6 +343,7 @@ export class ProcessedVisualSettings{
             img.style.backgroundImage = "url(" + this.iconURL + ")"
             img.style.backgroundRepeat = 'no-repeat'
             img.style.backgroundSize = 'contain'
+            img.style.opacity = this.iconOpacity.toString()
 
             switch (this.iconPlacement) {
                 case enums.Icon_Placement.left:
@@ -350,6 +354,7 @@ export class ProcessedVisualSettings{
                     img.style.display = 'inline-block'
                     img.style.verticalAlign = 'middle'
                     img.style.marginRight = this.iconHmargin + 'px'
+                    img.style.backgroundPosition = 'center center'
 
 
                     textContainer.style.display = 'inline-block'
