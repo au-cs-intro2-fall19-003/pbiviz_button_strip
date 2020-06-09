@@ -48,7 +48,7 @@ import * as d3 from "d3";
 import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { dataPoint, propertyStateName, propertyStateValue, propertyStatesInput, propertyStatesOutput } from './interfaces'
-import { getGroupedKeyNames, levelProperties, addFilters } from './functions'
+import { getPropertyStateNameArr, levelProperties, addFilters } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 const propertiesOf = <TObj>(_obj: (TObj | undefined) = undefined) => <T extends keyof TObj>(name: T): T => name;
@@ -89,7 +89,7 @@ export class Visual implements IVisual {
         let settingsKeys = Object.keys(settings)
         for (let i = 0; i < settingsKeys.length; i++) {
             let settingKey: string = settingsKeys[i]
-            let groupedKeyNamesArr: propertyStateName[] = getGroupedKeyNames(Object.keys(settings[settingKey]))
+            let groupedKeyNamesArr: propertyStateName[] = getPropertyStateNameArr(Object.keys(settings[settingKey]))
             for (let j = 0; j < groupedKeyNamesArr.length; j++) {
                 let groupedKeyNames: propertyStateName = groupedKeyNamesArr[j]
                 switch (settings[settingKey].state) {
@@ -188,7 +188,7 @@ export class Visual implements IVisual {
         for (let i = 0; i < objKeys.length; i++) {
             let objKey: string = objKeys[i]
             let propKeys: string[] = Object.keys(this.visualSettings[objKey])
-            let groupedKeyNamesArr: propertyStateName[] = getGroupedKeyNames(propKeys)
+            let groupedKeyNamesArr: propertyStateName[] = getPropertyStateNameArr(propKeys)
 
             let object: powerbi.VisualObjectInstance = {
                 objectName: objKey,
@@ -265,7 +265,7 @@ export class Visual implements IVisual {
             .attr("d", function (d) { return d.shapePath })
             .attr("fill", function (d) { return d.buttonFill })
             .style("fill-opacity", function (d) { return d.buttonFillOpacity })
-            .style("filter", function (d) { return d.filters })
+            .style("filter", function (d) { return d.filter })
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 this.update(options)

@@ -183,6 +183,9 @@ export class EffectsSettings{
   public glowStrengthA: number = null
   public glowStrengthS: number = 2
   public glowStrengthU: number = 2
+
+  public filterS: string = "url(#selected)"
+  public filterU: string = "url(#unselected)"
 }
 
 export class VisualSettings extends DataViewObjectsParser {

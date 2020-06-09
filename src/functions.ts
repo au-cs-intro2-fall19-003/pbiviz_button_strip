@@ -19,19 +19,20 @@ export function calculateWordDimensions(text: string, fontFamily: string, fontSi
     return dimensions;
 }
 
-export function getGroupedKeyNames(propKeys: string[]): propertyStateName[] {
-    let groupedKeyNames: propertyStateName[] = []
+export function getPropertyStateNameArr(propKeys: string[]): propertyStateName[] {
+    let propertyStateNameArr: propertyStateName[] = []
+    for (let i = 0; i < propKeys.length; i++)
+        if (propKeys[i].endsWith('A')) 
+            propertyStateNameArr.push(getPropertyStateNames(propKeys[i].slice(0, -1)))
+    return propertyStateNameArr
+}
 
-    for (let i = 0; i < propKeys.length; i++) {
-        if (propKeys[i].endsWith('A')) {
-            groupedKeyNames.push({
-                all: propKeys[i],
-                selected: propKeys[i].replace(/.$/, "S"),
-                unselected: propKeys[i].replace(/.$/, "U"),
-            })
+export function getPropertyStateNames(propBase: string): propertyStateName{
+    return {
+            all: propBase+"A",
+            selected: propBase+"S",
+            unselected: propBase+"U"
         }
-    }
-    return groupedKeyNames
 }
 
 export function levelProperties(propertyStates: propertyStatesInput): propertyStatesOutput {

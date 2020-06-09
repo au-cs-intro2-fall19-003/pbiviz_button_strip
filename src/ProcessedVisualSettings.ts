@@ -6,7 +6,7 @@ import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import { VisualSettings } from "./settings";
 import {dataPoint} from './interfaces'
 import * as enums from "./enums"
-import {calculateWordDimensions} from './functions'
+import {calculateWordDimensions, getPropertyStateNames} from './functions'
 import { max } from "d3";
 import {Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon, Tab_RoundedCorners, Tab_CutCorners, Tab_CutCorner, ChevronVertical, ParallelogramVertical} from "./shapes"
 
@@ -46,6 +46,12 @@ export class ProcessedVisualSettings{
     get isSelected(): boolean {
         return ProcessedVisualSettings.selectionIdKey && ProcessedVisualSettings.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
     }
+    get currState(): enums.State {
+        if(this.isSelected)
+            return enums.State.selected
+        if(!this.isSelected)
+            return enums.State.unselected
+    }
     get viewportWidth(): number {
         return this.options.viewport.width - this.effectSpace
     }
@@ -58,25 +64,25 @@ export class ProcessedVisualSettings{
         return this.dataPoints[this.i].value as string
     }
     get textFill(): string {
-        return this.isSelected ? this.settings.text.colorS : this.settings.text.colorU
+        return this.settings.text[this.getCorrectPropertyStateName("color")]
     }
     get textFillOpacity(): number {
-        return 1 - (this.isSelected ? this.settings.text.transparencyS : this.settings.text.transparencyU) / 100
+        return 1 - (this.settings.text[this.getCorrectPropertyStateName("transparency")]) / 100
     }
     get fontSize(): number {
-        return this.isSelected ? this.settings.text.fontSizeS : this.settings.text.fontSizeU
+        return this.settings.text[this.getCorrectPropertyStateName("fontSize")]
     }
     get fontFamily(): string {
-        return this.isSelected ? this.settings.text.fontFamilyS : this.settings.text.fontFamilyU
+        return this.settings.text[this.getCorrectPropertyStateName("fontFamily")]
     }
     get textAlign(): string {
-        return this.isSelected ? this.settings.text.alignmentS : this.settings.text.alignmentU
+        return this.settings.text[this.getCorrectPropertyStateName("alignment")]
     }
     get textHmargin(): number {
-        return this.isSelected ? this.settings.text.hmarginS : this.settings.text.hmarginU
+        return this.settings.text[this.getCorrectPropertyStateName("hmargin")]
     }
     get textVmargin(): number {
-        return this.isSelected ? this.settings.text.vmarginS : this.settings.text.vmarginU
+        return this.settings.text[this.getCorrectPropertyStateName("vmargin")]
     }
     get widthSpaceForAllText(): number{
         let totalPadding = (this.framesInRow - 1) * this.settings.layout.padding;
@@ -104,18 +110,28 @@ export class ProcessedVisualSettings{
         return this.textWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
     }
 
+    getCorrectPropertyStateName(allProp: string): string{
+        let propertyStateNames = getPropertyStateNames(allProp)
+        switch(this.currState){
+            case enums.State.selected:
+                return propertyStateNames.selected
+            case enums.State.unselected:
+                return propertyStateNames.unselected
+        }
+        return ""
+    }
 
     get buttonFill(): string {
-        return this.isSelected ? this.settings.button.colorS :  this.settings.button.colorU
+        return this.settings.button[this.getCorrectPropertyStateName("color")]
     }
     get buttonFillOpacity(): number {
-        return 1 - (this.isSelected ? this.settings.button.transparencyS : this.settings.button.transparencyU) / 100
+        return 1 - (this.settings.button[this.getCorrectPropertyStateName("transparency")]) / 100
     }
     get buttonStroke(): string {
-        return this.isSelected ? this.settings.button.strokeS :  this.settings.button.strokeU
+        return this.settings.button[this.getCorrectPropertyStateName("stroke")]
     }
     get buttonStrokeWidth(): number{
-        return this.isSelected ? this.settings.button.strokeWidthS :  this.settings.button.strokeWidthU
+        return this.settings.button[this.getCorrectPropertyStateName("strokeWidth")]
     }
     get buttonPadding(): number {
         return this.settings.layout.padding
@@ -163,28 +179,28 @@ export class ProcessedVisualSettings{
         return this.dataPoints[this.i].iconValue as string|| "https://via.placeholder.com/150"
     }
     get iconWidth(): number {
-        return this.isSelected ? this.settings.icon.widthS : this.settings.icon.widthU
+        return this.settings.icon[this.getCorrectPropertyStateName("width")]
     }
     get iconHmargin(): number {
-        return this.isSelected ? this.settings.icon.hmarginS : this.settings.icon.hmarginU
+        return this.settings.icon[this.getCorrectPropertyStateName("hmargin")]
     }
     get iconTopMargin(): number{
-        return this.isSelected ? this.settings.icon.topMarginS : this.settings.icon.topMarginU
+        return this.settings.icon[this.getCorrectPropertyStateName("topMargin")]
     }
     get iconBottomMargin(): number{
-        return this.isSelected ? this.settings.icon.bottomMarginS : this.settings.icon.bottomMarginU
+        return this.settings.icon[this.getCorrectPropertyStateName("bottomMargin")]
     }
     get spaceForIcon(): number {
         return this.titleFOWidth - 2*this.iconHmargin
     }
     get iconPlacement(): enums.Icon_Placement {
-        return this.isSelected ? this.settings.icon.placementS : this.settings.icon.placementU
+        return this.settings.icon[this.getCorrectPropertyStateName("placement")]
     }
     get iconHeight(): number {
         return this.titleFOHeight - this.textContainerHeight - this.iconTopMargin - this.iconBottomMargin
     }
     get iconOpacity(): number {
-        return 1 - (this.isSelected ? this.settings.icon.transparencyS : this.settings.icon.transparencyU)/100
+        return 1 - (this.settings.icon[this.getCorrectPropertyStateName("transparency")])/100
     }
 
 
@@ -273,8 +289,8 @@ export class ProcessedVisualSettings{
     get effectSpace(): number {
         return Math.max(this.shadowSpace, this.glowSpace, this.buttonStrokeWidth)
     }
-    get filters(): string{
-        return this.isSelected ? "url(#selected)" : "url(#unselected)"
+    get filter(): string{
+        return this.settings.effects[this.getCorrectPropertyStateName("filter")]
     }
 
 
@@ -367,7 +383,6 @@ export class ProcessedVisualSettings{
                     titleContainer.append(img, textContainer)
                     break
                 default:
-                    // titleContainer.style.position = 'relative'
                     titleContainer.style.height = this.titleFOHeight + 'px'
                     titleContainer.style.maxHeight = this.titleFOHeight + 'px'
 
