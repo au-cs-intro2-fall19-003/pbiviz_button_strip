@@ -38,7 +38,8 @@ export class ButtonSettings {
   public colorA: string = "";
   public colorS: string = "#252423";
   public colorU: string = "#252423";
-
+  public colorH: string = "#fff";
+  
   public strokeA: string = "";
   public strokeS: string = "#000";
   public strokeU: string = "#000";

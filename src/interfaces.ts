@@ -4,19 +4,22 @@ import * as enums from "./enums"
 export interface dataPoint {
     value: powerbi.PrimitiveValue,
     iconValue?: powerbi.PrimitiveValue,
-    selectionId: powerbi.visuals.ISelectionId
+    selectionId: powerbi.visuals.ISelectionId,
+    selectionIdHover: powerbi.visuals.ISelectionId
 }
 
 export interface propertyStateName {
     all: string,
     selected: string,
     unselected: string,
+    hover: string
 }
 
 export interface propertyStateValue {
     all: string | number,
     selected: string | number,
     unselected: string | number,
+    hover: string | number,
 }
 
 export interface propertyStatesInput extends propertyStateValue {

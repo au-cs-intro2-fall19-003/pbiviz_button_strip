@@ -57,6 +57,10 @@
                             {
                                 "displayName": "Unselected",
                                 "value": "unselected"
+                            },
+                            {
+                                "displayName": "Hover",
+                                "value": "hover"
                             }
                         ]
                     }
@@ -73,7 +77,7 @@
                     }
                 },
                 "colorS": {
-                    "displayName": "Background color (selected)",
+                    "displayName": "Background color",
                     "description": "Background color for the selected button.",
                     "type": {
                         "fill": {
@@ -84,8 +88,19 @@
                     }
                 },
                 "colorU": {
-                    "displayName": "Background color (unselected)",
+                    "displayName": "Background color",
                     "description": "Background color for the unselected buttons.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "colorH": {
+                    "displayName": "Background color",
+                    "description": "Background color for the hovered button.",
                     "type": {
                         "fill": {
                             "solid": {
@@ -190,6 +205,10 @@
                             {
                                 "displayName": "Unselected",
                                 "value": "unselected"
+                            },
+                            {
+                                "displayName": "Hover",
+                                "value": "hover"
                             }
                         ]
                     }
@@ -390,6 +409,10 @@
                             {
                                 "displayName": "Unselected",
                                 "value": "unselected"
+                            },
+                            {
+                                "displayName": "Hover",
+                                "value": "hover"
                             }
                         ]
                     }
@@ -748,6 +771,10 @@
                             {
                                 "displayName": "Unselected",
                                 "value": "unselected"
+                            },
+                            {
+                                "displayName": "Hover",
+                                "value": "hover"
                             }
                         ]
                     }
