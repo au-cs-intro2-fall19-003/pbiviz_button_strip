@@ -51,7 +51,6 @@ import { dataPoint, propertyStateName, propertyStateValue, propertyStatesInput, 
 import { getPropertyStateNameArr, levelProperties, addFilters } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
-const propertiesOf = <TObj>(_obj: (TObj | undefined) = undefined) => <T extends keyof TObj>(name: T): T => name;
 
 import * as enums from "./enums"
 import { select, merge } from "d3";
@@ -59,11 +58,13 @@ import { select, merge } from "d3";
 export class Visual implements IVisual {
     private target: HTMLElement;
     private selectionManager: ISelectionManager;
+    private selectionManagerHover: ISelectionManager;
     private selectionIds: any = {};
     private host: IVisualHost;
     private isEventUpdate: boolean = false;
     private visualSettings: VisualSettings;
     private selectionIdBuilder: ISelectionIdBuilder;
+    private selectionIdBuilderHover: ISelectionIdBuilder;
 
     private dataPoints: dataPoint[];
     private svg: Selection<SVGElement>;
@@ -73,7 +74,9 @@ export class Visual implements IVisual {
 
     constructor(options: VisualConstructorOptions) {
         this.selectionIdBuilder = options.host.createSelectionIdBuilder();
+        this.selectionIdBuilderHover = options.host.createSelectionIdBuilder();
         this.selectionManager = options.host.createSelectionManager();
+        this.selectionManagerHover = options.host.createSelectionManager();
         this.host = options.host;
         this.svg = d3.select(options.element)
             .append('svg')
@@ -96,14 +99,22 @@ export class Visual implements IVisual {
                     case enums.State.all:
                         delete settings[settingKey][groupedKeyNames.selected]
                         delete settings[settingKey][groupedKeyNames.unselected]
+                        delete settings[settingKey][groupedKeyNames.hover]
                         break
                     case enums.State.selected:
                         delete settings[settingKey][groupedKeyNames.all]
                         delete settings[settingKey][groupedKeyNames.unselected]
+                        delete settings[settingKey][groupedKeyNames.hover]
                         break
                     case enums.State.unselected:
                         delete settings[settingKey][groupedKeyNames.all]
                         delete settings[settingKey][groupedKeyNames.selected]
+                        delete settings[settingKey][groupedKeyNames.hover]
+                        break
+                    case enums.State.hover:
+                        delete settings[settingKey][groupedKeyNames.all]
+                        delete settings[settingKey][groupedKeyNames.selected]
+                        delete settings[settingKey][groupedKeyNames.unselected]
                         break
                 }
             }
@@ -143,34 +154,15 @@ export class Visual implements IVisual {
         if(settings.layout.buttonShape != enums.Button_Shape.tab_cutCorner){
             delete settings.layout.tab_cutCornerLength
         }
-        if(!settings.effects.shadow){
-            delete settings.effects.shadowColorA
-            delete settings.effects.shadowColorS
-            delete settings.effects.shadowColorU
-            delete settings.effects.shadowDirectionA
-            delete settings.effects.shadowDirectionS
-            delete settings.effects.shadowDirectionU
-            delete settings.effects.shadowDistanceA
-            delete settings.effects.shadowDistanceS
-            delete settings.effects.shadowDistanceU
-            delete settings.effects.shadowTransparencyA
-            delete settings.effects.shadowTransparencyS
-            delete settings.effects.shadowTransparencyU
-            delete settings.effects.shadowStrengthA
-            delete settings.effects.shadowStrengthS
-            delete settings.effects.shadowStrengthU
-        }
-        if(!settings.effects.glow){
-            delete settings.effects.glowColorA
-            delete settings.effects.glowColorS
-            delete settings.effects.glowColorU
-            delete settings.effects.glowTransparencyA
-            delete settings.effects.glowTransparencyS
-            delete settings.effects.glowTransparencyU
-            delete settings.effects.glowStrengthA
-            delete settings.effects.glowStrengthS
-            delete settings.effects.glowStrengthU
-        }
+        let effectSettingsKeys: string[] = Object.keys(settings.effects)
+        if(!settings.effects.shadow)
+            for (let i = 0; i < effectSettingsKeys.length; i++)
+                if (effectSettingsKeys[i].startsWith("shadow") && effectSettingsKeys[i] != "shadow")
+                    delete settings.effects[effectSettingsKeys[i]]
+       if(!settings.effects.glow)
+            for (let i = 0; i < effectSettingsKeys.length; i++)
+                if (effectSettingsKeys[i].startsWith("glow") && effectSettingsKeys[i] != "glow")
+                    delete settings.effects[effectSettingsKeys[i]]
         
 
         return VisualSettings.enumerateObjectInstances(settings, options);
@@ -204,6 +196,7 @@ export class Visual implements IVisual {
                     all: this.visualSettings[objKey][groupedKeyNames.all],
                     selected: this.visualSettings[objKey][groupedKeyNames.selected],
                     unselected: this.visualSettings[objKey][groupedKeyNames.unselected],
+                    hover: this.visualSettings[objKey][groupedKeyNames.hover],
                     state: this.visualSettings[objKey].state
                 }
                 let leveledPropertyState = levelProperties(propertyState)
@@ -219,7 +212,6 @@ export class Visual implements IVisual {
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
 
-
         this.dataPoints = []
         const dataView = options.dataViews[0]
         const categories = dataView.categorical.categories;
@@ -233,13 +225,14 @@ export class Visual implements IVisual {
             this.dataPoints.push({
                 value: pageValue,
                 iconValue: iconValue,
-                selectionId: categorySelectionId
+                selectionId: categorySelectionId,
+                selectionIdHover: categorySelectionId
             });
         }
 
         let data: ProcessedVisualSettings[] = [];
         for (let i = 0; i < this.dataPoints.length; i++)
-            data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, options))
+            data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, this.selectionManagerHover, options))
 
 
         this.svg
@@ -257,6 +250,19 @@ export class Visual implements IVisual {
         framesContainer.exit().remove()
         let framesContainerEnter = framesContainer.enter().append('g')
             .attr("class", "frameContainer " + this.visualSettings.layout.buttonShape)
+            .on('mouseover', (d, i)=>{
+                this.selectionManagerHover.select(this.dataPoints[i].selectionIdHover)
+                this.update(options)
+            })
+            .on('mouseout', (d, i)=>{
+                this.selectionManagerHover.clear()
+                this.update(options)
+            })
+            .on('click', (d, i) => {
+                this.selectionManager.select(this.dataPoints[i].selectionId)
+                this.update(options)
+            })
+
         framesContainerEnter.append('path').attr("class", "fill")
         framesContainerEnter.append('path').attr("class", "stroke")
         framesContainer = this.container.selectAll('.frameContainer').data(data)
@@ -266,20 +272,13 @@ export class Visual implements IVisual {
             .attr("fill", function (d) { return d.buttonFill })
             .style("fill-opacity", function (d) { return d.buttonFillOpacity })
             .style("filter", function (d) { return d.filter })
-            .on('click', (d, i) => {
-                this.selectionManager.select(this.dataPoints[i].selectionId)
-                this.update(options)
-            })
+            
 
         framesContainer.select(".stroke")
             .attr("d", function (d) { return d.strokePath })
             .style("fill-opacity", 0)
             .style("stroke", function (d) { return d.buttonStroke })
             .style("stroke-width", function (d) { return d.buttonStrokeWidth })
-            .on('click', (d, i) => {
-                this.selectionManager.select(this.dataPoints[i].selectionId)
-                this.update(options)
-            })
 
         let titleFOs = this.container.selectAll('foreignObject').data(data)
         titleFOs.exit().remove()
@@ -312,6 +311,14 @@ export class Visual implements IVisual {
             .style("font-family", function (d) { return d.fontFamily })
             .style("text-align", function (d) { return d.textAlign })
             .style("color", function (d) { return d.textFill })
+            .on('mouseover', (d, i)=>{
+                this.selectionManagerHover.select(this.dataPoints[i].selectionIdHover)
+                this.update(options)
+            })
+            .on('mouseout', (d, i)=>{
+                this.selectionManagerHover.clear()
+                this.update(options)
+            })
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 this.update(options)
