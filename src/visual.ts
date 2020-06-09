@@ -48,7 +48,7 @@ import * as d3 from "d3";
 import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { dataPoint, propertyStateName, propertyStateValue, propertyStatesInput, propertyStatesOutput } from './interfaces'
-import { getPropertyStateNameArr, levelProperties, addFilters } from './functions'
+import { getPropertyStateNameArr, addFilters, getObjectsToPersist, levelProperties } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -69,6 +69,7 @@ export class Visual implements IVisual {
     private dataPoints: dataPoint[];
     private svg: Selection<SVGElement>;
     private container: Selection<SVGElement>;
+    private hoveredIdKey: string;
 
 
 
@@ -169,13 +170,19 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
+        console.log("just updated")
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
         let objects: powerbi.VisualObjectInstancesToPersist = {
             merge: []
         }
-
+        // let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
+        // if (objects.merge.length != 0){
+        //     console.log("persisting")
+        //     console.log(objects)
+        //     this.host.persistProperties(objects);
+        // }
         let objKeys = Object.keys(this.visualSettings)
         for (let i = 0; i < objKeys.length; i++) {
             let objKey: string = objKeys[i]
@@ -226,13 +233,12 @@ export class Visual implements IVisual {
                 value: pageValue,
                 iconValue: iconValue,
                 selectionId: categorySelectionId,
-                selectionIdHover: categorySelectionId
             });
         }
 
         let data: ProcessedVisualSettings[] = [];
         for (let i = 0; i < this.dataPoints.length; i++)
-            data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, this.selectionManagerHover, options))
+            data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, this.hoveredIdKey, options))
 
 
         this.svg
@@ -241,7 +247,7 @@ export class Visual implements IVisual {
 
         addFilters(this.svg.select("defs"), data[0])
 
-        this.container.selectAll(".frameContainer, .titleForeignObject").filter((d, i, nodes: Element[]) => {
+        this.container.selectAll(".frameContainer, .titleForeignObject, .cover").filter((d, i, nodes: Element[]) => {
             return !nodes[i].classList.contains(this.visualSettings.layout.buttonShape)
         }).remove()
 
@@ -250,18 +256,6 @@ export class Visual implements IVisual {
         framesContainer.exit().remove()
         let framesContainerEnter = framesContainer.enter().append('g')
             .attr("class", "frameContainer " + this.visualSettings.layout.buttonShape)
-            .on('mouseover', (d, i)=>{
-                this.selectionManagerHover.select(this.dataPoints[i].selectionIdHover)
-                this.update(options)
-            })
-            .on('mouseout', (d, i)=>{
-                this.selectionManagerHover.clear()
-                this.update(options)
-            })
-            .on('click', (d, i) => {
-                this.selectionManager.select(this.dataPoints[i].selectionId)
-                this.update(options)
-            })
 
         framesContainerEnter.append('path').attr("class", "fill")
         framesContainerEnter.append('path').attr("class", "stroke")
@@ -311,20 +305,29 @@ export class Visual implements IVisual {
             .style("font-family", function (d) { return d.fontFamily })
             .style("text-align", function (d) { return d.textAlign })
             .style("color", function (d) { return d.textFill })
+            .html("")
+            .append(function (d) { return d.titleContent })
+            
+        let covers = this.container.selectAll('.cover').data(data)
+        covers.exit().remove()
+        covers.enter().append('path')
+            .attr("class", "cover " + this.visualSettings.layout.buttonShape)
+            .attr("d", function (d) { return d.shapePath })
+            .style("fill-opacity", function (d) { return 0})
             .on('mouseover', (d, i)=>{
-                this.selectionManagerHover.select(this.dataPoints[i].selectionIdHover)
-                this.update(options)
+                this.hoveredIdKey = this.dataPoints[i].selectionId.getKey()
+                // this.update(options)
             })
             .on('mouseout', (d, i)=>{
-                this.selectionManagerHover.clear()
-                this.update(options)
+                this.hoveredIdKey = null
+                // this.update(options)
             })
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
+                console.log(VisualSettings.parse(options.dataViews[0]) as VisualSettings)
                 this.update(options)
+                // this.host.persistProperties(objects);
             })
-            .html("")
-            .append(function (d) { return d.titleContent })
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {
