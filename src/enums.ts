@@ -25,8 +25,7 @@ export enum Icon_Placement {
 export enum State {
     all = "all",
     selected = "selected",
-    unselected = "unselected",
-    hover = "hover"
+    unselected = "unselected"
 }
 
 export enum Direction {

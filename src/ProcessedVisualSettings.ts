@@ -18,10 +18,9 @@ export class ProcessedVisualSettings{
     widthSoFar: number;
     static widthSoFar: number; 
     static selectionIdKey: string;
-    static selectionIdKeyHover: string;
     static totalTextHmargin: number;
     static maxTextHeight: number;
-    constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, selectionManagerHover: ISelectionManager, options: VisualUpdateOptions){
+    constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, options: VisualUpdateOptions){
         this.dataPoints = dataPoints
         this.settings = settings
         this.options = options
@@ -32,11 +31,6 @@ export class ProcessedVisualSettings{
                 || ProcessedVisualSettings.selectionIdKey
             else 
                 ProcessedVisualSettings.selectionIdKey = null
-            if(selectionManagerHover.hasSelection())
-                ProcessedVisualSettings.selectionIdKeyHover = (selectionManagerHover.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() 
-                || ProcessedVisualSettings.selectionIdKeyHover
-            else 
-                ProcessedVisualSettings.selectionIdKeyHover = null
         }
         if (this.indexInRow == 0){
             ProcessedVisualSettings.widthSoFar = 0;
@@ -49,23 +43,14 @@ export class ProcessedVisualSettings{
         ProcessedVisualSettings.maxTextHeight = Math.max(this.textHeight, ProcessedVisualSettings.maxTextHeight)
     }
 
-    getCorrectPropertyStateName(obj: string, prop: string): string{
-        let propertyStateNames = getPropertyStateNames(prop)
-        let name: string = ""
-        if(this.isSelected  && this.settings[obj][propertyStateNames.selected] != null)
-            name = name || propertyStateNames.selected
-        if(this.isHovered && this.settings[obj][propertyStateNames.hover] != null)
-            name = name || propertyStateNames.hover
-        if(!this.isSelected && this.settings[obj][propertyStateNames.unselected] != null)
-            name = name || propertyStateNames.unselected
-        return name
-    }
-
     get isSelected(): boolean {
         return ProcessedVisualSettings.selectionIdKey && ProcessedVisualSettings.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
     }
-    get isHovered(): boolean {
-        return ProcessedVisualSettings.selectionIdKeyHover && ProcessedVisualSettings.selectionIdKeyHover == this.dataPoints[this.i].selectionIdHover.getKey()
+    get currState(): enums.State {
+        if(this.isSelected)
+            return enums.State.selected
+        if(!this.isSelected)
+            return enums.State.unselected
     }
     get viewportWidth(): number {
         return this.options.viewport.width - this.effectSpace
@@ -79,25 +64,25 @@ export class ProcessedVisualSettings{
         return this.dataPoints[this.i].value as string
     }
     get textFill(): string {
-        return this.settings.text[this.getCorrectPropertyStateName("text", "color")]
+        return this.settings.text[this.getCorrectPropertyStateName("color")]
     }
     get textFillOpacity(): number {
-        return 1 - (this.settings.text[this.getCorrectPropertyStateName("text", "transparency")]) / 100
+        return 1 - (this.settings.text[this.getCorrectPropertyStateName("transparency")]) / 100
     }
     get fontSize(): number {
-        return this.settings.text[this.getCorrectPropertyStateName("text", "fontSize")]
+        return this.settings.text[this.getCorrectPropertyStateName("fontSize")]
     }
     get fontFamily(): string {
-        return this.settings.text[this.getCorrectPropertyStateName("text", "fontFamily")]
+        return this.settings.text[this.getCorrectPropertyStateName("fontFamily")]
     }
     get textAlign(): string {
-        return this.settings.text[this.getCorrectPropertyStateName("text", "alignment")]
+        return this.settings.text[this.getCorrectPropertyStateName("alignment")]
     }
     get textHmargin(): number {
-        return this.settings.text[this.getCorrectPropertyStateName("text", "hmargin")]
+        return this.settings.text[this.getCorrectPropertyStateName("hmargin")]
     }
     get textVmargin(): number {
-        return this.settings.text[this.getCorrectPropertyStateName("text", "vmargin")]
+        return this.settings.text[this.getCorrectPropertyStateName("vmargin")]
     }
     get widthSpaceForAllText(): number{
         let totalPadding = (this.framesInRow - 1) * this.settings.layout.padding;
@@ -125,17 +110,28 @@ export class ProcessedVisualSettings{
         return this.textWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
     }
 
+    getCorrectPropertyStateName(allProp: string): string{
+        let propertyStateNames = getPropertyStateNames(allProp)
+        switch(this.currState){
+            case enums.State.selected:
+                return propertyStateNames.selected
+            case enums.State.unselected:
+                return propertyStateNames.unselected
+        }
+        return ""
+    }
+
     get buttonFill(): string {
-        return this.settings.button[this.getCorrectPropertyStateName("button", "color")]
+        return this.settings.button[this.getCorrectPropertyStateName("color")]
     }
     get buttonFillOpacity(): number {
-        return 1 - (this.settings.button[this.getCorrectPropertyStateName("button", "transparency")]) / 100
+        return 1 - (this.settings.button[this.getCorrectPropertyStateName("transparency")]) / 100
     }
     get buttonStroke(): string {
-        return this.settings.button[this.getCorrectPropertyStateName("button", "stroke")]
+        return this.settings.button[this.getCorrectPropertyStateName("stroke")]
     }
     get buttonStrokeWidth(): number{
-        return this.settings.button[this.getCorrectPropertyStateName("button", "strokeWidth")]
+        return this.settings.button[this.getCorrectPropertyStateName("strokeWidth")]
     }
     get buttonPadding(): number {
         return this.settings.layout.padding
@@ -183,28 +179,28 @@ export class ProcessedVisualSettings{
         return this.dataPoints[this.i].iconValue as string|| "https://via.placeholder.com/150"
     }
     get iconWidth(): number {
-        return this.settings.icon[this.getCorrectPropertyStateName("icon", "width")]
+        return this.settings.icon[this.getCorrectPropertyStateName("width")]
     }
     get iconHmargin(): number {
-        return this.settings.icon[this.getCorrectPropertyStateName("icon", "hmargin")]
+        return this.settings.icon[this.getCorrectPropertyStateName("hmargin")]
     }
     get iconTopMargin(): number{
-        return this.settings.icon[this.getCorrectPropertyStateName("icon", "topMargin")]
+        return this.settings.icon[this.getCorrectPropertyStateName("topMargin")]
     }
     get iconBottomMargin(): number{
-        return this.settings.icon[this.getCorrectPropertyStateName("icon", "bottomMargin")]
+        return this.settings.icon[this.getCorrectPropertyStateName("bottomMargin")]
     }
     get spaceForIcon(): number {
         return this.titleFOWidth - 2*this.iconHmargin
     }
     get iconPlacement(): enums.Icon_Placement {
-        return this.settings.icon[this.getCorrectPropertyStateName("icon", "placement")]
+        return this.settings.icon[this.getCorrectPropertyStateName("placement")]
     }
     get iconHeight(): number {
         return this.titleFOHeight - this.textContainerHeight - this.iconTopMargin - this.iconBottomMargin
     }
     get iconOpacity(): number {
-        return 1 - (this.settings.icon[this.getCorrectPropertyStateName("icon", "transparency")])/100
+        return 1 - (this.settings.icon[this.getCorrectPropertyStateName("transparency")])/100
     }
 
 
@@ -294,7 +290,7 @@ export class ProcessedVisualSettings{
         return Math.max(this.shadowSpace, this.glowSpace, this.buttonStrokeWidth)
     }
     get filter(): string{
-        return this.settings.effects[this.getCorrectPropertyStateName("effects", "filter")]
+        return this.settings.effects[this.getCorrectPropertyStateName("filter")]
     }
 
 

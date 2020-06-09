@@ -31,8 +31,7 @@ export function getPropertyStateNames(propBase: string): propertyStateName{
     return {
             all: propBase+"A",
             selected: propBase+"S",
-            unselected: propBase+"U",
-            hover: propBase+"H"
+            unselected: propBase+"U"
         }
 }
 
@@ -40,25 +39,20 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
     let _all = propertyStates.all
     let _selected = propertyStates.selected
     let _unselected = propertyStates.unselected
-    let _hover = propertyStates.hover
     let _allExists: boolean = typeof _all == 'number' ? _all >= 0 : _all && _all.length > 0
     let _selectedExists: boolean = typeof _selected == 'number' ? _selected >= 0 : _selected && _selected.length > 0
     let _nullValue = typeof _all == 'number' ? null : ""
     if (propertyStates.state == enums.State.all && _allExists)
-        _selected = _unselected = _hover = _all
+        _selected = _unselected = _all
     if (_selectedExists && _selected == _unselected)
         _all = _selected
-    if (!(_selected == _unselected && _selected == _hover))
+    if (propertyStates.state != enums.State.all && _selected != _unselected)
         _all = _nullValue
     return {
         all: _all,
         selected: _selected,
         unselected: _unselected,
-        hover: _hover,
-        didChange: !(propertyStates.all == _all && 
-                    propertyStates.selected == _selected && 
-                    propertyStates.unselected == _unselected &&
-                    (!propertyStates.hover || propertyStates.hover == _hover))
+        didChange: !(propertyStates.all == _all && propertyStates.selected == _selected && propertyStates.unselected == _unselected)
     }
 }
 
