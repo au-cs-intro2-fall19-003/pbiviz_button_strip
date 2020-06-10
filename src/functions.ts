@@ -65,8 +65,6 @@ export function getObjectsToPersist(visualSettings: VisualSettings): powerbi.Vis
                 state: visualSettings[objKey].state
             }
             let leveledPropertyState = levelProperties(propertyState)
-            if(leveledPropertyState.didChange)
-                console.log(objKey, propertyState, leveledPropertyState.didChange)
             if (leveledPropertyState.didChange) {
                 object.properties[groupedKeyNames.all] = leveledPropertyState.all
                 object.properties[groupedKeyNames.selected] = leveledPropertyState.selected
@@ -100,9 +98,9 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
         unselected: _unselected,
         hover: _hover,
         didChange: !(propertyStates.all == _all && 
-                    (!propertyStates.selected || propertyStates.selected == _selected)  && 
-                    (!propertyStates.unselected || propertyStates.unselected == _unselected) &&
-                    (!propertyStates.hover || propertyStates.hover == _hover))
+                    (propertyStates.selected == null || propertyStates.selected == _selected)  && 
+                    (propertyStates.unselected == null || propertyStates.unselected == _unselected) &&
+                    (propertyStates.hover == null || propertyStates.hover == _hover))
     }
 }
 

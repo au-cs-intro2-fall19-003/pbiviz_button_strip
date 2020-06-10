@@ -138,11 +138,20 @@ export class Visual implements IVisual {
         switch(settings.content.source){
             case enums.Content_Source.databound:
                 delete settings.content.n
-                for(let i = 1; i < 11; i++)
+                for(let i = 1; i < 11; i++){
                     delete settings.content['text' + i]
+                    delete settings.content['icon' + i]
+                }
+                break
             case enums.Content_Source.fixed:
-                for(let i = 10; i > settings.content.n; i--)
+                for(let i = 10; i > settings.content.n; i--){
                     delete settings.content['text' + i]
+                    delete settings.content['icon' + i]
+                }
+                if(!this.visualSettings.content.icons)
+                    for(let i = 1; i < 11; i++)
+                        delete settings.content['icon' + i]
+                break
         }
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
@@ -207,7 +216,7 @@ export class Visual implements IVisual {
                 for(let i = 0; i < this.visualSettings.content.n; i++) {
                     this.dataPoints.push({
                         value: this.visualSettings.content['text'+(i+1)],
-                        iconValue: "",
+                        iconValue: this.visualSettings.content.icons ? this.visualSettings.content['icon'+(i+1)] : "",
                     });
                 }
         }

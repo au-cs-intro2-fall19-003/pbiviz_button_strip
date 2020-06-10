@@ -73,8 +73,7 @@ export class ProcessedVisualSettings{
                         ProcessedVisualSettings.selectionIdKey && 
                         ProcessedVisualSettings.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
             case enums.Content_Source.fixed:
-                return  ProcessedVisualSettings.selectionIndexUnbound &&
-                        ProcessedVisualSettings.selectionIndexUnbound == this.i
+                return  ProcessedVisualSettings.selectionIndexUnbound == this.i
         }
         
     }
@@ -85,8 +84,7 @@ export class ProcessedVisualSettings{
                         ProcessedVisualSettings.hoveredIdKey &&
                         ProcessedVisualSettings.hoveredIdKey == this.dataPoints[this.i].selectionId.getKey()
             case enums.Content_Source.fixed:
-                return ProcessedVisualSettings.hoveredIndexUnbound &&
-                        ProcessedVisualSettings.hoveredIndexUnbound == this.i
+                return ProcessedVisualSettings.hoveredIndexUnbound == this.i
         }
     }
     get viewportWidth(): number {
@@ -202,7 +200,7 @@ export class ProcessedVisualSettings{
     }
 
     get iconURL(): string {
-        return this.dataPoints[this.i].iconValue as string|| "https://via.placeholder.com/150"
+        return this.dataPoints[this.i].iconValue as string
     }
     get iconWidth(): number {
         return this.settings.icon[this.getCorrectPropertyStateName("icon", "width")]

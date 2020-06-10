@@ -1390,6 +1390,13 @@
                         "numeric": true
                     }
                 },
+                "icons": {
+                    "displayName": "Icons",
+                    "description": "Option to give URL for button icons",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "text1": {
                     "displayName": "Button 1 Text",
                     "description": "Text for the first button",
@@ -1456,6 +1463,76 @@
                 "text10": {
                     "displayName": "Button 10 Text",
                     "description": "Text for the tenth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon1": {
+                    "displayName": "Button 1 Icon URL",
+                    "description": "Icon URL for the first button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon2": {
+                    "displayName": "Button 2 Icon URL",
+                    "description": "Icon URL for the second button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon3": {
+                    "displayName": "Button 3 Icon URL",
+                    "description": "Icon URL for the third button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon4": {
+                    "displayName": "Button 4 Icon URL",
+                    "description": "Icon URL for the fourth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon5": {
+                    "displayName": "Button 5 Icon URL",
+                    "description": "Icon URL for the fifth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon6": {
+                    "displayName": "Button 6 Icon URL",
+                    "description": "Icon URL for the sixth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon7": {
+                    "displayName": "Button 7 Icon URL",
+                    "description": "Icon URL for the seventh button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon8": {
+                    "displayName": "Button 8 Icon URL",
+                    "description": "Icon URL for the eighth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon9": {
+                    "displayName": "Button 9 Icon URL",
+                    "description": "Icon URL for the ninth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "icon10": {
+                    "displayName": "Button 10 Icon URL",
+                    "description": "Icon URL for the tenth button",
                     "type": {
                         "text": true
                     }

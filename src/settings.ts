@@ -207,16 +207,27 @@ export class ContentSettings{
   public source: enums.Content_Source = enums.Content_Source.databound
 
   public n: number = 5
+  public icons: boolean = false
   public text1: string = "Text"
+  public icon1: string = ""
   public text2: string = "Text"
+  public icon2: string = ""
   public text3: string = "Text"
+  public icon3: string = ""
   public text4: string = "Text"
+  public icon4: string = ""
   public text5: string = "Text"
+  public icon5: string = ""
   public text6: string = "Text"
+  public icon6: string = ""
   public text7: string = "Text"
+  public icon7: string = ""
   public text8: string = "Text"
+  public icon8: string = ""
   public text9: string = "Text"
+  public icon9: string = ""
   public text10: string = "Text"
+  public icon10: string = ""
 }
 
 export class VisualSettings extends DataViewObjectsParser {
