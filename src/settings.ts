@@ -34,6 +34,7 @@ import * as enums from "./enums"
 
 export class ButtonSettings {
   public state : enums.State = enums.State.all;
+  public hover: boolean = false
   
   public colorA: string = "";
   public colorS: string = "#252423";
@@ -58,6 +59,7 @@ export class ButtonSettings {
 
 export class TextSettings{
   public state : enums.State = enums.State.all;
+  public hover: boolean = false
 
   public colorA: string = "";
   public colorS: string = "#fff";
@@ -99,6 +101,7 @@ export class TextSettings{
 export class IconSettings{
   public icons: boolean = false;
   public state : enums.State = enums.State.all;
+  public hover: boolean = false
 
   public placementA: enums.Icon_Placement = null;
   public placementS: enums.Icon_Placement = enums.Icon_Placement.left;
@@ -153,12 +156,14 @@ export class LayoutSettings{
 export class EffectsSettings{
   public shapeRoundedCornerRadius: number = 0 
   public state : enums.State = enums.State.all;
+  public hover: boolean = false
+
   public shadow: boolean = false;
 
   public shadowColorA: string = ""
   public shadowColorS: string = "#000"
   public shadowColorU: string = "#000"
-  public shadowColorH: string = "#000"
+  // public shadowColorH: string = "#000"
   
   public shadowTransparencyA: number = null
   public shadowTransparencyS: number = 70
@@ -185,7 +190,7 @@ export class EffectsSettings{
   public glowColorA: string = ""
   public glowColorS: string = "#3380FF"
   public glowColorU: string = "#3380FF"
-  public glowColorH: string = "#3380FF"
+  // public glowColorH: string = "#3380FF"
 
   public glowTransparencyA: number = null
   public glowTransparencyS: number = 0 
@@ -196,9 +201,6 @@ export class EffectsSettings{
   public glowStrengthS: number = 2
   public glowStrengthU: number = 2
   public glowStrengthH: number = 2
-
-  public filterS: string = "url(#selected)"
-  public filterU: string = "url(#unselected)"
 }
 
 export class VisualSettings extends DataViewObjectsParser {

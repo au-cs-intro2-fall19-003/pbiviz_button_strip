@@ -65,6 +65,13 @@
                         ]
                     }
                 },
+                "hover": {
+                    "displayName": "Hover styling",
+                    "description": "Allow seperate hover styling",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "colorA": {
                     "displayName": "Background color",
                     "description": "Background color for the buttons.",
@@ -236,6 +243,13 @@
                                 "value": "hover"
                             }
                         ]
+                    }
+                },
+                "hover": {
+                    "displayName": "Hover styling",
+                    "description": "Allow seperate hover styling",
+                    "type": {
+                        "bool": true
                     }
                 },
                 "colorA": {
@@ -496,6 +510,13 @@
                                 "value": "hover"
                             }
                         ]
+                    }
+                },
+                "hover": {
+                    "displayName": "Hover styling",
+                    "description": "Allow seperate hover styling",
+                    "type": {
+                        "bool": true
                     }
                 },
                 "placementA": {
@@ -915,6 +936,13 @@
                         ]
                     }
                 },
+                "hover": {
+                    "displayName": "Hover styling",
+                    "description": "Allow seperate hover styling",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "shapeRoundedCornerRadius": {
                     "displayName": "Rounded corner radius",
                     "description": "Radius for shape's rounded corner",
@@ -977,6 +1005,13 @@
                     }
                 },
                 "shadowTransparencyU": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowTransparencyH": {
                     "displayName": "Transparency",
                     "description": "Transparency of the shadow.",
                     "type": {
@@ -1127,6 +1162,54 @@
                         ]
                     }
                 },
+                "shadowDirectionH": {
+                    "displayName": "Direction",
+                    "description": "Direction of the shadow",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Bottom Right",
+                                "value": "bottom_right"
+                            },
+                            {
+                                "displayName": "Bottom",
+                                "value": "bottom"
+                            },
+                            {
+                                "displayName": "Bottom Left",
+                                "value": "bottom_left"
+                            },
+                            {
+                                "displayName": "Left",
+                                "value": "left"
+                            },
+                            {
+                                "displayName": "Center",
+                                "value": "center"
+                            },
+                            {
+                                "displayName": "Top Left",
+                                "value": "top_left"
+                            },
+                            {
+                                "displayName": "Top",
+                                "value": "top"
+                            },
+                            {
+                                "displayName": "Top Right",
+                                "value": "top_right"
+                            },
+                            {
+                                "displayName": "Right",
+                                "value": "right"
+                            },
+                            {
+                                "displayName": "Custom",
+                                "value": "custom"
+                            }
+                        ]
+                    }
+                },
                 "shadowDistanceA": {
                     "displayName": "Distance",
                     "description": "Distance of the shadow.",
@@ -1148,6 +1231,13 @@
                         "numeric": true
                     }
                 },
+                "shadowDistanceH": {
+                    "displayName": "Distance",
+                    "description": "Distance of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "shadowStrengthA": {
                     "displayName": "Strength",
                     "description": "Strength of the shadow.",
@@ -1163,6 +1253,13 @@
                     }
                 },
                 "shadowStrengthU": {
+                    "displayName": "Strength",
+                    "description": "Strength of the shadow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "shadowStrengthH": {
                     "displayName": "Strength",
                     "description": "Strength of the shadow.",
                     "type": {
@@ -1230,6 +1327,13 @@
                         "numeric": true
                     }
                 },
+                "glowTransparencyH": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of the glow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "glowStrengthA": {
                     "displayName": "Strength",
                     "description": "Strength of the glow.",
@@ -1245,6 +1349,13 @@
                     }
                 },
                 "glowStrengthU": {
+                    "displayName": "Strength",
+                    "description": "Strength of the glow.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "glowStrengthH": {
                     "displayName": "Strength",
                     "description": "Strength of the glow.",
                     "type": {

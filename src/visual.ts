@@ -89,6 +89,7 @@ export class Visual implements IVisual {
     }
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
+        console.log("enumerating")
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
         let settingsKeys = Object.keys(settings)
         for (let i = 0; i < settingsKeys.length; i++) {
@@ -96,6 +97,7 @@ export class Visual implements IVisual {
             let groupedKeyNamesArr: propertyStateName[] = getPropertyStateNameArr(Object.keys(settings[settingKey]))
             for (let j = 0; j < groupedKeyNamesArr.length; j++) {
                 let groupedKeyNames: propertyStateName = groupedKeyNamesArr[j]
+                // console.log(settingKey, groupedKeyNames)
                 switch (settings[settingKey].state) {
                     case enums.State.all:
                         delete settings[settingKey][groupedKeyNames.selected]
@@ -170,10 +172,12 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
+        console.log("updating")
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
         let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
+        console.log(objects)
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
         
@@ -194,17 +198,20 @@ export class Visual implements IVisual {
                 selectionId: categorySelectionId,
             });
         }
-
+        this.svg.select("defs").html("")
         let data: ProcessedVisualSettings[] = [];
-        for (let i = 0; i < this.dataPoints.length; i++)
+        for (let i = 0; i < this.dataPoints.length; i++){
             data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, this.hoveredIdKey, options))
+            addFilters(this.svg.select("defs"), data[i])
+        }
 
+        console.log("drawing")
 
         this.svg
             .style('width', options.viewport.width)
             .style('height', options.viewport.height)
-
-        addFilters(this.svg.select("defs"), data[0])
+        
+        
 
         this.container.selectAll(".frameContainer, .titleForeignObject, .cover").filter((d, i, nodes: Element[]) => {
             return !nodes[i].classList.contains(this.visualSettings.layout.buttonShape)
@@ -284,9 +291,9 @@ export class Visual implements IVisual {
             })
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
-                console.log(VisualSettings.parse(options.dataViews[0]) as VisualSettings)
                 this.update(options)
             })
+        console.log("end")
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {

@@ -65,6 +65,8 @@ export function getObjectsToPersist(visualSettings: VisualSettings): powerbi.Vis
                 state: visualSettings[objKey].state
             }
             let leveledPropertyState = levelProperties(propertyState)
+            if(leveledPropertyState.didChange)
+                console.log(objKey, propertyState, leveledPropertyState.didChange)
             if (leveledPropertyState.didChange) {
                 object.properties[groupedKeyNames.all] = leveledPropertyState.all
                 object.properties[groupedKeyNames.selected] = leveledPropertyState.selected
@@ -98,66 +100,39 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
         unselected: _unselected,
         hover: _hover,
         didChange: !(propertyStates.all == _all && 
-                    propertyStates.selected == _selected && 
-                    propertyStates.unselected == _unselected &&
+                    (!propertyStates.selected || propertyStates.selected == _selected)  && 
+                    (!propertyStates.unselected || propertyStates.unselected == _unselected) &&
                     (!propertyStates.hover || propertyStates.hover == _hover))
     }
 }
 
-export function addFilters(defs: d3.Selection<d3.BaseType, any, any, any>, pvs: ProcessedVisualSettings): void {
-    defs.html("")
-
-    let selected = defs.append("filter")
-        .attr("id", "selected")
-    let unselected = defs.append("filter")
-        .attr("id", "unselected")
+export function addFilters(defs: d3.Selection<d3.BaseType, any, any, any>, pvs: ProcessedVisualSettings,): void {
+    let filter = defs.append("filter")
+        .attr("id", "filter" + pvs.i)
     if (pvs.settings.effects.shadow) {
-        selected
+        filter
             .append("feDropShadow")
-            .attr("dx", pvs.shadowDirectionCoordsS.x * pvs.shadowDistanceS)
-            .attr("dy", pvs.shadowDirectionCoordsS.y * pvs.shadowDistanceS)
-            .attr("stdDeviation", pvs.shadowStrengthS)
-            .attr("flood-color", pvs.shadowColorS)
-            .attr("flood-opacity", pvs.shadowTransparencyS)
-            .attr("result", "dropshadow")
-
-        unselected
-            .append("feDropShadow")
-            .attr("dx", pvs.shadowDirectionCoordsU.x * pvs.shadowDistanceU)
-            .attr("dy", pvs.shadowDirectionCoordsU.y * pvs.shadowDistanceU)
-            .attr("stdDeviation", pvs.shadowStrengthU)
-            .attr("flood-color", pvs.shadowColorU)
-            .attr("flood-opacity", pvs.shadowTransparencyU)
+            .attr("dx", pvs.shadowDirectionCoords.x * pvs.shadowDistance)
+            .attr("dy", pvs.shadowDirectionCoords.y * pvs.shadowDistance)
+            .attr("stdDeviation", pvs.shadowStrength)
+            .attr("flood-color", pvs.shadowColor)
+            .attr("flood-opacity", pvs.shadowTransparency)
             .attr("result", "dropshadow")
     }
 
     if (pvs.settings.effects.glow) {
-        selected
+        filter
             .append("feDropShadow")
             .attr("dx", 0)
             .attr("dy", 0)
-            .attr("stdDeviation", pvs.glowStrengthS)
-            .attr("flood-color", pvs.glowColorS)
-            .attr("flood-opacity", pvs.glowTransparencyS)
+            .attr("stdDeviation", pvs.glowStrength)
+            .attr("flood-color", pvs.glowColor)
+            .attr("flood-opacity", pvs.glowTransparency)
             .attr("result", "glow")
 
-        unselected
-            .append("feDropShadow")
-            .attr("dx", 0)
-            .attr("dy", 0)
-            .attr("stdDeviation", pvs.glowStrengthU)
-            .attr("flood-color", pvs.glowColorU)
-            .attr("flood-opacity", pvs.glowTransparencyU)
-            .attr("result", "glow")
     }
 
-
-
-    let feMergeS = selected.append("feMerge")
-    feMergeS.append("feMergeNode").attr("in", "dropshadow")
-    feMergeS.append("feMergeNode").attr("in", "glow")
-    let feMergeU = unselected.append("feMerge")
-    feMergeU.append("feMergeNode").attr("in", "dropshadow")
-    feMergeU.append("feMergeNode").attr("in", "glow")
-
+    let feMerge = filter.append("feMerge")
+    feMerge.append("feMergeNode").attr("in", "dropshadow")
+    feMerge.append("feMergeNode").attr("in", "glow")
 }

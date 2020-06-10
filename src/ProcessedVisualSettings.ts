@@ -50,7 +50,7 @@ export class ProcessedVisualSettings{
         let name: string = ""
         if(this.isSelected  && this.settings[obj][propertyStateNames.selected] != null)
             name = name || propertyStateNames.selected
-        if(this.isHovered && this.settings[obj][propertyStateNames.hover] != null)
+        if(this.isHovered && this.settings[obj][propertyStateNames.hover] != null && this.settings[obj]['hover'])
             name = name || propertyStateNames.hover
         if(!this.isSelected && this.settings[obj][propertyStateNames.unselected] != null)
             name = name || propertyStateNames.unselected
@@ -207,20 +207,12 @@ export class ProcessedVisualSettings{
     get shadowSpace(): number {
         return this.settings.effects.shadow ? 3*(this.shadowMaxDistance+this.shadowMaxStrength) : 0
     }
-    get shadowColorS(): string {
-        return this.settings.effects.shadowColorS
+    get shadowColor(): string {
+        console.log("getting shadow color")
+        return this.settings.effects[this.getCorrectPropertyStateName("effects", "shadowColor")]
     }
-    get shadowColorU(): string {
-        return this.settings.effects.shadowColorU
-    }
-    get shadowTransparencyS(): number {
-        return 1 - this.settings.effects.shadowTransparencyS/100
-    }
-    get shadowTransparencyU(): number {
-        return 1 - this.settings.effects.shadowTransparencyU/100
-    }
-    get shadowTranslateS(): number{
-        return 0
+    get shadowTransparency(): number {
+        return 1 - this.settings.effects[this.getCorrectPropertyStateName("effects", "shadowTransparency")]/100
     }
     getshadowDirectionCoords(direction: enums.Direction): {x: number, y:number}{
         switch(direction){
@@ -236,51 +228,33 @@ export class ProcessedVisualSettings{
             case enums.Direction.custom: return {x: 0, y:0}  
         }
     }
-    get shadowDirectionCoordsS(): {x: number, y: number}{
-        return this.getshadowDirectionCoords(this.settings.effects.shadowDirectionS)
+    get shadowDirectionCoords(): {x: number, y: number}{
+        return this.getshadowDirectionCoords(this.settings.effects[this.getCorrectPropertyStateName("effects", "shadowDirection")])
     }
-    get shadowDirectionCoordsU(): {x: number, y: number}{
-        return this.getshadowDirectionCoords(this.settings.effects.shadowDirectionU)
-    }
-    get shadowDistanceS(): number {
-        return this.settings.effects.shadowDistanceS
+    get shadowDistance(): number {
+        return this.settings.effects[this.getCorrectPropertyStateName("effects", "shadowDistance")]
     } 
-    get shadowDistanceU(): number {
-        return this.settings.effects.shadowDistanceU
-    }
     get shadowMaxDistance(): number {
-        return Math.max(this.shadowDistanceS, this.shadowDistanceU)
+        return Math.max(this.settings.effects.shadowDistanceS, this.settings.effects.shadowDistanceU, this.settings.effects.shadowDistanceH)
     }
-    get shadowStrengthS(): number {
-        return this.settings.effects.shadowStrengthS
-    }
-    get shadowStrengthU(): number {
-        return this.settings.effects.shadowStrengthU
+    get shadowStrength(): number {
+        return this.settings.effects[this.getCorrectPropertyStateName("effects", "shadowStrength")]
     }
     get shadowMaxStrength(): number{
-        return Math.max(this.shadowStrengthS, this.shadowStrengthU)
+        return Math.max(this.settings.effects.shadowStrengthS, this.settings.effects.shadowStrengthU, this.settings.effects.shadowStrengthH)
     }
 
-    get glowColorS(): string {
-        return this.settings.effects.glowColorS
+    get glowColor(): string {
+        return this.settings.effects[this.getCorrectPropertyStateName("effects", "glowColor")]
     }
-    get glowColorU(): string {
-        return this.settings.effects.glowColorU
+    get glowTransparency(): number {
+        return 1 - this.settings.effects[this.getCorrectPropertyStateName("effects", "glowTransparency")]/100
     }
-    get glowTransparencyS(): number {
-        return 1 - this.settings.effects.glowTransparencyS/100
-    }
-    get glowTransparencyU(): number {
-        return 1 - this.settings.effects.glowTransparencyU/100
-    }
-    get glowStrengthS(): number {
-        return this.settings.effects.glowStrengthS
-    }
-    get glowStrengthU(): number {
-        return this.settings.effects.glowStrengthU
+    get glowStrength(): number {
+        return this.settings.effects[this.getCorrectPropertyStateName("effects", "glowStrength")]
     }
     get glowMaxStrength(): number{
-        return Math.max(this.glowStrengthS, this.glowStrengthU)
+        return Math.max(this.settings.effects.glowStrengthS, this.settings.effects.glowStrengthU, this.settings.effects.glowStrengthH)
     }
     get glowSpace(): number {
         return this.settings.effects.glow ? 3*(this.glowMaxStrength) : 0
@@ -290,7 +264,7 @@ export class ProcessedVisualSettings{
         return Math.max(this.shadowSpace, this.glowSpace, this.buttonStrokeWidth)
     }
     get filter(): string{
-        return this.settings.effects[this.getCorrectPropertyStateName("effects", "filter")]
+        return "url(#filter" + this.i + ")"
     }
 
 

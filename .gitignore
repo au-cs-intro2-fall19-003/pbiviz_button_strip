@@ -1,2 +1,3 @@
 .tmp/*
 webpack.statistics.dev.html
+*.html
