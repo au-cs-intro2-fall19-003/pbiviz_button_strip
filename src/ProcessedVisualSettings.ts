@@ -4,10 +4,9 @@ import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 
 import { VisualSettings } from "./settings";
-import {dataPoint} from './interfaces'
+import {dataPoint, stateIds} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions, getPropertyStateNames} from './functions'
-import { max } from "d3";
 import {Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon, Tab_RoundedCorners, Tab_CutCorners, Tab_CutCorner, ChevronVertical, ParallelogramVertical} from "./shapes"
 
 export class ProcessedVisualSettings{
@@ -17,17 +16,27 @@ export class ProcessedVisualSettings{
     options: VisualUpdateOptions
     widthSoFar: number;
     static widthSoFar: number; 
-    static selectionIdKey: string;
-    static hoveredIdKey: string;
     static totalTextHmargin: number;
     static maxTextHeight: number;
-    constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, hoveredIdKey: string, options: VisualUpdateOptions){
+
+    static selectionIdKey: string;
+    static hoveredIdKey: string;
+    static selectionIndexUnbound: number;
+    static hoveredIndexUnbound: number;
+    
+    
+    constructor(i: number, dataPoints: dataPoint[], 
+                settings: VisualSettings, selectionManager: ISelectionManager, 
+                stateIds: stateIds, 
+                options: VisualUpdateOptions){
         this.dataPoints = dataPoints
         this.settings = settings
         this.options = options
         this.i = i
         if (i == 0){
-            ProcessedVisualSettings.hoveredIdKey = hoveredIdKey
+            ProcessedVisualSettings.selectionIndexUnbound = stateIds.selectionIndexUnbound
+            ProcessedVisualSettings.hoveredIdKey = stateIds.hoveredIdKey
+            ProcessedVisualSettings.hoveredIndexUnbound = stateIds.hoveredIndexUnbound
             if(selectionManager.hasSelection())
                 ProcessedVisualSettings.selectionIdKey = (selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() 
                 || ProcessedVisualSettings.selectionIdKey
@@ -58,10 +67,27 @@ export class ProcessedVisualSettings{
     }
 
     get isSelected(): boolean {
-        return ProcessedVisualSettings.selectionIdKey && ProcessedVisualSettings.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
+        switch(this.settings.content.source){
+            case enums.Content_Source.databound:
+                return  this.dataPoints[this.i].selectionId && 
+                        ProcessedVisualSettings.selectionIdKey && 
+                        ProcessedVisualSettings.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
+            case enums.Content_Source.fixed:
+                return  ProcessedVisualSettings.selectionIndexUnbound &&
+                        ProcessedVisualSettings.selectionIndexUnbound == this.i
+        }
+        
     }
     get isHovered(): boolean {
-        return ProcessedVisualSettings.hoveredIdKey == this.dataPoints[this.i].selectionId.getKey()
+        switch(this.settings.content.source){
+            case enums.Content_Source.databound:
+                return  this.dataPoints[this.i].selectionId && 
+                        ProcessedVisualSettings.hoveredIdKey &&
+                        ProcessedVisualSettings.hoveredIdKey == this.dataPoints[this.i].selectionId.getKey()
+            case enums.Content_Source.fixed:
+                return ProcessedVisualSettings.hoveredIndexUnbound &&
+                        ProcessedVisualSettings.hoveredIndexUnbound == this.i
+        }
     }
     get viewportWidth(): number {
         return this.options.viewport.width - this.effectSpace

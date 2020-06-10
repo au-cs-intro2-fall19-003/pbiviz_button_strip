@@ -53,3 +53,8 @@ export enum Button_Shape {
     tab_cutCorners = "tab_cutCorners",
     tab_cutCorner = "tab_cutCorner"
 }
+
+export enum Content_Source {
+    databound = "databound",
+    fixed = "fixed"
+}

@@ -4,7 +4,7 @@ import * as enums from "./enums"
 export interface dataPoint {
     value: powerbi.PrimitiveValue,
     iconValue?: powerbi.PrimitiveValue,
-    selectionId: powerbi.visuals.ISelectionId,
+    selectionId?: powerbi.visuals.ISelectionId,
 }
 
 export interface propertyStateName {
@@ -34,4 +34,10 @@ export interface containerProperties{
     yPos: number,
     width: number,
     height: number
+}
+
+export interface stateIds{
+    hoveredIdKey: string,
+    selectionIndexUnbound: number,
+    hoveredIndexUnbound: number
 }

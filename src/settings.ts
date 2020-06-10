@@ -203,10 +203,27 @@ export class EffectsSettings{
   public glowStrengthH: number = 2
 }
 
+export class ContentSettings{
+  public source: enums.Content_Source = enums.Content_Source.databound
+
+  public n: number = 5
+  public text1: string = "Text"
+  public text2: string = "Text"
+  public text3: string = "Text"
+  public text4: string = "Text"
+  public text5: string = "Text"
+  public text6: string = "Text"
+  public text7: string = "Text"
+  public text8: string = "Text"
+  public text9: string = "Text"
+  public text10: string = "Text"
+}
+
 export class VisualSettings extends DataViewObjectsParser {
   public button: ButtonSettings = new ButtonSettings();
   public text: TextSettings = new TextSettings();
   public icon: IconSettings = new IconSettings();
   public layout: LayoutSettings = new LayoutSettings();
   public effects: EffectsSettings = new EffectsSettings();
+  public content: ContentSettings = new ContentSettings();
 }

@@ -1363,7 +1363,104 @@
                     }
                 }
             }
-
+        },
+        "content": {
+            "displayName": "Content",
+            "properties": {
+                "source": {
+                    "displayName": "Source",
+                    "description": "Data source",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Data-bound",
+                                "value": "databound"
+                            },
+                            {
+                                "displayName": "Fixed",
+                                "value": "fixed"
+                            }
+                        ]
+                    }
+                },
+                "n": {
+                    "displayName": "Number of buttons",
+                    "description": "Number of buttons.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "text1": {
+                    "displayName": "Button 1 Text",
+                    "description": "Text for the first button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text2": {
+                    "displayName": "Button 2 Text",
+                    "description": "Text for the second button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text3": {
+                    "displayName": "Button 3 Text",
+                    "description": "Text for the third button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text4": {
+                    "displayName": "Button 4 Text",
+                    "description": "Text for the fourth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text5": {
+                    "displayName": "Button 5 Text",
+                    "description": "Text for the fifth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text6": {
+                    "displayName": "Button 6 Text",
+                    "description": "Text for the sixth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text7": {
+                    "displayName": "Button 7 Text",
+                    "description": "Text for the seventh button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text8": {
+                    "displayName": "Button 8 Text",
+                    "description": "Text for the eighth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text9": {
+                    "displayName": "Button 9 Text",
+                    "description": "Text for the ninth button",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "text10": {
+                    "displayName": "Button 10 Text",
+                    "description": "Text for the tenth button",
+                    "type": {
+                        "text": true
+                    }
+                }
+            }
         }
     },
     "dataViewMappings": [

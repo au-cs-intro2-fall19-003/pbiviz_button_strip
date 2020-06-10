@@ -47,7 +47,7 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import * as d3 from "d3";
 import { ProcessedVisualSettings } from "./processedvisualsettings";
 
-import { dataPoint, propertyStateName, propertyStateValue, propertyStatesInput, propertyStatesOutput } from './interfaces'
+import { dataPoint, propertyStateName, stateIds} from './interfaces'
 import { getPropertyStateNameArr, addFilters, getObjectsToPersist, levelProperties } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
@@ -64,18 +64,18 @@ export class Visual implements IVisual {
     private isEventUpdate: boolean = false;
     private visualSettings: VisualSettings;
     private selectionIdBuilder: ISelectionIdBuilder;
-    private selectionIdBuilderHover: ISelectionIdBuilder;
 
     private dataPoints: dataPoint[];
     private svg: Selection<SVGElement>;
     private container: Selection<SVGElement>;
     private hoveredIdKey: string;
+    private hoveredIndexUnbound: number;
+    private selectionIndexUnbound: number;
 
 
 
     constructor(options: VisualConstructorOptions) {
         this.selectionIdBuilder = options.host.createSelectionIdBuilder();
-        this.selectionIdBuilderHover = options.host.createSelectionIdBuilder();
         this.selectionManager = options.host.createSelectionManager();
         this.selectionManagerHover = options.host.createSelectionManager();
         this.host = options.host;
@@ -89,7 +89,6 @@ export class Visual implements IVisual {
     }
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
-        console.log("enumerating")
         const settings: VisualSettings = this.visualSettings || <VisualSettings>VisualSettings.getDefault();
         let settingsKeys = Object.keys(settings)
         for (let i = 0; i < settingsKeys.length; i++) {
@@ -97,7 +96,6 @@ export class Visual implements IVisual {
             let groupedKeyNamesArr: propertyStateName[] = getPropertyStateNameArr(Object.keys(settings[settingKey]))
             for (let j = 0; j < groupedKeyNamesArr.length; j++) {
                 let groupedKeyNames: propertyStateName = groupedKeyNamesArr[j]
-                // console.log(settingKey, groupedKeyNames)
                 switch (settings[settingKey].state) {
                     case enums.State.all:
                         delete settings[settingKey][groupedKeyNames.selected]
@@ -122,12 +120,29 @@ export class Visual implements IVisual {
                 }
             }
         }
-
-        if (!settings.icon.icons) {
-            let iconSettingsKeys: string[] = Object.keys(settings.icon)
+        let iconSettingsKeys: string[] = Object.keys(settings.icon)
+        if (!settings.icon.icons) 
             for (let i = 0; i < iconSettingsKeys.length; i++)
                 if (iconSettingsKeys[i] != 'icons')
                     delete settings.icon[iconSettingsKeys[i]]
+        let effectSettingsKeys: string[] = Object.keys(settings.effects)
+        if(!settings.effects.shadow)
+            for (let i = 0; i < effectSettingsKeys.length; i++)
+                if (effectSettingsKeys[i].startsWith("shadow") && effectSettingsKeys[i] != "shadow")
+                    delete settings.effects[effectSettingsKeys[i]]
+       if(!settings.effects.glow)
+            for (let i = 0; i < effectSettingsKeys.length; i++)
+                if (effectSettingsKeys[i].startsWith("glow") && effectSettingsKeys[i] != "glow")
+                    delete settings.effects[effectSettingsKeys[i]]
+        
+        switch(settings.content.source){
+            case enums.Content_Source.databound:
+                delete settings.content.n
+                for(let i = 1; i < 11; i++)
+                    delete settings.content['text' + i]
+            case enums.Content_Source.fixed:
+                for(let i = 10; i > settings.content.n; i--)
+                    delete settings.content['text' + i]
         }
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
@@ -157,27 +172,15 @@ export class Visual implements IVisual {
         if(settings.layout.buttonShape != enums.Button_Shape.tab_cutCorner){
             delete settings.layout.tab_cutCornerLength
         }
-        let effectSettingsKeys: string[] = Object.keys(settings.effects)
-        if(!settings.effects.shadow)
-            for (let i = 0; i < effectSettingsKeys.length; i++)
-                if (effectSettingsKeys[i].startsWith("shadow") && effectSettingsKeys[i] != "shadow")
-                    delete settings.effects[effectSettingsKeys[i]]
-       if(!settings.effects.glow)
-            for (let i = 0; i < effectSettingsKeys.length; i++)
-                if (effectSettingsKeys[i].startsWith("glow") && effectSettingsKeys[i] != "glow")
-                    delete settings.effects[effectSettingsKeys[i]]
-        
 
         return VisualSettings.enumerateObjectInstances(settings, options);
     }
 
     public update(options: VisualUpdateOptions) {
-        console.log("updating")
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
         let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
-        console.log(objects)
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
         
@@ -185,27 +188,42 @@ export class Visual implements IVisual {
         this.dataPoints = []
         const dataView = options.dataViews[0]
         const categories = dataView.categorical.categories;
-
-        for (let categoryIndex = 0; categoryIndex < categories[0].values.length; categoryIndex++) {
-            const pageValue: powerbi.PrimitiveValue = categories[0].values[categoryIndex];
-            const iconValue: powerbi.PrimitiveValue = categories[1].values[categoryIndex];
-            const categorySelectionId = this.host.createSelectionIdBuilder()
-                .withCategory(categories[0], categoryIndex) // we have only one category (`Page Name`)
-                .createSelectionId();
-            this.dataPoints.push({
-                value: pageValue,
-                iconValue: iconValue,
-                selectionId: categorySelectionId,
-            });
+        switch(this.visualSettings.content.source){
+            case enums.Content_Source.databound:
+                for (let categoryIndex = 0; categoryIndex < categories[0].values.length; categoryIndex++) {
+                    const pageValue: powerbi.PrimitiveValue = categories[0].values[categoryIndex];
+                    const iconValue: powerbi.PrimitiveValue = categories[1].values[categoryIndex];
+                    const categorySelectionId = this.host.createSelectionIdBuilder()
+                        .withCategory(categories[0], categoryIndex)
+                        .createSelectionId();
+                    this.dataPoints.push({
+                        value: pageValue,
+                        iconValue: iconValue,
+                        selectionId: categorySelectionId,
+                    });
+                }
+                break
+            case enums.Content_Source.fixed:
+                for(let i = 0; i < this.visualSettings.content.n; i++) {
+                    this.dataPoints.push({
+                        value: this.visualSettings.content['text'+(i+1)],
+                        iconValue: "",
+                    });
+                }
         }
+
+        let stateIds: stateIds = {
+            hoveredIdKey: this.hoveredIdKey,
+            selectionIndexUnbound: this.selectionIndexUnbound,
+            hoveredIndexUnbound: this.hoveredIndexUnbound
+        }
+        
         this.svg.select("defs").html("")
         let data: ProcessedVisualSettings[] = [];
         for (let i = 0; i < this.dataPoints.length; i++){
-            data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, this.hoveredIdKey, options))
+            data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, stateIds, options))
             addFilters(this.svg.select("defs"), data[i])
         }
-
-        console.log("drawing")
 
         this.svg
             .style('width', options.viewport.width)
@@ -282,18 +300,38 @@ export class Visual implements IVisual {
             .attr("d", function (d) { return d.shapePath })
             .style("fill-opacity", function (d) { return 0})
             .on('mouseover', (d, i)=>{
-                this.hoveredIdKey = this.dataPoints[i].selectionId.getKey()
+                switch(this.visualSettings.content.source){
+                    case enums.Content_Source.databound:
+                        this.hoveredIdKey = this.dataPoints[i].selectionId.getKey()
+                        break
+                    case enums.Content_Source.fixed:
+                        this.hoveredIndexUnbound = i
+                        break
+                }
                 this.update(options)
             })
             .on('mouseout', (d, i)=>{
-                this.hoveredIdKey = null
+                switch(this.visualSettings.content.source){
+                    case enums.Content_Source.databound:
+                        this.hoveredIdKey = null
+                        break
+                    case enums.Content_Source.fixed:
+                        this.hoveredIndexUnbound = null
+                        break
+                }
                 this.update(options)
             })
             .on('click', (d, i) => {
-                this.selectionManager.select(this.dataPoints[i].selectionId)
+                switch(this.visualSettings.content.source){
+                    case enums.Content_Source.databound:
+                        this.selectionManager.select(this.dataPoints[i].selectionId)
+                        break
+                    case enums.Content_Source.fixed:
+                        this.selectionIndexUnbound = i
+                        break
+                }
                 this.update(options)
             })
-        console.log("end")
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {
