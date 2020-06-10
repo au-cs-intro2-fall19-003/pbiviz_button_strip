@@ -18,25 +18,21 @@ export class ProcessedVisualSettings{
     widthSoFar: number;
     static widthSoFar: number; 
     static selectionIdKey: string;
-    static selectionIdKeyHover: string;
+    static hoveredIdKey: string;
     static totalTextHmargin: number;
     static maxTextHeight: number;
-    constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, selectionManagerHover: ISelectionManager, options: VisualUpdateOptions){
+    constructor(i: number, dataPoints: dataPoint[], settings: VisualSettings, selectionManager: ISelectionManager, hoveredIdKey: string, options: VisualUpdateOptions){
         this.dataPoints = dataPoints
         this.settings = settings
         this.options = options
         this.i = i
         if (i == 0){
+            ProcessedVisualSettings.hoveredIdKey = hoveredIdKey
             if(selectionManager.hasSelection())
                 ProcessedVisualSettings.selectionIdKey = (selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() 
                 || ProcessedVisualSettings.selectionIdKey
             else 
                 ProcessedVisualSettings.selectionIdKey = null
-            if(selectionManagerHover.hasSelection())
-                ProcessedVisualSettings.selectionIdKeyHover = (selectionManagerHover.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() 
-                || ProcessedVisualSettings.selectionIdKeyHover
-            else 
-                ProcessedVisualSettings.selectionIdKeyHover = null
         }
         if (this.indexInRow == 0){
             ProcessedVisualSettings.widthSoFar = 0;
@@ -65,7 +61,7 @@ export class ProcessedVisualSettings{
         return ProcessedVisualSettings.selectionIdKey && ProcessedVisualSettings.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
     }
     get isHovered(): boolean {
-        return ProcessedVisualSettings.selectionIdKeyHover && ProcessedVisualSettings.selectionIdKeyHover == this.dataPoints[this.i].selectionIdHover.getKey()
+        return ProcessedVisualSettings.hoveredIdKey == this.dataPoints[this.i].selectionId.getKey()
     }
     get viewportWidth(): number {
         return this.options.viewport.width - this.effectSpace
@@ -356,7 +352,6 @@ export class ProcessedVisualSettings{
         let text = document.createElement('span')
         text.className = 'text'
         text.textContent = this.text
-
         if (this.settings.icon.icons) {
             let img = document.createElement('div')
             img.className = 'icon'

@@ -1,6 +1,8 @@
 import { propertyStateName, propertyStatesInput, propertyStatesOutput } from './interfaces'
 import * as enums from "./enums"
 import { ProcessedVisualSettings } from "./processedvisualsettings";
+import powerbi from "powerbi-visuals-api";
+import { VisualSettings } from './settings';
 
 export function calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): { width: number, height: number } {
     var div = document.createElement('div');
@@ -34,6 +36,46 @@ export function getPropertyStateNames(propBase: string): propertyStateName{
             unselected: propBase+"U",
             hover: propBase+"H"
         }
+}
+
+export function getObjectsToPersist(visualSettings: VisualSettings): powerbi.VisualObjectInstancesToPersist{
+    let objKeys = Object.keys(visualSettings)
+    let objects: powerbi.VisualObjectInstancesToPersist = {
+        merge: []
+    }
+    for (let i = 0; i < objKeys.length; i++) {
+        let objKey: string = objKeys[i]
+        let propKeys: string[] = Object.keys(visualSettings[objKey])
+        let groupedKeyNamesArr: propertyStateName[] = getPropertyStateNameArr(propKeys)
+        let object: powerbi.VisualObjectInstance = {
+            objectName: objKey,
+            selector: undefined,
+            properties:
+                {}
+        }
+
+        for (let j = 0; j < groupedKeyNamesArr.length; j++) {
+            let groupedKeyNames: propertyStateName = groupedKeyNamesArr[j]
+            let type = typeof visualSettings[objKey][groupedKeyNames.all]
+            let propertyState: propertyStatesInput = {
+                all: visualSettings[objKey][groupedKeyNames.all],
+                selected: visualSettings[objKey][groupedKeyNames.selected],
+                unselected: visualSettings[objKey][groupedKeyNames.unselected],
+                hover: visualSettings[objKey][groupedKeyNames.hover],
+                state: visualSettings[objKey].state
+            }
+            let leveledPropertyState = levelProperties(propertyState)
+            if (leveledPropertyState.didChange) {
+                object.properties[groupedKeyNames.all] = leveledPropertyState.all
+                object.properties[groupedKeyNames.selected] = leveledPropertyState.selected
+                object.properties[groupedKeyNames.unselected] = leveledPropertyState.unselected
+                object.properties[groupedKeyNames.hover] = leveledPropertyState.hover
+            }
+        }
+        if (Object.keys(object.properties).length != 0)
+            objects.merge.push(object)
+    }
+    return objects
 }
 
 export function levelProperties(propertyStates: propertyStatesInput): propertyStatesOutput {
