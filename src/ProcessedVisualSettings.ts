@@ -19,9 +19,9 @@ export class ProcessedVisualSettings{
     static totalTextHmargin: number;
     static maxTextHeight: number;
 
-    static selectionIdKey: string;
+    static selectionIdKeys: string[];
     static hoveredIdKey: string;
-    static selectionIndexUnbound: number;
+    static selectionIndexesUnbound: number[];
     static hoveredIndexUnbound: number;
     
     
@@ -34,14 +34,11 @@ export class ProcessedVisualSettings{
         this.options = options
         this.i = i
         if (i == 0){
-            ProcessedVisualSettings.selectionIndexUnbound = stateIds.selectionIndexUnbound
+            ProcessedVisualSettings.selectionIndexesUnbound = stateIds.selectionIndexesUnbound
+            console.log(ProcessedVisualSettings.selectionIndexesUnbound)
             ProcessedVisualSettings.hoveredIdKey = stateIds.hoveredIdKey
             ProcessedVisualSettings.hoveredIndexUnbound = stateIds.hoveredIndexUnbound
-            if(selectionManager.hasSelection())
-                ProcessedVisualSettings.selectionIdKey = (selectionManager.getSelectionIds()[0] as powerbi.visuals.ISelectionId).getKey() 
-                || ProcessedVisualSettings.selectionIdKey
-            else 
-                ProcessedVisualSettings.selectionIdKey = null
+            ProcessedVisualSettings.selectionIdKeys = (selectionManager.getSelectionIds() as powerbi.visuals.ISelectionId[]).map(x => x.getKey()) as string[]
         }
         if (this.indexInRow == 0){
             ProcessedVisualSettings.widthSoFar = 0;
@@ -70,10 +67,10 @@ export class ProcessedVisualSettings{
         switch(this.settings.content.source){
             case enums.Content_Source.databound:
                 return  this.dataPoints[this.i].selectionId && 
-                        ProcessedVisualSettings.selectionIdKey && 
-                        ProcessedVisualSettings.selectionIdKey == this.dataPoints[this.i].selectionId.getKey()
+                        ProcessedVisualSettings.selectionIdKeys && 
+                        ProcessedVisualSettings.selectionIdKeys.indexOf(this.dataPoints[this.i].selectionId.getKey() as string) > -1
             case enums.Content_Source.fixed:
-                return  ProcessedVisualSettings.selectionIndexUnbound == this.i
+                return  ProcessedVisualSettings.selectionIndexesUnbound && ProcessedVisualSettings.selectionIndexesUnbound.indexOf(this.i) > -1
         }
         
     }

@@ -70,7 +70,7 @@ export class Visual implements IVisual {
     private container: Selection<SVGElement>;
     private hoveredIdKey: string;
     private hoveredIndexUnbound: number;
-    private selectionIndexUnbound: number;
+    private selectionIndexesUnbound: number[] = [];
 
 
 
@@ -223,7 +223,7 @@ export class Visual implements IVisual {
 
         let stateIds: stateIds = {
             hoveredIdKey: this.hoveredIdKey,
-            selectionIndexUnbound: this.selectionIndexUnbound,
+            selectionIndexesUnbound: this.selectionIndexesUnbound,
             hoveredIndexUnbound: this.hoveredIndexUnbound
         }
         
@@ -333,10 +333,14 @@ export class Visual implements IVisual {
             .on('click', (d, i) => {
                 switch(this.visualSettings.content.source){
                     case enums.Content_Source.databound:
-                        this.selectionManager.select(this.dataPoints[i].selectionId)
+                        this.selectionManager.select(this.dataPoints[i].selectionId, true)
                         break
                     case enums.Content_Source.fixed:
-                        this.selectionIndexUnbound = i
+                        let index: number = this.selectionIndexesUnbound.indexOf(i)
+                        if(index > -1)
+                            this.selectionIndexesUnbound.splice(index, 1)
+                        else
+                            this.selectionIndexesUnbound.push(i)
                         break
                 }
                 this.update(options)

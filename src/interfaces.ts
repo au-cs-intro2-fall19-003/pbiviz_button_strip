@@ -38,6 +38,6 @@ export interface containerProperties{
 
 export interface stateIds{
     hoveredIdKey: string,
-    selectionIndexUnbound: number,
+    selectionIndexesUnbound: number[],
     hoveredIndexUnbound: number
 }
