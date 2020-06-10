@@ -99,7 +99,7 @@
                     }
                 },
                 "colorH": {
-                    "displayName": "Background color",
+                    "displayName": "Background color (hover)",
                     "description": "Background color for the hovered button.",
                     "type": {
                         "fill": {
@@ -121,7 +121,7 @@
                     }
                 },
                 "strokeS": {
-                    "displayName": "Border color (selected)",
+                    "displayName": "Border color",
                     "description": "Border color for the buttons.",
                     "type": {
                         "fill": {
@@ -132,7 +132,18 @@
                     }
                 },
                 "strokeU": {
-                    "displayName": "Border color (unselected)",
+                    "displayName": "Border color",
+                    "description": "Border color for the buttons.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "strokeH": {
+                    "displayName": "Border color (hover)",
                     "description": "Border color for the buttons.",
                     "type": {
                         "fill": {
@@ -163,6 +174,13 @@
                         "numeric": true
                     }
                 },
+                "strokeWidthH": {
+                    "displayName": "Stroke width",
+                    "description": "The width of the stroke in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "transparencyA": {
                     "displayName": "Transparency",
                     "description": "The transparency of the button.",
@@ -178,6 +196,13 @@
                     }
                 },
                 "transparencyU": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the button.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "transparencyH": {
                     "displayName": "Transparency",
                     "description": "The transparency of the button.",
                     "type": {
@@ -246,6 +271,17 @@
                         }
                     }
                 },
+                "colorH": {
+                    "displayName": "Font color",
+                    "description": "Font color for the text.",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
                 "alignmentA": {
                     "displayName": "Alignment",
                     "description": "Alignment position for the text",
@@ -273,6 +309,15 @@
                         }
                     }
                 },
+                "alignmentH": {
+                    "displayName": "Alignment",
+                    "description": "Alignment position for the text",
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
+                    }
+                },
                 "fontSizeA": {
                     "displayName": "Font size",
                     "description": "The size of the font.",
@@ -288,6 +333,13 @@
                     }
                 },
                 "fontSizeU": {
+                    "displayName": "Font size",
+                    "description": "The size of the font.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "fontSizeH": {
                     "displayName": "Font size",
                     "description": "The size of the font.",
                     "type": {
@@ -318,6 +370,14 @@
                         }
                     }
                 },
+                "fontFamilyH": {
+                    "displayName": "Font family",
+                    "type": {
+                        "formatting": {
+                            "fontFamily": true
+                        }
+                    }
+                },
                 "hmarginA": {
                     "displayName": "Horizontal margin",
                     "description": "Margin between text and button left and right",
@@ -333,6 +393,13 @@
                     }
                 },
                 "hmarginU": {
+                    "displayName": "Horizontal margin",
+                    "description": "Margin between text and button left and right",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "hmarginH": {
                     "displayName": "Horizontal margin",
                     "description": "Margin between text and button left and right",
                     "type": {
@@ -360,6 +427,13 @@
                         "numeric": true
                     }
                 },
+                "vmarginH": {
+                    "displayName": "Vertical margin",
+                    "description": "Margin between text and button top and bottom",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "transparencyA": {
                     "displayName": "Transparency",
                     "description": "The transparency of the font.",
@@ -375,6 +449,13 @@
                     }
                 },
                 "transparencyU": {
+                    "displayName": "Transparency",
+                    "description": "The transparency of the font.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "transparencyH": {
                     "displayName": "Transparency",
                     "description": "The transparency of the font.",
                     "type": {
@@ -477,6 +558,26 @@
                         ]
                     }
                 },
+                "placementH": {
+                    "displayName": "Placement",
+                    "description": "How buttons will be laid out.",
+                    "type": {
+                        "enumeration": [
+                            {
+                                "displayName": "Left",
+                                "value": "left"
+                            },
+                            {
+                                "displayName": "Above",
+                                "value": "above"
+                            },
+                            {
+                                "displayName": "Below",
+                                "value": "below"
+                            }
+                        ]
+                    }
+                },
                 "widthA": {
                     "displayName": "Width",
                     "description": "Width of icon in pixels",
@@ -492,6 +593,13 @@
                     }
                 },
                 "widthU": {
+                    "displayName": "Width",
+                    "description": "Width of icon in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "widthH": {
                     "displayName": "Width",
                     "description": "Width of icon in pixels",
                     "type": {
@@ -519,6 +627,13 @@
                         "numeric": true
                     }
                 },
+                "hmarginH": {
+                    "displayName": "Horizontal margin",
+                    "description": "Margin between icon and button left and right",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "topMarginA": {
                     "displayName": "Top margin",
                     "description": "Top margin for the icon",
@@ -534,6 +649,13 @@
                     }  
                 },
                 "topMarginU": {
+                    "displayName": "Top margin",
+                    "description": "Top margin for the icon",
+                    "type": {
+                        "numeric": true
+                    }  
+                },
+                "topMarginH": {
                     "displayName": "Top margin",
                     "description": "Top margin for the icon",
                     "type": {
@@ -561,6 +683,13 @@
                         "numeric": true
                     }  
                 },
+                "bottomMarginH": {
+                    "displayName": "Bottom margin",
+                    "description": "Bottom margin for the icon",
+                    "type": {
+                        "numeric": true
+                    }  
+                },
                 "transparencyA": {
                     "displayName": "Transparency",
                     "description": "Transparency of icon",
@@ -576,6 +705,13 @@
                     }
                 },
                 "transparencyU": {
+                    "displayName": "Transparency",
+                    "description": "Transparency of icon",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "transparencyH": {
                     "displayName": "Transparency",
                     "description": "Transparency of icon",
                     "type": {
