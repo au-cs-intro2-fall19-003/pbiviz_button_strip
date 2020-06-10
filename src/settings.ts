@@ -204,6 +204,7 @@ export class EffectsSettings{
 }
 
 export class ContentSettings{
+  public multiselect: boolean = false
   public source: enums.Content_Source = enums.Content_Source.databound
 
   public n: number = 5

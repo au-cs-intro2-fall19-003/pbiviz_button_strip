@@ -333,14 +333,19 @@ export class Visual implements IVisual {
             .on('click', (d, i) => {
                 switch(this.visualSettings.content.source){
                     case enums.Content_Source.databound:
-                        this.selectionManager.select(this.dataPoints[i].selectionId, true)
+                        this.selectionManager.select(this.dataPoints[i].selectionId, this.visualSettings.content.multiselect)
                         break
                     case enums.Content_Source.fixed:
                         let index: number = this.selectionIndexesUnbound.indexOf(i)
-                        if(index > -1)
-                            this.selectionIndexesUnbound.splice(index, 1)
-                        else
-                            this.selectionIndexesUnbound.push(i)
+                        if(this.visualSettings.content.multiselect){
+                            if(index > -1)
+                                this.selectionIndexesUnbound.splice(index, 1)
+                            else
+                                this.selectionIndexesUnbound.push(i)
+                        } else {
+                            this.selectionIndexesUnbound = [i]
+                        }
+                            
                         break
                 }
                 this.update(options)

@@ -1367,6 +1367,13 @@
         "content": {
             "displayName": "Content",
             "properties": {
+                "multiselect": {
+                    "displayName": "Multiselect",
+                    "description": "Ability to select multiple buttons",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "source": {
                     "displayName": "Source",
                     "description": "Data source",

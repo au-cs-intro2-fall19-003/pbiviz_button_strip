@@ -70,7 +70,10 @@ export class ProcessedVisualSettings{
                         ProcessedVisualSettings.selectionIdKeys && 
                         ProcessedVisualSettings.selectionIdKeys.indexOf(this.dataPoints[this.i].selectionId.getKey() as string) > -1
             case enums.Content_Source.fixed:
-                return  ProcessedVisualSettings.selectionIndexesUnbound && ProcessedVisualSettings.selectionIndexesUnbound.indexOf(this.i) > -1
+                if(this.settings.content.multiselect)  
+                    return ProcessedVisualSettings.selectionIndexesUnbound && ProcessedVisualSettings.selectionIndexesUnbound.indexOf(this.i) > -1
+                else
+                    return ProcessedVisualSettings.selectionIndexesUnbound[0] && ProcessedVisualSettings.selectionIndexesUnbound[0] == this.i
         }
         
     }
