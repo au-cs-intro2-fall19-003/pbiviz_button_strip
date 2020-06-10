@@ -170,54 +170,13 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
-        console.log("just updated")
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
-        let objects: powerbi.VisualObjectInstancesToPersist = {
-            merge: []
-        }
-        // let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
-        // if (objects.merge.length != 0){
-        //     console.log("persisting")
-        //     console.log(objects)
-        //     this.host.persistProperties(objects);
-        // }
-        let objKeys = Object.keys(this.visualSettings)
-        for (let i = 0; i < objKeys.length; i++) {
-            let objKey: string = objKeys[i]
-            let propKeys: string[] = Object.keys(this.visualSettings[objKey])
-            let groupedKeyNamesArr: propertyStateName[] = getPropertyStateNameArr(propKeys)
-
-            let object: powerbi.VisualObjectInstance = {
-                objectName: objKey,
-                selector: undefined,
-                properties:
-                    {}
-            }
-
-            for (let j = 0; j < groupedKeyNamesArr.length; j++) {
-                let groupedKeyNames: propertyStateName = groupedKeyNamesArr[j]
-                let type = typeof this.visualSettings[objKey][groupedKeyNames.all]
-                let propertyState: propertyStatesInput = {
-                    all: this.visualSettings[objKey][groupedKeyNames.all],
-                    selected: this.visualSettings[objKey][groupedKeyNames.selected],
-                    unselected: this.visualSettings[objKey][groupedKeyNames.unselected],
-                    hover: this.visualSettings[objKey][groupedKeyNames.hover],
-                    state: this.visualSettings[objKey].state
-                }
-                let leveledPropertyState = levelProperties(propertyState)
-                if (leveledPropertyState.didChange) {
-                    object.properties[groupedKeyNames.all] = leveledPropertyState.all
-                    object.properties[groupedKeyNames.selected] = leveledPropertyState.selected
-                    object.properties[groupedKeyNames.unselected] = leveledPropertyState.unselected
-                }
-            }
-            if (Object.keys(object.properties).length != 0)
-                objects.merge.push(object)
-        }
+        let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
+        
 
         this.dataPoints = []
         const dataView = options.dataViews[0]
@@ -312,21 +271,21 @@ export class Visual implements IVisual {
         covers.exit().remove()
         covers.enter().append('path')
             .attr("class", "cover " + this.visualSettings.layout.buttonShape)
+        covers = this.container.selectAll('.cover').data(data) 
             .attr("d", function (d) { return d.shapePath })
             .style("fill-opacity", function (d) { return 0})
             .on('mouseover', (d, i)=>{
                 this.hoveredIdKey = this.dataPoints[i].selectionId.getKey()
-                // this.update(options)
+                this.update(options)
             })
             .on('mouseout', (d, i)=>{
                 this.hoveredIdKey = null
-                // this.update(options)
+                this.update(options)
             })
             .on('click', (d, i) => {
                 this.selectionManager.select(this.dataPoints[i].selectionId)
                 console.log(VisualSettings.parse(options.dataViews[0]) as VisualSettings)
                 this.update(options)
-                // this.host.persistProperties(objects);
             })
     }
 
