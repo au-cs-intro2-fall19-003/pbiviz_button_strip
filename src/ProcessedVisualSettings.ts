@@ -73,7 +73,7 @@ export class ProcessedVisualSettings{
                 if(this.settings.content.multiselect)  
                     return ProcessedVisualSettings.selectionIndexesUnbound && ProcessedVisualSettings.selectionIndexesUnbound.indexOf(this.i) > -1
                 else
-                    return ProcessedVisualSettings.selectionIndexesUnbound[0] && ProcessedVisualSettings.selectionIndexesUnbound[0] == this.i
+                    return ProcessedVisualSettings.selectionIndexesUnbound.length > 0 && ProcessedVisualSettings.selectionIndexesUnbound[0] == this.i
         }
         
     }
