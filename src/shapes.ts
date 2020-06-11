@@ -163,7 +163,7 @@ export class ParallelogramVertical extends Shape implements Shape{
                 buttonWidth: this.width,
                 buttonHeight: this.height,
                 get xPos(): number {
-                    return this.buttonXPos + this.buttonWidth - 5
+                    return this.buttonXPos + this.buttonWidth
                 }, 
                 get yPos(): number {
                     return this.buttonYPos + this.z
@@ -245,20 +245,21 @@ export class Chevron extends Shape implements Shape{
 }
 
 export class ChevronVertical extends Shape implements Shape{
-    z: number
+    static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        this.z = (0.5*this.width)/Math.tan(angle * (Math.PI / 180))
+        if(!this.handleFocused)
+            ChevronVertical._z = (0.5*this.width)/Math.tan(angle*(Math.PI/180))
     }
 
     get shapePath(): string{
         let path = new Path()
         path.MoveTo(this.xPos, this.yPos)
-        path.DrawTo(this.xPos + 0.5*this.width, this.yPos + this.z)
+        path.DrawTo(this.xPos + 0.5*this.width, this.yPos + ChevronVertical._z)
         path.DrawTo(this.xPos + this.width, this.yPos)
-        path.DrawTo(this.xPos + this.width, this.yPos + this.height - this.z)
+        path.DrawTo(this.xPos + this.width, this.yPos + this.height - ChevronVertical._z)
         path.DrawTo(this.xPos + 0.5*this.width, this.yPos + this.height)
-        path.DrawTo(this.xPos, this.yPos + this.height - this.z)
+        path.DrawTo(this.xPos, this.yPos + this.height - ChevronVertical._z)
         path.close()
         path.roundCorners(this.radius)
         return path.toString()
@@ -267,10 +268,38 @@ export class ChevronVertical extends Shape implements Shape{
     get titleFOPoints(): containerProperties{
         return {
             xPos: this.xPos,
-            yPos: this.yPos + this.z,
+            yPos: this.yPos + ChevronVertical._z,
             width: this.width,
-            height: this.height - 2*this.z
+            height: this.height - 2*ChevronVertical._z
         }
+    }
+    get handles(): Handle[]{
+        let handles: Handle[] = [
+            {
+                buttonXPos: this.xPos,
+                buttonYPos: this.yPos,
+                buttonWidth: this.width,
+                buttonHeight: this.height,
+                get xPos(): number {
+                    return this.buttonXPos + this.buttonWidth
+                }, 
+                get yPos(): number {
+                    return this.buttonYPos + this.buttonHeight - this.z
+                },
+                axis: 'y',
+                propName: 'chevronAngle',
+                get z(): number {
+                    return ChevronVertical._z
+                },
+                set z(x: number){
+                    ChevronVertical._z = this.buttonHeight - x
+                },
+                get disp(): number {
+                    return Math.floor(Math.atan(this.buttonWidth/(2*this.z)) * (180 / Math.PI))
+                },
+            }
+        ]
+        return handles
     }
 }
 

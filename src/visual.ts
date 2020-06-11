@@ -232,9 +232,19 @@ export class Visual implements IVisual {
         let defs = this.svg.select("defs")
         defs.html("")
         defs.append("g")
-            .attr("id", "handle")
+            .attr("id", "handleHorizontal")
+            .attr("class", "handle")
             .append("path")
-            .attr("d", "M 5 0 l 5 10 l -10 0 z")
+            .attr("d", "M 1 0 l 6 12 l -12 0 z")
+        defs.append("g")
+            .attr("id", "handleVertical")
+            .attr("class", "handle")
+            .append("path")
+            .attr("d", "M -13 -6 l 12 6 l -12 6 z")
+        defs.selectAll(".handle")
+            .attr("fill", "#f2c811")
+            .style("stroke", "#252423")
+            .style("stroke-width", 2)
         let data: ProcessedVisualSettings[] = [];
         for (let i = 0; i < this.dataPoints.length; i++){
             data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, stateIds, options))
@@ -381,7 +391,11 @@ export class Visual implements IVisual {
                         firstCover.data(firstCoverData.handles)
                             .append('use')
                             .attr("class", "handle")
-                            .attr("href", "#handle")
+                            .attr("href", (d)=>{
+                                return d.axis == "x" ? 
+                                "#handleHorizontal" :
+                                "#handleVertical"
+                            })
                             .attr("x", function(d){return d.xPos})
                             .attr("y", function(d){return d.yPos})
                             .call(
@@ -390,7 +404,7 @@ export class Visual implements IVisual {
                                         firstCoverData.shape.handleFocused = true
                                     })
                                     .on("drag", (d: Handle, i, n)=>{
-                                        d.z = d3.event.x
+                                        d.z = d3.event[d.axis]
                                         select(n[i])
                                             .attr( d.axis, d3.event[d.axis])
                                         this.update(options)
