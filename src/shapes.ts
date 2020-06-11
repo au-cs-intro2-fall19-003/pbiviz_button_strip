@@ -1,5 +1,6 @@
 import {containerProperties} from "./interfaces"
 import {roundPathCorners} from "./rounding"
+import { path } from "d3"
 export class Shape{
     xPos: number
     yPos: number
@@ -17,16 +18,21 @@ export class Shape{
     get strokePath(): string{
         return this.shapePath
     }
+
+    get handles(): any[]{
+        return []
+    }
 }
 
 export interface Shape{
-    xPos: number
-    yPos: number
-    width: number
-    height: number
-    shapePath: string
-    strokePath: string
-    titleFOPoints: containerProperties
+    xPos: number,
+    yPosd: number,
+    width: number,
+    height: number,
+    shapePath: string,
+    strokePath: string,
+    titleFOPoints: containerProperties,
+    handles: any[]
 }
 
 
@@ -81,6 +87,17 @@ export class Parallelogram extends Shape implements Shape{
             width: this.width - 2*this.z,
             height: this.height
         }
+    }
+
+    get handles(): any[]{
+        let handles = []
+
+        let handle = {
+            xPos: this.xPos + this.z,
+            yPos: this.yPos
+        }
+        handles.push(handle)
+        return handles
     }
 }
 

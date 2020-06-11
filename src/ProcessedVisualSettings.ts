@@ -35,7 +35,6 @@ export class ProcessedVisualSettings{
         this.i = i
         if (i == 0){
             ProcessedVisualSettings.selectionIndexesUnbound = stateIds.selectionIndexesUnbound
-            console.log(ProcessedVisualSettings.selectionIndexesUnbound)
             ProcessedVisualSettings.hoveredIdKey = stateIds.hoveredIdKey
             ProcessedVisualSettings.hoveredIndexUnbound = stateIds.hoveredIndexUnbound
             ProcessedVisualSettings.selectionIdKeys = (selectionManager.getSelectionIds() as powerbi.visuals.ISelectionId[]).map(x => x.getKey()) as string[]
@@ -232,7 +231,6 @@ export class ProcessedVisualSettings{
         return this.settings.effects.shadow ? 3*(this.shadowMaxDistance+this.shadowMaxStrength) : 0
     }
     get shadowColor(): string {
-        console.log("getting shadow color")
         return this.settings.effects[this.getCorrectPropertyStateName("effects", "shadowColor")]
     }
     get shadowTransparency(): number {
@@ -499,6 +497,9 @@ export class ProcessedVisualSettings{
             default:
                 return 0
         }
+    }
+    get handles(): any[] {
+        return this.shape.handles
     }
 
     get titleFOHeight(): number {

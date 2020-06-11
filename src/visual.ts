@@ -227,11 +227,16 @@ export class Visual implements IVisual {
             hoveredIndexUnbound: this.hoveredIndexUnbound
         }
         
-        this.svg.select("defs").html("")
+        let defs = this.svg.select("defs")
+        defs.html("")
+        defs.append("g")
+            .attr("id", "handle")
+            .append("path")
+            .attr("d", "M 5 0 l 5 10 l -10 0 z")
         let data: ProcessedVisualSettings[] = [];
         for (let i = 0; i < this.dataPoints.length; i++){
             data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, stateIds, options))
-            addFilters(this.svg.select("defs"), data[i])
+            addFilters(defs, data[i])
         }
 
         this.svg
@@ -300,15 +305,22 @@ export class Visual implements IVisual {
             .style("color", function (d) { return d.textFill })
             .html("")
             .append(function (d) { return d.titleContent })
-            
+        
+        let shiftFired: boolean = false
+        let handleFocused: boolean = false
         let covers = this.container.selectAll('.cover').data(data)
         covers.exit().remove()
-        covers.enter().append('path')
+        covers.enter().append('g')
             .attr("class", "cover " + this.visualSettings.layout.buttonShape)
-        covers = this.container.selectAll('.cover').data(data) 
+            .append("path")
+        covers = this.container.selectAll('.cover').data(data)
+        let coverPaths = covers.select("path")
             .attr("d", function (d) { return d.shapePath })
             .style("fill-opacity", function (d) { return 0})
             .on('mouseover', (d, i)=>{
+                if(handleFocused)
+                    return
+                covers.select(".handle").remove()
                 switch(this.visualSettings.content.source){
                     case enums.Content_Source.databound:
                         this.hoveredIdKey = this.dataPoints[i].selectionId.getKey()
@@ -320,6 +332,9 @@ export class Visual implements IVisual {
                 this.update(options)
             })
             .on('mouseout', (d, i)=>{
+                if(shiftFired)
+                    return
+                covers.select(".handle").remove()
                 switch(this.visualSettings.content.source){
                     case enums.Content_Source.databound:
                         this.hoveredIdKey = null
@@ -331,6 +346,8 @@ export class Visual implements IVisual {
                 this.update(options)
             })
             .on('click', (d, i) => {
+                if(shiftFired)
+                    return
                 switch(this.visualSettings.content.source){
                     case enums.Content_Source.databound:
                         this.selectionManager.select(this.dataPoints[i].selectionId, this.visualSettings.content.multiselect)
@@ -343,16 +360,43 @@ export class Visual implements IVisual {
                             else
                                 this.selectionIndexesUnbound.push(i)
                         } else {
-                            this.selectionIndexesUnbound = [i]
+                            if(index > -1)
+                                this.selectionIndexesUnbound = []
+                            else
+                                this.selectionIndexesUnbound = [i]
                         }
                             
                         break
                 }
                 this.update(options)
             })
+            d3.select("body")
+                .on("keydown", () => {
+                    if(d3.event.shiftKey && this.hoveredIndexUnbound != null && !shiftFired){
+                        shiftFired = true
+                        let firstCover = covers.filter((d, i) => {return i == 0})
+                        let dragHandle = d3.drag()
+                            .on("start", ()=>{handleFocused = true})
+                            .on("drag", function(){d3.select(this).attr("x", d3.event.x)})
+                            .on("end", ()=>{handleFocused = false})
+                        firstCover.data(firstCover.data()[0].shape.handles)
+                            .append('use')
+                            .attr("class", "handle")
+                            .attr("href", "#handle")
+                            .attr("x", function(d){return d.xPos})
+                            .attr("y", function(d){return d.yPos})
+                            .call(dragHandle);
+                    }
+                })
+                .on("keyup", () => {
+                    if(d3.event.keyCode == 16){ 
+                        covers.select(".handle").remove()
+                        shiftFired = handleFocused = false 
+                    }
+                })
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {
         return <VisualSettings>VisualSettings.parse(dataView);
     }
-}   
+}
