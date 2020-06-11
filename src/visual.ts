@@ -191,7 +191,6 @@ export class Visual implements IVisual {
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
-        console.log("new ", this.visualSettings.layout.parallelogramAngle)
         let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
@@ -393,7 +392,7 @@ export class Visual implements IVisual {
                                     .on("drag", (d: Handle, i, n)=>{
                                         d.z = d3.event.x
                                         select(n[i])
-                                            .attr( d.axis, d3.event.x)
+                                            .attr( d.axis, d3.event[d.axis])
                                         this.update(options)
                                     })
                                     .on("end", (d: Handle)=>{
@@ -405,6 +404,7 @@ export class Visual implements IVisual {
                                         }
                                         object.properties[d.propName] = d.disp
                                         firstCoverData.shape.handleFocused = false
+                                        console.log(object)
                                         this.host.persistProperties({merge: [object]})
                                     })
                             );

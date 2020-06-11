@@ -480,7 +480,7 @@ export class ProcessedVisualSettings{
                     return -1*Parallelogram._z
             case enums.Button_Shape.chevron:
                 if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
-                    return -0.5*this.buttonHeight/Math.tan(this.chevronAngle * (Math.PI / 180))
+                    return -1*Chevron._z
             default:
                 return 0
         }
@@ -488,12 +488,12 @@ export class ProcessedVisualSettings{
 
     get alterVerticalPadding(): number {
         switch(this.buttonShape){
-            case enums.Button_Shape.parallelogram:
-                if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
-                    return -1*this.buttonWidth/Math.tan(this.parallelogramAngle * (Math.PI / 180))
-            case enums.Button_Shape.chevron:
-                if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
-                    return -0.5*this.buttonWidth/Math.tan(this.chevronAngle * (Math.PI / 180))
+            // case enums.Button_Shape.parallelogram:
+            //     if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
+            //         return -1*this.buttonWidth/Math.tan(this.parallelogramAngle * (Math.PI / 180))
+            // case enums.Button_Shape.chevron:
+            //     if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
+            //         return -0.5*this.buttonWidth/Math.tan(this.chevronAngle * (Math.PI / 180))
             default:
                 return 0
         }

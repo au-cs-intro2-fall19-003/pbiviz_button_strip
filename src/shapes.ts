@@ -117,7 +117,6 @@ export class Parallelogram extends Shape implements Shape{
                     return Parallelogram._z
                 },
                 set z(x: number){
-                    console.log("setting z as ", x)
                     Parallelogram._z = x
                 },
                 get disp(): number {
@@ -130,18 +129,19 @@ export class Parallelogram extends Shape implements Shape{
 }
 
 export class ParallelogramVertical extends Shape implements Shape{
-    z: number
+    static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        this.z = this.width/Math.tan(angle * (Math.PI / 180))
+        if(!this.handleFocused)
+        ParallelogramVertical._z = this.width/Math.tan(angle*(Math.PI/180))
     }
 
     get shapePath(): string{
         let path = new Path()
         path.MoveTo(this.xPos, this.yPos)
-        path.DrawTo(this.xPos + this.width, this.yPos + this.z)
+        path.DrawTo(this.xPos + this.width, this.yPos + ParallelogramVertical._z )
         path.DrawTo(this.xPos + this.width , this.yPos + this.height)
-        path.DrawTo(this.xPos, this.yPos + this.height -  this.z)
+        path.DrawTo(this.xPos, this.yPos + this.height -  ParallelogramVertical._z )
         path.close()
         path.roundCorners(this.radius)
         return path.toString()
@@ -150,28 +150,57 @@ export class ParallelogramVertical extends Shape implements Shape{
     get titleFOPoints(): containerProperties{
         return {
             xPos: this.xPos,
-            yPos: this.yPos + this.z,
+            yPos: this.yPos + ParallelogramVertical._z,
             width: this.width,
-            height: this.height - 2*this.z
+            height: this.height - 2*ParallelogramVertical._z
         }
+    }
+    get handles(): Handle[]{
+        let handles: Handle[] = [
+            {
+                buttonXPos: this.xPos,
+                buttonYPos: this.yPos,
+                buttonWidth: this.width,
+                buttonHeight: this.height,
+                get xPos(): number {
+                    return this.buttonXPos + this.buttonWidth - 5
+                }, 
+                get yPos(): number {
+                    return this.buttonYPos + this.z
+                },
+                axis: 'y',
+                propName: 'parallelogramAngle',
+                get z(): number {
+                    return ParallelogramVertical._z
+                },
+                set z(x: number){
+                    ParallelogramVertical._z = x
+                },
+                get disp(): number {
+                    return Math.floor(Math.atan(this.buttonWidth/this.z) * (180 / Math.PI))
+                },
+            }
+        ]
+        return handles
     }
 }
 
 export class Chevron extends Shape implements Shape{
-    z: number
+    static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        this.z = (0.5*this.height)/Math.tan(angle * (Math.PI / 180))
+        if(!this.handleFocused)
+            Chevron._z = (0.5*this.height)/Math.tan(angle*(Math.PI/180))
     }
 
     get shapePath(): string{
         let path = new Path()
         path.MoveTo(this.xPos, this.yPos)
-        path.DrawTo(this.xPos + this.width - this.z, this.yPos)
+        path.DrawTo(this.xPos + this.width - Chevron._z, this.yPos)
         path.DrawTo(this.xPos + this.width, this.yPos + 0.5*this.height)
-        path.DrawTo(this.xPos + this.width - this.z, this.yPos + this.height)
+        path.DrawTo(this.xPos + this.width - Chevron._z , this.yPos + this.height)
         path.DrawTo(this.xPos, this.yPos + this.height)
-        path.DrawTo(this.xPos + this.z, this.yPos + 0.5*this.height)
+        path.DrawTo(this.xPos + Chevron._z , this.yPos + 0.5*this.height)
         path.close()
         path.roundCorners(this.radius)
         return path.toString()
@@ -179,11 +208,39 @@ export class Chevron extends Shape implements Shape{
 
     get titleFOPoints(): containerProperties{
         return {
-            xPos: this.xPos + this.z,
+            xPos: this.xPos + Chevron._z,
             yPos: this.yPos,
-            width: this.width - 2*this.z,
+            width: this.width - 2*Chevron._z,
             height: this.height
         }
+    }
+    get handles(): Handle[]{
+        let handles: Handle[] = [
+            {
+                buttonXPos: this.xPos,
+                buttonYPos: this.yPos,
+                buttonWidth: this.width,
+                buttonHeight: this.height,
+                get xPos(): number {
+                    return this.buttonXPos + this.buttonWidth - this.z
+                }, 
+                get yPos(): number {
+                    return this.buttonYPos
+                },
+                axis: 'x',
+                propName: 'chevronAngle',
+                get z(): number {
+                    return Chevron._z
+                },
+                set z(x: number){
+                    Chevron._z = this.buttonWidth - x
+                },
+                get disp(): number {
+                    return Math.floor(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
+                },
+            }
+        ]
+        return handles
     }
 }
 
@@ -218,18 +275,19 @@ export class ChevronVertical extends Shape implements Shape{
 }
 
 export class Pentagon extends Shape implements Shape{
-    z: number
+    static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        this.z = (0.5*this.height)/Math.tan(angle * (Math.PI / 180))
+        if(!this.handleFocused)
+            Pentagon._z = 0.5*this.height/Math.tan(angle*(Math.PI/180))
     }
 
     get shapePath(): string{
         let path = new Path()
         path.MoveTo(this.xPos, this.yPos)
-        path.DrawTo(this.xPos + this.width - this.z, this.yPos)
+        path.DrawTo(this.xPos + this.width - Pentagon._z, this.yPos)
         path.DrawTo(this.xPos + this.width, this.yPos + 0.5*this.height)
-        path.DrawTo(this.xPos + this.width - this.z, this.yPos + this.height)
+        path.DrawTo(this.xPos + this.width - Pentagon._z, this.yPos + this.height)
         path.DrawTo(this.xPos, this.yPos + this.height)
         path.close()
         path.roundCorners(this.radius)
@@ -240,26 +298,56 @@ export class Pentagon extends Shape implements Shape{
         return {
             xPos: this.xPos,
             yPos: this.yPos,
-            width: this.width - this.z,
+            width: this.width - Pentagon._z,
             height: this.height
         }
+    }
+
+    get handles(): Handle[]{
+        let handles: Handle[] = [
+            {
+                buttonXPos: this.xPos,
+                buttonYPos: this.yPos,
+                buttonWidth: this.width,
+                buttonHeight: this.height,
+                get xPos(): number {
+                    return this.buttonXPos + this.buttonWidth - this.z
+                }, 
+                get yPos(): number {
+                    return this.buttonYPos
+                },
+                axis: 'x',
+                propName: 'pentagonAngle',
+                get z(): number {
+                    return Pentagon._z
+                },
+                set z(x: number){
+                    Pentagon._z = this.buttonWidth - x
+                },
+                get disp(): number {
+                    return Math.floor(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
+                },
+            }
+        ]
+        return handles
     }
 }
 
 export class Hexagon extends Shape implements Shape{
-    z: number
+    static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        this.z = (0.5*this.height)/Math.tan(angle * (Math.PI / 180))
+        if(!this.handleFocused)
+            Hexagon._z = 0.5*this.height/Math.tan(angle*(Math.PI/180))
     }
 
     get shapePath(): string{
         let path = new Path()
-        path.MoveTo(this.xPos + this.z, this.yPos)
-        path.DrawTo(this.xPos + this.width - this.z, this.yPos)
+        path.MoveTo(this.xPos + Hexagon._z, this.yPos)
+        path.DrawTo(this.xPos + this.width - Hexagon._z, this.yPos)
         path.DrawTo(this.xPos + this.width, this.yPos + 0.5*this.height)
-        path.DrawTo(this.xPos + this.width - this.z, this.yPos + this.height)
-        path.DrawTo(this.xPos + this.z, this.yPos + this.height)
+        path.DrawTo(this.xPos + this.width - Hexagon._z, this.yPos + this.height)
+        path.DrawTo(this.xPos + Hexagon._z, this.yPos + this.height)
         path.DrawTo(this.xPos, this.yPos + 0.5*this.height)
         path.close()
         path.roundCorners(this.radius)
@@ -268,11 +356,40 @@ export class Hexagon extends Shape implements Shape{
 
     get titleFOPoints(): containerProperties{
         return {
-            xPos: this.xPos + this.z,
+            xPos: this.xPos + Hexagon._z,
             yPos: this.yPos,
-            width: this.width - 2*this.z,
+            width: this.width - 2*Hexagon._z,
             height: this.height
         }
+    }
+
+    get handles(): Handle[]{
+        let handles: Handle[] = [
+            {
+                buttonXPos: this.xPos,
+                buttonYPos: this.yPos,
+                buttonWidth: this.width,
+                buttonHeight: this.height,
+                get xPos(): number {
+                    return this.buttonXPos + this.buttonWidth - this.z
+                }, 
+                get yPos(): number {
+                    return this.buttonYPos
+                },
+                axis: 'x',
+                propName: 'hexagonAngle',
+                get z(): number {
+                    return Hexagon._z
+                },
+                set z(x: number){
+                    Hexagon._z = this.buttonWidth - x
+                },
+                get disp(): number {
+                    return Math.floor(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
+                },
+            }
+        ]
+        return handles
     }
 }
 
@@ -335,19 +452,20 @@ export class Tab_RoundedCorners extends Shape implements Shape{
     }
 }
 export class Tab_CutCorners extends Shape implements Shape{
-    z: number
+    static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, length: number){
         super(xPos, yPos, width, height)
-        this.z = length
+        if(!this.handleFocused)
+            Tab_CutCorners._z = length
     }
 
     get shapePath(): string{
         let path = new Path()
         path.MoveTo(this.xPos, this.yPos + this.height)
-        path.DrawTo(this.xPos, this.yPos + this.z)
-        path.DrawTo(this.xPos + this.z, this.yPos)
-        path.DrawTo(this.xPos + this.width - this.z, this.yPos)
-        path.DrawTo(this.xPos + this.width, this.yPos + this.z)
+        path.DrawTo(this.xPos, this.yPos + Tab_CutCorners._z)
+        path.DrawTo(this.xPos + Tab_CutCorners._z, this.yPos)
+        path.DrawTo(this.xPos + this.width - Tab_CutCorners._z, this.yPos)
+        path.DrawTo(this.xPos + this.width, this.yPos + Tab_CutCorners._z)
         path.DrawTo(this.xPos + this.width, this.yPos + this.height)
         path.close()
         return path.toString()
@@ -366,20 +484,49 @@ export class Tab_CutCorners extends Shape implements Shape{
         strokePath.removeClose()
         return strokePath.toString()
     }
+    get handles(): Handle[]{
+        let handles: Handle[] = [
+            {
+                buttonXPos: this.xPos,
+                buttonYPos: this.yPos,
+                buttonWidth: this.width,
+                buttonHeight: this.height,
+                get xPos(): number {
+                    return this.buttonXPos + this.buttonWidth - this.z
+                }, 
+                get yPos(): number {
+                    return this.buttonYPos
+                },
+                axis: 'x',
+                propName: 'tab_cutCornersLength',
+                get z(): number {
+                    return Tab_CutCorners._z
+                },
+                set z(x: number){
+                    Tab_CutCorners._z = this.buttonWidth - x
+                },
+                get disp(): number {
+                    return Math.floor(this.z)
+                }
+            }
+        ]
+        return handles
+    }
 }
 export class Tab_CutCorner extends Shape implements Shape{
-    z: number
+    static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, length: number){
         super(xPos, yPos, width, height)
-        this.z = length
+        if(!this.handleFocused)
+            Tab_CutCorner._z = length
     }
 
     get shapePath(): string{
         let path = new Path()
         path.MoveTo(this.xPos, this.yPos + this.height)
         path.DrawTo(this.xPos, this.yPos)
-        path.DrawTo(this.xPos + this.width - this.z, this.yPos)
-        path.DrawTo(this.xPos + this.width, this.yPos + this.z)
+        path.DrawTo(this.xPos + this.width - Tab_CutCorner._z, this.yPos)
+        path.DrawTo(this.xPos + this.width, this.yPos + Tab_CutCorner._z)
         path.DrawTo(this.xPos + this.width, this.yPos + this.height)
         path.close()
         return path.toString()
@@ -397,6 +544,35 @@ export class Tab_CutCorner extends Shape implements Shape{
         let strokePath: Path = new Path(this.shapePath)
         strokePath.removeClose()
         return strokePath.toString()
+    }
+
+    get handles(): Handle[]{
+        let handles: Handle[] = [
+            {
+                buttonXPos: this.xPos,
+                buttonYPos: this.yPos,
+                buttonWidth: this.width,
+                buttonHeight: this.height,
+                get xPos(): number {
+                    return this.buttonXPos + this.buttonWidth - this.z
+                }, 
+                get yPos(): number {
+                    return this.buttonYPos
+                },
+                axis: 'x',
+                propName: 'tab_cutCornerLength',
+                get z(): number {
+                    return Tab_CutCorner._z
+                },
+                set z(x: number){
+                    Tab_CutCorner._z = this.buttonWidth - x
+                },
+                get disp(): number {
+                    return Math.floor(this.z)
+                }
+            }
+        ]
+        return handles
     }
 }
 
