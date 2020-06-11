@@ -48,7 +48,7 @@ import * as d3 from "d3";
 import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { dataPoint, propertyStateName, stateIds, Handle} from './interfaces'
-import { getPropertyStateNameArr, addFilters, getObjectsToPersist, levelProperties } from './functions'
+import { getPropertyStateNameArr, addFilters, getObjectsToPersist, levelProperties, getCorrectPropertyStateName } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -154,6 +154,11 @@ export class Visual implements IVisual {
                     for(let i = 1; i < 11; i++)
                         delete settings.content['icon' + i]
                 break
+        }
+        let iconPlacement = settings.icon[getCorrectPropertyStateName(settings.icon.state, 'placement')] as enums.Icon_Placement
+        if(iconPlacement == enums.Icon_Placement.left){
+            delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "topMargin")]
+            delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "bottomMargin")]
         }
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {

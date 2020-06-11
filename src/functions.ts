@@ -38,6 +38,19 @@ export function getPropertyStateNames(propBase: string): propertyStateName{
         }
 }
 
+export function getCorrectPropertyStateName(state: enums.State, propBase: string): string{
+    switch(state){
+        case enums.State.all:
+            return propBase+"A"
+        case enums.State.selected:
+            return propBase+"S"
+        case enums.State.unselected:
+            return propBase + "U"
+        case enums.State.hover:
+            return propBase + "H"
+    }
+}
+
 export function getObjectsToPersist(visualSettings: VisualSettings): powerbi.VisualObjectInstancesToPersist{
     let objKeys = Object.keys(visualSettings)
     let objects: powerbi.VisualObjectInstancesToPersist = {
