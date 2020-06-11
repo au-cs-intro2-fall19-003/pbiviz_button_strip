@@ -147,3 +147,8 @@ export function addFilters(defs: d3.Selection<d3.BaseType, any, any, any>, pvs: 
     feMerge.append("feMergeNode").attr("in", "dropshadow")
     feMerge.append("feMergeNode").attr("in", "glow")
 }
+
+export function round(n, p?): number{
+    let x = p ? Math.pow(10, p) : 100
+    return Math.round(n*x) / x
+}

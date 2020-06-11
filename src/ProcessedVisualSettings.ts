@@ -21,7 +21,7 @@ export class ProcessedVisualSettings{
 
     static selectionIdKeys: string[];
     static hoveredIdKey: string;
-    static selectionIndexesUnbound: number[];
+    static selectionManagerUnboundIndexes: number[];
     static hoveredIndexUnbound: number;
     
     
@@ -34,7 +34,7 @@ export class ProcessedVisualSettings{
         this.options = options
         this.i = i
         if (i == 0){
-            ProcessedVisualSettings.selectionIndexesUnbound = stateIds.selectionIndexesUnbound
+            ProcessedVisualSettings.selectionManagerUnboundIndexes = stateIds.selectionManagerUnbound.getSelectionIndexes()
             ProcessedVisualSettings.hoveredIdKey = stateIds.hoveredIdKey
             ProcessedVisualSettings.hoveredIndexUnbound = stateIds.hoveredIndexUnbound
             ProcessedVisualSettings.selectionIdKeys = (selectionManager.getSelectionIds() as powerbi.visuals.ISelectionId[]).map(x => x.getKey()) as string[]
@@ -70,9 +70,9 @@ export class ProcessedVisualSettings{
                         ProcessedVisualSettings.selectionIdKeys.indexOf(this.dataPoints[this.i].selectionId.getKey() as string) > -1
             case enums.Content_Source.fixed:
                 if(this.settings.content.multiselect)  
-                    return ProcessedVisualSettings.selectionIndexesUnbound && ProcessedVisualSettings.selectionIndexesUnbound.indexOf(this.i) > -1
+                    return ProcessedVisualSettings.selectionManagerUnboundIndexes && ProcessedVisualSettings.selectionManagerUnboundIndexes.indexOf(this.i) > -1
                 else
-                    return ProcessedVisualSettings.selectionIndexesUnbound.length > 0 && ProcessedVisualSettings.selectionIndexesUnbound[0] == this.i
+                    return ProcessedVisualSettings.selectionManagerUnboundIndexes.length > 0 && ProcessedVisualSettings.selectionManagerUnboundIndexes[0] == this.i
         }
         
     }

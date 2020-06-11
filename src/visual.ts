@@ -49,6 +49,7 @@ import { ProcessedVisualSettings } from "./processedvisualsettings";
 
 import { dataPoint, propertyStateName, stateIds, Handle} from './interfaces'
 import { getPropertyStateNameArr, addFilters, getObjectsToPersist, levelProperties, getCorrectPropertyStateName } from './functions'
+import {SelectionManagerUnbound} from './SelectionManagerUnbound'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -58,6 +59,7 @@ import { select, merge } from "d3";
 export class Visual implements IVisual {
     private target: HTMLElement;
     private selectionManager: ISelectionManager;
+    private selectionManagerUnbound: SelectionManagerUnbound
     private selectionManagerHover: ISelectionManager;
     private selectionIds: any = {};
     private host: IVisualHost;
@@ -70,7 +72,7 @@ export class Visual implements IVisual {
     private container: Selection<SVGElement>;
     private hoveredIdKey: string;
     private hoveredIndexUnbound: number;
-    private selectionIndexesUnbound: number[] = [];
+
 
     private shiftFired: boolean = false
 
@@ -79,6 +81,7 @@ export class Visual implements IVisual {
     constructor(options: VisualConstructorOptions) {
         this.selectionIdBuilder = options.host.createSelectionIdBuilder();
         this.selectionManager = options.host.createSelectionManager();
+        this,this.selectionManagerUnbound = new SelectionManagerUnbound()
         this.selectionManagerHover = options.host.createSelectionManager();
         this.host = options.host;
         this.svg = d3.select(options.element)
@@ -230,7 +233,7 @@ export class Visual implements IVisual {
 
         let stateIds: stateIds = {
             hoveredIdKey: this.hoveredIdKey,
-            selectionIndexesUnbound: this.selectionIndexesUnbound,
+            selectionManagerUnbound: this.selectionManagerUnbound,
             hoveredIndexUnbound: this.hoveredIndexUnbound
         }
         
@@ -240,16 +243,16 @@ export class Visual implements IVisual {
             .attr("id", "handleHorizontal")
             .attr("class", "handle")
             .append("path")
-            .attr("d", "M 1 0 l 6 12 l -12 0 z")
+            .attr("d", "M 0 0 l 6 12 l -12 0 z")
         defs.append("g")
             .attr("id", "handleVertical")
             .attr("class", "handle")
             .append("path")
-            .attr("d", "M -13 -6 l 12 6 l -12 6 z")
+            .attr("d", "M 0 0 l -12 6 l 0 -12 z")
         defs.selectAll(".handle")
             .attr("fill", "#f2c811")
             .style("stroke", "#252423")
-            .style("stroke-width", 2)
+            .style("stroke-width", 0.5)
         let data: ProcessedVisualSettings[] = [];
         for (let i = 0; i < this.dataPoints.length; i++){
             data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, stateIds, options))
@@ -369,19 +372,7 @@ export class Visual implements IVisual {
                         this.selectionManager.select(this.dataPoints[i].selectionId, this.visualSettings.content.multiselect)
                         break
                     case enums.Content_Source.fixed:
-                        let index: number = this.selectionIndexesUnbound.indexOf(i)
-                        if(this.visualSettings.content.multiselect){
-                            if(index > -1)
-                                this.selectionIndexesUnbound.splice(index, 1)
-                            else
-                                this.selectionIndexesUnbound.push(i)
-                        } else {
-                            if(index > -1)
-                                this.selectionIndexesUnbound = []
-                            else
-                                this.selectionIndexesUnbound = [i]
-                        }
-                            
+                        this.selectionManagerUnbound.select(i, this.visualSettings.content.multiselect)
                         break
                 }
                 this.update(options)
@@ -392,7 +383,6 @@ export class Visual implements IVisual {
                         this.shiftFired = true
                         let firstCover = covers.filter((d, i) => {return i == 0})
                         let firstCoverData = firstCover.data()[0] as ProcessedVisualSettings
-                         
                         firstCover.data(firstCoverData.handles)
                             .append('use')
                             .attr("class", "handle")
@@ -403,30 +393,7 @@ export class Visual implements IVisual {
                             })
                             .attr("x", function(d){return d.xPos})
                             .attr("y", function(d){return d.yPos})
-                            .call(
-                                d3.drag()
-                                    .on("start", ()=> {
-                                        firstCoverData.shape.handleFocused = true
-                                    })
-                                    .on("drag", (d: Handle, i, n)=>{
-                                        d.z = d3.event[d.axis]
-                                        select(n[i])
-                                            .attr( d.axis, d3.event[d.axis])
-                                        this.update(options)
-                                    })
-                                    .on("end", (d: Handle)=>{
-                                        let object: powerbi.VisualObjectInstance = {
-                                            objectName: 'layout',
-                                            selector: undefined,
-                                            properties:
-                                                {}
-                                        }
-                                        object.properties[d.propName] = d.disp
-                                        firstCoverData.shape.handleFocused = false
-                                        console.log(object)
-                                        this.host.persistProperties({merge: [object]})
-                                    })
-                            );
+                            .call(dragHandle);
                     }
                 })
                 .on("keyup", () => {
@@ -436,6 +403,28 @@ export class Visual implements IVisual {
                         this.update(options)
                     }
                 })
+
+                let dragHandle = d3.drag()
+                    .on("start", (d: Handle)=> {
+                        d.handleFocused = true
+                    })
+                    .on("drag", (d: Handle, i, n)=>{
+                        d.z = d3.event[d.axis]
+                        select(n[i])
+                            .attr( d.axis, d3.event[d.axis])
+                        this.update(options)
+                    })
+                    .on("end", (d: Handle)=>{
+                        let object: powerbi.VisualObjectInstance = {
+                            objectName: 'layout',
+                            selector: undefined,
+                            properties:
+                                {}
+                        }
+                        object.properties[d.propName] = d.disp
+                        d.handleFocused = false
+                        this.host.persistProperties({merge: [object]})
+                    })
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {

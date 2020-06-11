@@ -1,5 +1,6 @@
 import powerbi from "powerbi-visuals-api";
 import * as enums from "./enums"
+import { SelectionManagerUnbound } from "./SelectionManagerUnbound";
 
 export interface dataPoint {
     value: powerbi.PrimitiveValue,
@@ -38,7 +39,7 @@ export interface containerProperties{
 
 export interface stateIds{
     hoveredIdKey: string,
-    selectionIndexesUnbound: number[],
+    selectionManagerUnbound: SelectionManagerUnbound,
     hoveredIndexUnbound: number
 }
 
@@ -52,5 +53,6 @@ export interface Handle{
     axis: string,
     propName: string,
     disp: number,
-    z: number
+    z: number,
+    handleFocused: boolean,
 }

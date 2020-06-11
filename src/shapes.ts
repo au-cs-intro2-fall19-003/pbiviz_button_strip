@@ -1,13 +1,14 @@
 import {containerProperties, Handle} from "./interfaces"
 import {roundPathCorners} from "./rounding"
 import { path } from "d3"
+import {round} from './functions'
 export class Shape{
     xPos: number
     yPos: number
     width: number
     height: number
     radius: number
-    static _handleFocused: boolean = false
+    static handleFocused: boolean = false
     constructor(xPos: number, yPos: number, width: number, height: number, radius?: number){
         this.xPos = xPos
         this.yPos = yPos
@@ -23,13 +24,6 @@ export class Shape{
     get handles(): any[]{
         return []
     }
-
-    public get handleFocused(): boolean {
-        return Shape._handleFocused
-    }
-    public set handleFocused(x: boolean){
-        Shape._handleFocused = x
-    }    
 }
 
 export interface Shape{
@@ -74,7 +68,7 @@ export class Parallelogram extends Shape implements Shape{
     static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        if(!this.handleFocused)
+        if(!Shape.handleFocused)
             Parallelogram._z = this.height/Math.tan(angle*(Math.PI/180))
     }
 
@@ -120,8 +114,14 @@ export class Parallelogram extends Shape implements Shape{
                     Parallelogram._z = x
                 },
                 get disp(): number {
-                    return Math.floor(Math.atan(this.buttonHeight/this.z) * (180 / Math.PI))
+                    return round(Math.atan(this.buttonHeight/this.z) * (180 / Math.PI))
                 },
+                get handleFocused(): boolean{
+                    return Shape.handleFocused
+                },
+                set handleFocused(b: boolean){
+                    Shape.handleFocused = b
+                }
             }
         ]
         return handles
@@ -132,7 +132,7 @@ export class ParallelogramVertical extends Shape implements Shape{
     static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        if(!this.handleFocused)
+        if(!Shape.handleFocused)
         ParallelogramVertical._z = this.width/Math.tan(angle*(Math.PI/180))
     }
 
@@ -177,8 +177,14 @@ export class ParallelogramVertical extends Shape implements Shape{
                     ParallelogramVertical._z = x
                 },
                 get disp(): number {
-                    return Math.floor(Math.atan(this.buttonWidth/this.z) * (180 / Math.PI))
+                    return round(Math.atan(this.buttonWidth/this.z) * (180 / Math.PI))
                 },
+                get handleFocused(): boolean{
+                    return Shape.handleFocused
+                },
+                set handleFocused(b: boolean){
+                    Shape.handleFocused = b
+                }
             }
         ]
         return handles
@@ -189,7 +195,7 @@ export class Chevron extends Shape implements Shape{
     static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        if(!this.handleFocused)
+        if(!Shape.handleFocused)
             Chevron._z = (0.5*this.height)/Math.tan(angle*(Math.PI/180))
     }
 
@@ -236,8 +242,14 @@ export class Chevron extends Shape implements Shape{
                     Chevron._z = this.buttonWidth - x
                 },
                 get disp(): number {
-                    return Math.floor(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
+                    return round(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
                 },
+                get handleFocused(): boolean{
+                    return Shape.handleFocused
+                },
+                set handleFocused(b: boolean){
+                    Shape.handleFocused = b
+                }
             }
         ]
         return handles
@@ -248,7 +260,7 @@ export class ChevronVertical extends Shape implements Shape{
     static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        if(!this.handleFocused)
+        if(!Shape.handleFocused)
             ChevronVertical._z = (0.5*this.width)/Math.tan(angle*(Math.PI/180))
     }
 
@@ -295,8 +307,14 @@ export class ChevronVertical extends Shape implements Shape{
                     ChevronVertical._z = this.buttonHeight - x
                 },
                 get disp(): number {
-                    return Math.floor(Math.atan(this.buttonWidth/(2*this.z)) * (180 / Math.PI))
+                    return round(Math.atan(this.buttonWidth/(2*this.z)) * (180 / Math.PI))
                 },
+                get handleFocused(): boolean{
+                    return Shape.handleFocused
+                },
+                set handleFocused(b: boolean){
+                    Shape.handleFocused = b
+                }
             }
         ]
         return handles
@@ -307,7 +325,7 @@ export class Pentagon extends Shape implements Shape{
     static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        if(!this.handleFocused)
+        if(!Shape.handleFocused)
             Pentagon._z = 0.5*this.height/Math.tan(angle*(Math.PI/180))
     }
 
@@ -354,8 +372,14 @@ export class Pentagon extends Shape implements Shape{
                     Pentagon._z = this.buttonWidth - x
                 },
                 get disp(): number {
-                    return Math.floor(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
+                    return round(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
                 },
+                get handleFocused(): boolean{
+                    return Shape.handleFocused
+                },
+                set handleFocused(b: boolean){
+                    Shape.handleFocused = b
+                }
             }
         ]
         return handles
@@ -366,7 +390,7 @@ export class Hexagon extends Shape implements Shape{
     static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, angle: number, radius: number){
         super(xPos, yPos, width, height, radius)
-        if(!this.handleFocused)
+        if(!Shape.handleFocused)
             Hexagon._z = 0.5*this.height/Math.tan(angle*(Math.PI/180))
     }
 
@@ -414,8 +438,14 @@ export class Hexagon extends Shape implements Shape{
                     Hexagon._z = this.buttonWidth - x
                 },
                 get disp(): number {
-                    return Math.floor(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
+                    return round(Math.atan(this.buttonHeight/(2*this.z)) * (180 / Math.PI))
                 },
+                get handleFocused(): boolean{
+                    return Shape.handleFocused
+                },
+                set handleFocused(b: boolean){
+                    Shape.handleFocused = b
+                }
             }
         ]
         return handles
@@ -484,7 +514,7 @@ export class Tab_CutCorners extends Shape implements Shape{
     static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, length: number){
         super(xPos, yPos, width, height)
-        if(!this.handleFocused)
+        if(!Shape.handleFocused)
             Tab_CutCorners._z = length
     }
 
@@ -535,7 +565,13 @@ export class Tab_CutCorners extends Shape implements Shape{
                     Tab_CutCorners._z = this.buttonWidth - x
                 },
                 get disp(): number {
-                    return Math.floor(this.z)
+                    return round(this.z)
+                },
+                get handleFocused(): boolean{
+                    return Shape.handleFocused
+                },
+                set handleFocused(b: boolean){
+                    Shape.handleFocused = b
                 }
             }
         ]
@@ -546,7 +582,7 @@ export class Tab_CutCorner extends Shape implements Shape{
     static _z: number;
     constructor(xPos: number, yPos: number, width: number, height: number, length: number){
         super(xPos, yPos, width, height)
-        if(!this.handleFocused)
+        if(!Shape.handleFocused)
             Tab_CutCorner._z = length
     }
 
@@ -597,7 +633,13 @@ export class Tab_CutCorner extends Shape implements Shape{
                     Tab_CutCorner._z = this.buttonWidth - x
                 },
                 get disp(): number {
-                    return Math.floor(this.z)
+                    return round(this.z)
+                },
+                get handleFocused(): boolean{
+                    return Shape.handleFocused
+                },
+                set handleFocused(b: boolean){
+                    Shape.handleFocused = b
                 }
             }
         ]
