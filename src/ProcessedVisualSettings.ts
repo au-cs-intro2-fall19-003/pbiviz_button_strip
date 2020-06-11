@@ -4,7 +4,7 @@ import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 
 import { VisualSettings } from "./settings";
-import {dataPoint, stateIds} from './interfaces'
+import {dataPoint, stateIds, Handle} from './interfaces'
 import * as enums from "./enums"
 import {calculateWordDimensions, getPropertyStateNames} from './functions'
 import {Shape, Rectangle, Parallelogram, Chevron, Ellipse, Pentagon, Hexagon, Tab_RoundedCorners, Tab_CutCorners, Tab_CutCorner, ChevronVertical, ParallelogramVertical} from "./shapes"
@@ -477,7 +477,7 @@ export class ProcessedVisualSettings{
         switch(this.buttonShape){
             case enums.Button_Shape.parallelogram:
                 if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
-                    return -1*this.buttonHeight/Math.tan(this.parallelogramAngle * (Math.PI / 180))
+                    return -1*Parallelogram._z
             case enums.Button_Shape.chevron:
                 if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
                     return -0.5*this.buttonHeight/Math.tan(this.chevronAngle * (Math.PI / 180))
@@ -498,7 +498,7 @@ export class ProcessedVisualSettings{
                 return 0
         }
     }
-    get handles(): any[] {
+    get handles(): Handle[] {
         return this.shape.handles
     }
 

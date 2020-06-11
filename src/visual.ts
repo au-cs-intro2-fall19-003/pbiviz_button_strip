@@ -47,7 +47,7 @@ import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInst
 import * as d3 from "d3";
 import { ProcessedVisualSettings } from "./processedvisualsettings";
 
-import { dataPoint, propertyStateName, stateIds} from './interfaces'
+import { dataPoint, propertyStateName, stateIds, Handle} from './interfaces'
 import { getPropertyStateNameArr, addFilters, getObjectsToPersist, levelProperties } from './functions'
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
@@ -191,6 +191,7 @@ export class Visual implements IVisual {
         if (!(options && options.dataViews && options.dataViews[0]))
             return
         this.visualSettings = VisualSettings.parse(options.dataViews[0]) as VisualSettings
+        console.log("new ", this.visualSettings.layout.parallelogramAngle)
         let objects: powerbi.VisualObjectInstancesToPersist = getObjectsToPersist(this.visualSettings)
         if (objects.merge.length != 0)
             this.host.persistProperties(objects);
@@ -373,24 +374,47 @@ export class Visual implements IVisual {
             })
             d3.select("body")
                 .on("keydown", () => {
-                    if(d3.event.shiftKey && this.hoveredIndexUnbound != null && !this.shiftFired){
+                    if(d3.event.shiftKey && !this.shiftFired){
                         this.shiftFired = true
                         let firstCover = covers.filter((d, i) => {return i == 0})
-                        let dragHandle = d3.drag()
-                            .on("drag", function(){d3.select(this).attr("x", d3.event.x)})
-                        firstCover.data(firstCover.data()[0].shape.handles)
+                        let firstCoverData = firstCover.data()[0] as ProcessedVisualSettings
+                         
+                        firstCover.data(firstCoverData.handles)
                             .append('use')
                             .attr("class", "handle")
                             .attr("href", "#handle")
                             .attr("x", function(d){return d.xPos})
                             .attr("y", function(d){return d.yPos})
-                            .call(dragHandle);
+                            .call(
+                                d3.drag()
+                                    .on("start", ()=> {
+                                        firstCoverData.shape.handleFocused = true
+                                    })
+                                    .on("drag", (d: Handle, i, n)=>{
+                                        d.z = d3.event.x
+                                        select(n[i])
+                                            .attr( d.axis, d3.event.x)
+                                        this.update(options)
+                                    })
+                                    .on("end", (d: Handle)=>{
+                                        let object: powerbi.VisualObjectInstance = {
+                                            objectName: 'layout',
+                                            selector: undefined,
+                                            properties:
+                                                {}
+                                        }
+                                        object.properties[d.propName] = d.disp
+                                        firstCoverData.shape.handleFocused = false
+                                        this.host.persistProperties({merge: [object]})
+                                    })
+                            );
                     }
                 })
                 .on("keyup", () => {
                     if(d3.event.keyCode == 16){ 
                         covers.select(".handle").remove()
                         this.shiftFired = false 
+                        this.update(options)
                     }
                 })
     }

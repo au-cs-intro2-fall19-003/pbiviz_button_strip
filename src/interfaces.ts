@@ -41,3 +41,16 @@ export interface stateIds{
     selectionIndexesUnbound: number[],
     hoveredIndexUnbound: number
 }
+
+export interface Handle{
+    buttonXPos: number,
+    buttonYPos: number,
+    buttonWidth: number,
+    buttonHeight: number,
+    xPos: number,
+    yPos: number,
+    axis: string,
+    propName: string,
+    disp: number,
+    z: number
+}

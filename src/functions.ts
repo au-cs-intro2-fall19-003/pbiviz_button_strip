@@ -104,7 +104,7 @@ export function levelProperties(propertyStates: propertyStatesInput): propertySt
     }
 }
 
-export function addFilters(defs: d3.Selection<d3.BaseType, any, any, any>, pvs: ProcessedVisualSettings,): void {
+export function addFilters(defs: d3.Selection<d3.BaseType, any, any, any>, pvs: ProcessedVisualSettings): void {
     let filter = defs.append("filter")
         .attr("id", "filter" + pvs.i)
     if (pvs.settings.effects.shadow) {
