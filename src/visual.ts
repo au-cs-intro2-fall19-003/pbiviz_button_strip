@@ -72,6 +72,8 @@ export class Visual implements IVisual {
     private hoveredIndexUnbound: number;
     private selectionIndexesUnbound: number[] = [];
 
+    private shiftFired: boolean = false
+
 
 
     constructor(options: VisualConstructorOptions) {
@@ -306,8 +308,7 @@ export class Visual implements IVisual {
             .html("")
             .append(function (d) { return d.titleContent })
         
-        let shiftFired: boolean = false
-        let handleFocused: boolean = false
+        
         let covers = this.container.selectAll('.cover').data(data)
         covers.exit().remove()
         covers.enter().append('g')
@@ -318,7 +319,7 @@ export class Visual implements IVisual {
             .attr("d", function (d) { return d.shapePath })
             .style("fill-opacity", function (d) { return 0})
             .on('mouseover', (d, i)=>{
-                if(handleFocused)
+                if(this.shiftFired)
                     return
                 covers.select(".handle").remove()
                 switch(this.visualSettings.content.source){
@@ -332,7 +333,7 @@ export class Visual implements IVisual {
                 this.update(options)
             })
             .on('mouseout', (d, i)=>{
-                if(shiftFired)
+                if(this.shiftFired)
                     return
                 covers.select(".handle").remove()
                 switch(this.visualSettings.content.source){
@@ -346,7 +347,7 @@ export class Visual implements IVisual {
                 this.update(options)
             })
             .on('click', (d, i) => {
-                if(shiftFired)
+                if(this.shiftFired)
                     return
                 switch(this.visualSettings.content.source){
                     case enums.Content_Source.databound:
@@ -372,13 +373,11 @@ export class Visual implements IVisual {
             })
             d3.select("body")
                 .on("keydown", () => {
-                    if(d3.event.shiftKey && this.hoveredIndexUnbound != null && !shiftFired){
-                        shiftFired = true
+                    if(d3.event.shiftKey && this.hoveredIndexUnbound != null && !this.shiftFired){
+                        this.shiftFired = true
                         let firstCover = covers.filter((d, i) => {return i == 0})
                         let dragHandle = d3.drag()
-                            .on("start", ()=>{handleFocused = true})
                             .on("drag", function(){d3.select(this).attr("x", d3.event.x)})
-                            .on("end", ()=>{handleFocused = false})
                         firstCover.data(firstCover.data()[0].shape.handles)
                             .append('use')
                             .attr("class", "handle")
@@ -391,7 +390,7 @@ export class Visual implements IVisual {
                 .on("keyup", () => {
                     if(d3.event.keyCode == 16){ 
                         covers.select(".handle").remove()
-                        shiftFired = handleFocused = false 
+                        this.shiftFired = false 
                     }
                 })
     }
