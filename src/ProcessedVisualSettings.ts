@@ -356,70 +356,79 @@ export class ProcessedVisualSettings{
             textContainer.style.width = this.widthSpaceForText + 'px'
             textContainer.style.height = this.textContainerHeight + 'px'
             text.style.position = 'absolute'
-            text.style.bottom = '0'
             text.style.right = '0'
+            if(this.iconPlacement == enums.Icon_Placement.below){
+                text.style.bottom = '0'
+            }
         }
+
+
         textContainer.append(text)
 
         return textContainer
     }
 
+    get img(): HTMLDivElement{
+        let img = document.createElement('div')
+        img.className = 'icon'
+        
+        img.style.backgroundImage = "url(" + this.iconURL + ")"
+        img.style.backgroundRepeat = 'no-repeat'
+        img.style.backgroundSize = 'contain'
+        img.style.opacity = this.iconOpacity.toString()
+
+        if(this.iconPlacement == enums.Icon_Placement.left){
+            img.style.minWidth = this.iconWidth + 'px'
+            img.style.height = this.iconWidth + 'px'
+            img.style.display = 'inline-block'
+            img.style.verticalAlign = 'middle'
+            img.style.marginRight = this.iconHmargin + 'px'
+            img.style.backgroundPosition = 'center center'
+        } else {
+            img.style.width = this.spaceForIcon + 'px'
+            img.style.backgroundSize = this.iconWidth + 'px ' + this.iconHeight + 'px' 
+            img.style.marginLeft = this.iconHmargin + 'px'
+            img.style.marginRight = this.iconHmargin + 'px'
+            img.style.marginTop = this.iconTopMargin + 'px'
+            img.style.marginBottom = this.iconBottomMargin + 'px'
+            img.style.height = this.iconHeight + 'px'
+            if(this.iconPlacement == enums.Icon_Placement.above){
+                img.style.backgroundPosition = 'center bottom'
+            } else {
+                img.style.backgroundPosition = 'center top'
+                img.style.position = 'absolute'
+                img.style.bottom = '0'
+            }
+
+        }
+
+        return img
+    }
+
 
     get titleContent(): HTMLDivElement {
         let titleContainer = document.createElement('div')
-        titleContainer.className = "titleContainer"
-
-       
+        titleContainer.className = "titleContainer"       
         
         titleContainer.style.paddingLeft = this.textHmargin + 'px'
         titleContainer.style.paddingRight = this.textHmargin + 'px'
 
         
         if (this.settings.icon.icons) {
-            let img = document.createElement('div')
-            img.className = 'icon'
-            img.style.backgroundImage = "url(" + this.iconURL + ")"
-            img.style.backgroundRepeat = 'no-repeat'
-            img.style.backgroundSize = 'contain'
-            img.style.opacity = this.iconOpacity.toString()
-
             switch (this.iconPlacement) {
                 case enums.Icon_Placement.left:
                     titleContainer.style.display = 'inline-block'
-
-                    img.style.minWidth = this.iconWidth + 'px'
-                    img.style.height = this.iconWidth + 'px'
-                    img.style.display = 'inline-block'
-                    img.style.verticalAlign = 'middle'
-                    img.style.marginRight = this.iconHmargin + 'px'
-                    img.style.backgroundPosition = 'center center'
-
-                    titleContainer.append(img, this.textContainer)
+                    titleContainer.append(this.img, this.textContainer)
                     break
                 default:
                     titleContainer.style.height = this.titleFOHeight + 'px'
                     titleContainer.style.maxHeight = this.titleFOHeight + 'px'
-
-                    img.style.width = this.spaceForIcon + 'px'
-                    img.style.marginLeft = this.iconHmargin + 'px'
-                    img.style.marginRight = this.iconHmargin + 'px'
-                    img.style.marginTop = this.iconTopMargin + 'px'
-                    img.style.marginBottom = this.iconBottomMargin + 'px'
-                    img.style.height = this.iconHeight + 'px'
-
-                   
                     switch (this.iconPlacement) {
                         case enums.Icon_Placement.above:
-                            img.style.backgroundPosition = 'center bottom'
-                           
-                            titleContainer.append(img, this.textContainer)
+                            titleContainer.append(this.img, this.textContainer)
                             break
                         case enums.Icon_Placement.below:
-                            img.style.backgroundPosition = 'center top'
-                            img.style.position = 'absolute'
-                            img.style.bottom = '0'
-                            
-                            titleContainer.append(this.textContainer, img)
+                            titleContainer.append(this.textContainer, this.img)
                             break
                     }
             }
