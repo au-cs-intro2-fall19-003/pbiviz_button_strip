@@ -335,88 +335,93 @@ export class ProcessedVisualSettings{
         return this.rowNumber * (this.buttonHeight + this.buttonVPadding) + this.effectSpace/2
     }
 
-    get titleContent(): HTMLDivElement {
-        let titleContainer = document.createElement('div')
-        titleContainer.className = "titleContainer"
-
-        let textContainer = document.createElement('div')
-        textContainer.className = 'textContainer'
-        textContainer.style.position = 'relative'
-        titleContainer.style.paddingLeft = this.textHmargin + 'px'
-        titleContainer.style.paddingRight = this.textHmargin + 'px'
-
+    get textElement(): HTMLSpanElement {
         let text = document.createElement('span')
         text.className = 'text'
         text.textContent = this.text
-        if (this.settings.icon.icons) {
-            let img = document.createElement('div')
-            img.className = 'icon'
-            img.style.backgroundImage = "url(" + this.iconURL + ")"
-            img.style.backgroundRepeat = 'no-repeat'
-            img.style.backgroundSize = 'contain'
-            img.style.opacity = this.iconOpacity.toString()
-
-            switch (this.iconPlacement) {
-                case enums.Icon_Placement.left:
-                    titleContainer.style.display = 'inline-block'
-
-                    img.style.minWidth = this.iconWidth + 'px'
-                    img.style.height = this.iconWidth + 'px'
-                    img.style.display = 'inline-block'
-                    img.style.verticalAlign = 'middle'
-                    img.style.marginRight = this.iconHmargin + 'px'
-                    img.style.backgroundPosition = 'center center'
-
-
-                    textContainer.style.display = 'inline-block'
-                    textContainer.style.verticalAlign = 'middle'
-
-                    textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
-                    textContainer.style.width = this.textContainerWidthByIcon
-
-                    textContainer.append(text)
-                    titleContainer.append(img, textContainer)
-                    break
-                default:
-                    titleContainer.style.height = this.titleFOHeight + 'px'
-                    titleContainer.style.maxHeight = this.titleFOHeight + 'px'
-
-                    img.style.width = this.spaceForIcon + 'px'
-                    img.style.marginLeft = this.iconHmargin + 'px'
-                    img.style.marginRight = this.iconHmargin + 'px'
-                    img.style.marginTop = this.iconTopMargin + 'px'
-                    img.style.marginBottom = this.iconBottomMargin + 'px'
-                    img.style.height = this.iconHeight + 'px'
-
-                    textContainer.style.width = this.widthSpaceForText + 'px'
-                    text.style.width = this.widthSpaceForText + 'px'
-                    textContainer.style.height = this.textContainerHeight + 'px'
-                    switch (this.iconPlacement) {
-                        case enums.Icon_Placement.above:
-                            img.style.backgroundPosition = 'center bottom'
-                            textContainer.style.position = 'absolute'
-                            textContainer.style.bottom = '0'
-                            textContainer.append(text)
-                            titleContainer.append(img, textContainer)
-                            break
-                        case enums.Icon_Placement.below:
-                            img.style.backgroundPosition = 'center top'
-                            img.style.position = 'absolute'
-                            img.style.bottom = '0'
-                            text.style.position = 'absolute'
-                            text.style.bottom = '0'
-                            text.style.right = '0'
-                            textContainer.append(text)
-                            titleContainer.append(textContainer, img)
-                            break
-                    }
-            }
-
-        } else {
-            textContainer.append(text)
-            titleContainer.append(textContainer)
+        text.style.width = this.widthSpaceForText + 'px'
+        if(this.iconPlacement != enums.Icon_Placement.left){
+            text.style.position = 'absolute'
+            text.style.right = '0'
         }
+        if(this.iconPlacement == enums.Icon_Placement.below){
+            text.style.bottom = '0'
+        }
+        return text
+    }
 
+    get textContainer(): HTMLDivElement {
+        let textContainer = document.createElement('div')
+        textContainer.className = 'textContainer'
+        textContainer.style.position = 'relative'
+        if(this.iconPlacement == enums.Icon_Placement.left){
+            textContainer.style.display = 'inline-block'
+            textContainer.style.verticalAlign = 'middle'
+            textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
+            textContainer.style.width = this.textContainerWidthByIcon
+        } else {
+            textContainer.style.width = this.widthSpaceForText + 'px'
+            textContainer.style.height = this.textContainerHeight + 'px'   
+        }
+        return textContainer
+    }
+
+    get img(): HTMLDivElement{
+        let img = document.createElement('div')
+        img.className = 'icon'
+        img.style.backgroundImage = "url(" + this.iconURL + ")"
+        img.style.backgroundRepeat = 'no-repeat'
+        img.style.backgroundSize = 'contain'
+        img.style.opacity = this.iconOpacity.toString()
+
+        if(this.iconPlacement == enums.Icon_Placement.left){
+            img.style.minWidth = this.iconWidth + 'px'
+            img.style.height = this.iconWidth + 'px'
+            img.style.display = 'inline-block'
+            img.style.verticalAlign = 'middle'
+            img.style.marginRight = this.iconHmargin + 'px'
+            img.style.backgroundPosition = 'center center'
+        } else {
+            img.style.width = this.spaceForIcon + 'px'
+            img.style.height = this.iconHeight + 'px'
+            img.style.backgroundSize = Math.min(this.iconWidth, this.spaceForIcon) + 'px ' + this.iconHeight + 'px' 
+            img.style.margin = this.iconTopMargin + 'px ' + this.iconHmargin + 'px ' + this.iconBottomMargin + 'px '
+            if(this.iconPlacement == enums.Icon_Placement.above){
+                img.style.backgroundPosition = 'center bottom'
+            } else {
+                img.style.backgroundPosition = 'center top'
+                img.style.position = 'absolute'
+                img.style.bottom = '0'
+            }
+        }
+        return img
+    }
+
+
+    get titleContent(): HTMLDivElement {
+        let titleContainer = document.createElement('div')
+        titleContainer.className = "titleContainer"       
+        titleContainer.style.paddingLeft = this.textHmargin + 'px'
+        titleContainer.style.paddingRight = this.textHmargin + 'px'
+        
+        let text = this.textElement
+        let textContainer = this.textContainer
+        let img = this.img
+        textContainer.append(text)
+        if (this.settings.icon.icons) {
+            if(this.iconPlacement == enums.Icon_Placement.left){
+                titleContainer.style.display = 'inline-block'
+                titleContainer.append(img, textContainer)
+            } else {
+                titleContainer.style.height = this.titleFOHeight + 'px'
+                titleContainer.style.maxHeight = this.titleFOHeight + 'px'
+                if(this.iconPlacement == enums.Icon_Placement.above)
+                    titleContainer.append(img, textContainer)
+                else
+                    titleContainer.append(textContainer, img)
+            }
+        } else
+            titleContainer.append(textContainer)
         return titleContainer
     }
 
