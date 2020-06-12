@@ -56,6 +56,8 @@ type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 import * as enums from "./enums"
 import { select, merge } from "d3";
 
+import {styleTitleFO, styleTitleTable, styleTitleTableCell, constructTitleFamily, styleFrameFill, styleFrameStroke, addHandles, constructFrameFamily} from './d3calls'
+
 export class Visual implements IVisual {
     private target: HTMLElement;
     private selectionManager: ISelectionManager;
@@ -239,20 +241,7 @@ export class Visual implements IVisual {
 
         let defs = this.svg.select("defs")
         defs.html("")
-        defs.append("g")
-            .attr("id", "handleHorizontal")
-            .attr("class", "handle")
-            .append("path")
-            .attr("d", "M 0 0 l 6 12 l -12 0 z")
-        defs.append("g")
-            .attr("id", "handleVertical")
-            .attr("class", "handle")
-            .append("path")
-            .attr("d", "M 0 0 l -12 6 l 0 -12 z")
-        defs.selectAll(".handle")
-            .attr("fill", "#f2c811")
-            .style("stroke", "#252423")
-            .style("stroke-width", 0.5)
+        defs.call(addHandles)
         let data: ProcessedVisualSettings[] = [];
         for (let i = 0; i < this.dataPoints.length; i++) {
             data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, stateIds, options))
@@ -263,68 +252,28 @@ export class Visual implements IVisual {
             .style('width', options.viewport.width)
             .style('height', options.viewport.height)
 
-
-
         this.container.selectAll(".frameContainer, .titleForeignObject, .cover").filter((d, i, nodes: Element[]) => {
             return !nodes[i].classList.contains(this.visualSettings.layout.buttonShape)
         }).remove()
 
-
         let framesContainer = this.container.selectAll('.frameContainer').data(data)
         framesContainer.exit().remove()
-        let framesContainerEnter = framesContainer.enter().append('g')
-            .attr("class", "frameContainer " + this.visualSettings.layout.buttonShape)
-
-        framesContainerEnter.append('path').attr("class", "fill")
-        framesContainerEnter.append('path').attr("class", "stroke")
+        framesContainer.enter().call(constructFrameFamily)
         framesContainer = this.container.selectAll('.frameContainer').data(data)
-
         framesContainer.select(".fill")
-            .attr("d", function (d) { return d.shapePath })
-            .attr("fill", function (d) { return d.buttonFill })
-            .style("fill-opacity", function (d) { return d.buttonFillOpacity })
-            .style("filter", function (d) { return d.filter })
-
-
+            .call(styleFrameFill)
         framesContainer.select(".stroke")
-            .attr("d", function (d) { return d.strokePath })
-            .style("fill-opacity", 0)
-            .style("stroke", function (d) { return d.buttonStroke })
-            .style("stroke-width", function (d) { return d.buttonStrokeWidth })
+            .call(styleFrameStroke)
 
-        let titleFOs = this.container.selectAll('foreignObject').data(data)
+        let titleFOs = this.container.selectAll('.titleForeignObject').data(data)
         titleFOs.exit().remove()
-        titleFOs.enter().append('foreignObject')
-            .attr("class", "titleForeignObject " + this.visualSettings.layout.buttonShape)
-            .append("xhtml:div")
-            .attr("class", "titleTable")
-            .append("xhtml:div")
-            .attr("class", "titleTableCell")
-            .append("xhtml:div")
-            .attr("class", "titleContainer")
-
-        titleFOs = this.container.selectAll('foreignObject').data(data)
-            .attr("height", function (d) { return d.titleFOHeight })
-            .attr("width", function (d) { return d.titleFOWidth })
-            .attr("x", function (d) { return d.titleFOXPos })
-            .attr("y", function (d) { return d.titleFOYPos })
-
-
-        let titleTables = titleFOs.select('.titleTable')
-            .style("height", "100%")
-            .style("width", "100%")
-            .style("display", "table")
-
-        let titleTableCells = titleTables.select(".titleTableCell")
-            .style("display", "table-cell")
-            .style("vertical-align", "middle")
-            .style("opacity", function (d) { return d.textFillOpacity })
-            .style("font-size", function (d) { return d.fontSize + "pt" })
-            .style("font-family", function (d) { return d.fontFamily })
-            .style("text-align", function (d) { return d.textAlign })
-            .style("color", function (d) { return d.textFill })
-            .html("")
-            .append(function (d) { return d.titleContent })
+        titleFOs.enter().call(constructTitleFamily)
+        titleFOs = this.container.selectAll('.titleForeignObject').data(data)
+            .call(styleTitleFO)
+        titleFOs.select('.titleTable')
+            .call(styleTitleTable)
+        titleFOs.select(".titleTableCell")
+            .call(styleTitleTableCell)
 
 
         let covers = this.container.selectAll('.cover').data(data)
@@ -333,7 +282,7 @@ export class Visual implements IVisual {
             .attr("class", "cover " + this.visualSettings.layout.buttonShape)
             .append("path")
         covers = this.container.selectAll('.cover').data(data)
-        let coverPaths = covers.select("path")
+        covers.select("path")
             .attr("d", function (d) { return d.shapePath })
             .style("fill-opacity", function (d) { return 0 })
             .on('mouseover', (d, i) => {
