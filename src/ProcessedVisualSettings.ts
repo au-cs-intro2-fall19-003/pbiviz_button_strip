@@ -335,19 +335,46 @@ export class ProcessedVisualSettings{
         return this.rowNumber * (this.buttonHeight + this.buttonVPadding) + this.effectSpace/2
     }
 
-    get titleContent(): HTMLDivElement {
-        let titleContainer = document.createElement('div')
-        titleContainer.className = "titleContainer"
-
+    get textContainer(): HTMLDivElement {
         let textContainer = document.createElement('div')
-        textContainer.className = 'textContainer'
-        textContainer.style.position = 'relative'
-        titleContainer.style.paddingLeft = this.textHmargin + 'px'
-        titleContainer.style.paddingRight = this.textHmargin + 'px'
 
         let text = document.createElement('span')
         text.className = 'text'
         text.textContent = this.text
+        text.style.width = this.widthSpaceForText + 'px'
+
+        textContainer.className = 'textContainer'
+        textContainer.style.position = 'relative'
+        
+        if(this.iconPlacement == enums.Icon_Placement.left){
+            textContainer.style.display = 'inline-block'
+            textContainer.style.verticalAlign = 'middle'
+
+            textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
+            textContainer.style.width = this.textContainerWidthByIcon
+        } else {
+            textContainer.style.width = this.widthSpaceForText + 'px'
+            textContainer.style.height = this.textContainerHeight + 'px'
+            text.style.position = 'absolute'
+            text.style.bottom = '0'
+            text.style.right = '0'
+        }
+        textContainer.append(text)
+
+        return textContainer
+    }
+
+
+    get titleContent(): HTMLDivElement {
+        let titleContainer = document.createElement('div')
+        titleContainer.className = "titleContainer"
+
+       
+        
+        titleContainer.style.paddingLeft = this.textHmargin + 'px'
+        titleContainer.style.paddingRight = this.textHmargin + 'px'
+
+        
         if (this.settings.icon.icons) {
             let img = document.createElement('div')
             img.className = 'icon'
@@ -367,15 +394,7 @@ export class ProcessedVisualSettings{
                     img.style.marginRight = this.iconHmargin + 'px'
                     img.style.backgroundPosition = 'center center'
 
-
-                    textContainer.style.display = 'inline-block'
-                    textContainer.style.verticalAlign = 'middle'
-
-                    textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
-                    textContainer.style.width = this.textContainerWidthByIcon
-
-                    textContainer.append(text)
-                    titleContainer.append(img, textContainer)
+                    titleContainer.append(img, this.textContainer)
                     break
                 default:
                     titleContainer.style.height = this.titleFOHeight + 'px'
@@ -388,33 +407,25 @@ export class ProcessedVisualSettings{
                     img.style.marginBottom = this.iconBottomMargin + 'px'
                     img.style.height = this.iconHeight + 'px'
 
-                    textContainer.style.width = this.widthSpaceForText + 'px'
-                    text.style.width = this.widthSpaceForText + 'px'
-                    textContainer.style.height = this.textContainerHeight + 'px'
+                   
                     switch (this.iconPlacement) {
                         case enums.Icon_Placement.above:
                             img.style.backgroundPosition = 'center bottom'
-                            textContainer.style.position = 'absolute'
-                            textContainer.style.bottom = '0'
-                            textContainer.append(text)
-                            titleContainer.append(img, textContainer)
+                           
+                            titleContainer.append(img, this.textContainer)
                             break
                         case enums.Icon_Placement.below:
                             img.style.backgroundPosition = 'center top'
                             img.style.position = 'absolute'
                             img.style.bottom = '0'
-                            text.style.position = 'absolute'
-                            text.style.bottom = '0'
-                            text.style.right = '0'
-                            textContainer.append(text)
-                            titleContainer.append(textContainer, img)
+                            
+                            titleContainer.append(this.textContainer, img)
                             break
                     }
             }
 
         } else {
-            textContainer.append(text)
-            titleContainer.append(textContainer)
+            titleContainer.append(this.textContainer)
         }
 
         return titleContainer
