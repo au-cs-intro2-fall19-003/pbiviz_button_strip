@@ -297,9 +297,9 @@ export class ProcessedVisualSettings{
             case enums.Button_Sizing_Method.fixed:
                 return this.settings.layout.buttonWidth
             case enums.Button_Sizing_Method.dynamic:
-                let buttonWidthScaleFactor = this.widthSpaceForAllText / this.allTextWidth
-                let width = this.textWidth * buttonWidthScaleFactor + 2 * this.textHmargin
-                return width
+                let buttonWidthScaleFactor = (this.textWidth / this.allTextWidth) * this.rowLength
+                console.log(this.buttonHPadding)
+                return ((this.viewportWidth - this.buttonHPadding * (this.rowLength - 1)) / (this.rowLength)) * buttonWidthScaleFactor
         }
     }
     get buttonHeight(): number {
@@ -450,12 +450,12 @@ export class ProcessedVisualSettings{
             case enums.Button_Shape.rectangle:
                 return new Rectangle(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.parallelogram:
-                if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
+                if(this.settings.layout.buttonLayout != enums.Button_Layout.vertical)
                     return new Parallelogram(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
                 else
                     return new ParallelogramVertical(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.parallelogramAngle, this.shapeRoundedCornerRadius)
             case enums.Button_Shape.chevron:
-                if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
+                if(this.settings.layout.buttonLayout != enums.Button_Layout.vertical)
                     return new Chevron(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
                 else
                     return new ChevronVertical(this.buttonXpos, this.buttonYpos, this.buttonWidth, this.buttonHeight, this.chevronAngle, this.shapeRoundedCornerRadius)
@@ -476,11 +476,11 @@ export class ProcessedVisualSettings{
     get alterHorizontalPadding(): number {
         switch(this.buttonShape){
             case enums.Button_Shape.parallelogram:
-                if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
-                    return -1*Parallelogram._z
+                if(this.settings.layout.buttonLayout != enums.Button_Layout.vertical)
+                    return -1*(Parallelogram._z || this.buttonHeight/Math.tan(this.parallelogramAngle*(Math.PI/180)))
             case enums.Button_Shape.chevron:
-                if(this.settings.layout.buttonLayout == enums.Button_Layout.horizontal)
-                    return -1*Chevron._z
+                if(this.settings.layout.buttonLayout != enums.Button_Layout.vertical)
+                    return -1*(Chevron._z || (0.5*this.buttonHeight)/Math.tan(this.chevronAngle*(Math.PI/180)))
             default:
                 return 0
         }
@@ -490,10 +490,10 @@ export class ProcessedVisualSettings{
         switch(this.buttonShape){
             case enums.Button_Shape.parallelogram:
                 if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
-                    return -1*ParallelogramVertical._z
+                    return -1*(ParallelogramVertical._z || this.buttonWidth/Math.tan(this.parallelogramAngle*(Math.PI/180)))
             case enums.Button_Shape.chevron:
                 if(this.settings.layout.buttonLayout == enums.Button_Layout.vertical)
-                    return -1*ChevronVertical._z
+                    return -1*(ChevronVertical._z || (0.5*this.buttonWidth)/Math.tan(this.chevronAngle*(Math.PI/180)))
             default:
                 return 0
         }
