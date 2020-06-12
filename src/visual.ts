@@ -56,6 +56,8 @@ type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 import * as enums from "./enums"
 import { select, merge } from "d3";
 
+import {styleTitleFOs} from './d3calls'
+
 export class Visual implements IVisual {
     private target: HTMLElement;
     private selectionManager: ISelectionManager;
@@ -292,7 +294,7 @@ export class Visual implements IVisual {
             .style("stroke", function (d) { return d.buttonStroke })
             .style("stroke-width", function (d) { return d.buttonStrokeWidth })
 
-        let titleFOs = this.container.selectAll('foreignObject').data(data)
+        let titleFOs = this.container.selectAll('.titleForeignObject').data(data)
         titleFOs.exit().remove()
         titleFOs.enter().append('foreignObject')
             .attr("class", "titleForeignObject " + this.visualSettings.layout.buttonShape)
@@ -303,11 +305,9 @@ export class Visual implements IVisual {
             .append("xhtml:div")
             .attr("class", "titleContainer")
 
-        titleFOs = this.container.selectAll('foreignObject').data(data)
-            .attr("height", function (d) { return d.titleFOHeight })
-            .attr("width", function (d) { return d.titleFOWidth })
-            .attr("x", function (d) { return d.titleFOXPos })
-            .attr("y", function (d) { return d.titleFOYPos })
+
+        titleFOs = this.container.selectAll('.titleForeignObject').data(data)
+            .call(styleTitleFOs)
 
 
         let titleTables = titleFOs.select('.titleTable')
@@ -381,6 +381,19 @@ export class Visual implements IVisual {
             .on("keydown", () => {
                 if (d3.event.shiftKey && !this.shiftFired) {
                     this.shiftFired = true
+
+                    covers.append("foreignObject")
+                    .attr("height", function (d) { return d.titleFOHeight })
+                    .attr("width", function (d) { return d.titleFOWidth })
+                    .attr("x", function (d) { return d.titleFOXPos })
+                    .attr("y", function (d) { return d.titleFOYPos })
+                    
+                    
+                    
+                    .append("xhtml:div").append(function(d){return d.titleContent})
+
+
+
                     let firstCover = covers.filter((d, i) => { return i == 0 })
                     let firstCoverData = firstCover.data()[0] as ProcessedVisualSettings
                     firstCover.data(firstCoverData.handles)
