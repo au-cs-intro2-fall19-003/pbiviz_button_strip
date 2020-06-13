@@ -23,6 +23,7 @@ export class ProcessedVisualSettings{
     static hoveredIdKey: string;
     static selectionManagerUnboundIndexes: number[];
     static hoveredIndexUnbound: number;
+    static textareaFocusedIndex: number = null
     
     
     constructor(i: number, dataPoints: dataPoint[], 
@@ -30,6 +31,7 @@ export class ProcessedVisualSettings{
                 stateIds: stateIds, 
                 options: VisualUpdateOptions){
         this.dataPoints = dataPoints
+        
         this.settings = settings
         this.options = options
         this.i = i
@@ -38,6 +40,7 @@ export class ProcessedVisualSettings{
             ProcessedVisualSettings.hoveredIdKey = stateIds.hoveredIdKey
             ProcessedVisualSettings.hoveredIndexUnbound = stateIds.hoveredIndexUnbound
             ProcessedVisualSettings.selectionIdKeys = (selectionManager.getSelectionIds() as powerbi.visuals.ISelectionId[]).map(x => x.getKey()) as string[]
+            // console.log(this.dataPoints[0].value)
         }
         if (this.indexInRow == 0){
             ProcessedVisualSettings.widthSoFar = 0;
@@ -86,6 +89,10 @@ export class ProcessedVisualSettings{
                 return ProcessedVisualSettings.hoveredIndexUnbound == this.i
         }
     }
+    get textareaIsFocused(): boolean {
+        return ProcessedVisualSettings.textareaFocusedIndex == this.i
+    }
+
     get viewportWidth(): number {
         return this.options.viewport.width - this.effectSpace
     }
@@ -93,9 +100,12 @@ export class ProcessedVisualSettings{
         return this.options.viewport.height - this.effectSpace
     }
 
-
+    private _text: string  = null;
     get text(): string {
-        return this.dataPoints[this.i].value as string
+        return this._text || this.dataPoints[this.i].value as string
+    }
+    set text(t: string)  {
+        this._text = t
     }
     get textFill(): string {
         return this.settings.text[this.getCorrectPropertyStateName("text", "color")]
@@ -128,20 +138,30 @@ export class ProcessedVisualSettings{
     get widthSpaceForText(): number{
         return this.titleFOWidth - 2*this.textHmargin
     }
-    get textWidth(): number{
+    get inlineTextWidth(): number{
         return calculateWordDimensions(this.text, this.fontFamily, this.fontSize + "pt").width
     }
     get textHeight(): number {
-        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.widthSpaceForText - 2) + 'px').height;
+        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px').height;
+    }
+    get textWidth(): number {
+        // console.log(this.widthSpaceForText)
+        // console.log(calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px'))
+        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px').width;
     }
     get textContainerHeight(): number {
         return ProcessedVisualSettings.maxTextHeight + this.textVmargin
     }
     get maxInlineTextWidth(): number {
-        return Math.floor(this.titleFOWidth - this.iconWidth - this.iconHmargin - 2*this.textHmargin)
+        let w = this.titleFOWidth - 2*this.textHmargin
+        if(this.settings.icon.icons)
+            w -= this.iconWidth + this.iconHmargin
+        return Math.floor(w)
     }
     get textContainerWidthByIcon(): string {
-        return this.textWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) ? 'min-content' : 'auto'
+        // return 'auto'
+        // console.log(this.text)
+        return this.inlineTextWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) && this.settings.icon.icons ? 'min-content' : 'auto'
     }
 
     get buttonFill(): string {
@@ -297,8 +317,7 @@ export class ProcessedVisualSettings{
             case enums.Button_Sizing_Method.fixed:
                 return this.settings.layout.buttonWidth
             case enums.Button_Sizing_Method.dynamic:
-                let buttonWidthScaleFactor = (this.textWidth / this.allTextWidth) * this.rowLength
-                console.log(this.buttonHPadding)
+                let buttonWidthScaleFactor = (this.inlineTextWidth / this.allTextWidth) * this.rowLength
                 return ((this.viewportWidth - this.buttonHPadding * (this.rowLength - 1)) / (this.rowLength)) * buttonWidthScaleFactor
         }
     }
@@ -358,7 +377,7 @@ export class ProcessedVisualSettings{
             textContainer.style.display = 'inline-block'
             textContainer.style.verticalAlign = 'middle'
             textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
-            textContainer.style.width = this.textContainerWidthByIcon
+            textContainer.style.width = this.textContainerWidthByIcon + 'px'
         } else {
             textContainer.style.width = this.widthSpaceForText + 'px'
             textContainer.style.height = this.textContainerHeight + 'px'   

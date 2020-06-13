@@ -56,7 +56,7 @@ type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 import * as enums from "./enums"
 import { select, merge } from "d3";
 
-import {styleTitleFO, styleTitleTable, styleTitleTableCell, constructTitleFamily, styleFrameFill, styleFrameStroke, addHandles, constructFrameFamily} from './d3calls'
+import { styleTitleFO, styleTitleTable, styleTitleTableCell, constructTitleFamily, styleFrameFill, styleFrameStroke, addHandles, constructFrameFamily, styleTitleContent, showOnlyTextBorder, styleTextArea, sizeTextContainer, sizeTextArea } from './d3calls'
 
 export class Visual implements IVisual {
     private target: HTMLElement;
@@ -77,6 +77,8 @@ export class Visual implements IVisual {
 
 
     private shiftFired: boolean = false
+
+
 
 
 
@@ -267,14 +269,18 @@ export class Visual implements IVisual {
 
         let titleFOs = this.container.selectAll('.titleForeignObject').data(data)
         titleFOs.exit().remove()
-        titleFOs.enter().call(constructTitleFamily)
+        titleFOs.enter()
+            .append('foreignObject')
+            .attr("class", function (d) { return "titleForeignObject " + d.buttonShape })
+            .call(constructTitleFamily)
         titleFOs = this.container.selectAll('.titleForeignObject').data(data)
             .call(styleTitleFO)
         titleFOs.select('.titleTable')
             .call(styleTitleTable)
         titleFOs.select(".titleTableCell")
             .call(styleTitleTableCell)
-
+            .append(function (d) { return d.titleContent })
+            .call(styleTitleContent)
 
         let covers = this.container.selectAll('.cover').data(data)
         covers.exit().remove()
@@ -329,7 +335,69 @@ export class Visual implements IVisual {
         d3.select("body")
             .on("keydown", () => {
                 if (d3.event.shiftKey && !this.shiftFired) {
+                    if (ProcessedVisualSettings.textareaFocusedIndex != null)
+                        return
                     this.shiftFired = true
+
+                    covers.append('foreignObject')
+                        .attr("class", function (d) { return "coverTitle " + d.buttonShape })
+                        .call(constructTitleFamily)
+                    let coverTitle = this.container.selectAll('.coverTitle').data(data)
+                        .call(styleTitleFO)
+                    coverTitle.select('.titleTable')
+                        .call(styleTitleTable)
+                    coverTitle.select(".titleTableCell")
+                        .call(styleTitleTableCell)
+                        .append(function (d) { return d.titleContent })
+                        .call(styleTitleContent)
+                        .call(showOnlyTextBorder)
+
+                    coverTitle.select(".textContainer")
+                        .on("mouseenter", (d, i, n) => {
+                            if (ProcessedVisualSettings.textareaFocusedIndex != null)
+                                return
+                            d3.select(n[i]).selectAll(".text")
+                                .style("display", "none")
+                            d3.select(n[i]).append("textarea")
+                                .call(styleTextArea)
+                                .on("focus", () => {
+                                    ProcessedVisualSettings.textareaFocusedIndex = i
+                                    covers.filter((d) => { return !d.textareaIsFocused }).remove()
+                                })
+                                .on("focusout", () => {
+                                    ProcessedVisualSettings.textareaFocusedIndex = null
+                                    this.shiftFired = false
+                                    covers.select(".coverTitle").remove()
+
+                                })
+                                .on("input", (d: ProcessedVisualSettings, i, n) => {
+                                    let textContainer = coverTitle.data(data)
+                                        .filter((d) => { return d.textareaIsFocused })
+                                        .select(".textContainer")
+                                        .each((d) => { d.text = n[i].value })
+                                        .call(sizeTextContainer)
+                                        .select("textarea")
+                                        .call(sizeTextArea)
+                                    let object: powerbi.VisualObjectInstance = {
+                                        objectName: 'content',
+                                        selector: undefined,
+                                        properties:
+                                            {}
+                                    }
+                                    object.properties["text" + (ProcessedVisualSettings.textareaFocusedIndex + 1)] = n[i].value
+                                    this.host.persistProperties({ merge: [object] })
+                                })
+                        })
+                        .on("mouseleave", (d, i, n) => {
+                            if (ProcessedVisualSettings.textareaFocusedIndex != null)
+                                return
+                            d3.select(n[i]).selectAll(".text")
+                                .style("display", "inline")
+                            d3.select(n[i]).select("textarea").remove()
+                        })
+
+
+
                     let firstCover = covers.filter((d, i) => { return i == 0 })
                     let firstCoverData = firstCover.data()[0] as ProcessedVisualSettings
                     firstCover.data(firstCoverData.handles)
@@ -348,6 +416,8 @@ export class Visual implements IVisual {
             .on("keyup", () => {
                 if (d3.event.keyCode == 16) {
                     covers.select(".handle").remove()
+                    if (ProcessedVisualSettings.textareaFocusedIndex == null)
+                        covers.select(".coverTitle").remove()
                     this.shiftFired = false
                     this.update(options)
                 }

@@ -8,7 +8,8 @@ export function calculateWordDimensions(text: string, fontFamily: string, fontSi
     var div = document.createElement('div');
     div.style.fontFamily = fontFamily
     div.style.fontSize = fontSize
-    div.style.width = width || 'auto'
+    div.style.width = 'auto'
+    div.style.maxWidth = width || 'none'
     div.style.whiteSpace = width ? "normal" : "nowrap"
     div.style.position = "absolute";
     div.innerHTML = text
