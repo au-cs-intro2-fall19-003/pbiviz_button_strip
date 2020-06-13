@@ -79,7 +79,6 @@ export function styleTitleTableCell(selection) {
 
 export function styleTitleContent(selection) {
     selection
-        .select('.text')
         .style("opacity", function (d) { return d.textFillOpacity })
         .style("font-size", function (d) { return d.fontSize + "pt" })
         .style("font-family", function (d) { return d.fontFamily })
@@ -102,20 +101,17 @@ import { ProcessedVisualSettings } from "./processedvisualsettings"
 
 
 export function sizeTextContainer(selection){
-    if(selection.data()[0].icons){
-        if(selection.data()[0].iconPlacement == enums.Icon_Placement.left){
-            selection
-                .style("width", (d: ProcessedVisualSettings)=>{return d.textContainerWidthByIcon})
-                .style("maxWidth", (d: ProcessedVisualSettings)=>{return d.maxInlineTextWidth})
-                .style("display", "inline-block")
-                .style("verticalAlign", "middle")
-        } else {
-            selection
-                .style("width", (d: ProcessedVisualSettings)=>{return d.widthSpaceForText })
-                .style("height", (d: ProcessedVisualSettings)=>{return d.textContainerHeight})
-        }
+    if(selection.data()[0].iconPlacement == enums.Icon_Placement.left){
+        selection
+            .style("width", (d: ProcessedVisualSettings)=>{return d.textContainerWidthByIcon})
+            .style("maxWidth", (d: ProcessedVisualSettings)=>{return d.maxInlineTextWidth})
+            .style("display", "inline-block")
+            .style("verticalAlign", "middle")
+    } else {
+        selection
+            .style("width", (d: ProcessedVisualSettings)=>{return d.widthSpaceForText})
+            .style("height", (d: ProcessedVisualSettings)=>{return d.textContainerHeight})
     }
-    
 }
 
 export function styleTextArea(selection) {
@@ -140,20 +136,6 @@ export function styleTextArea(selection) {
 
 export function sizeTextArea(selection){
     selection
-        .style("width", (d) => {console.log(d.textWidth); return d.textWidth+1 +'px' })
-        .style("height", (d) => { console.log(d.textHeight); return d.textHeight + 'px' })
-        .style("min-width", 40)
-        .style("min-height", 22)
-
-        if(selection.data()[0].icons){
-            console.log("here...")
-            if(selection.data()[0].iconPlacement == enums.Icon_Placement.left){
-                selection
-                    .style("position", "absolute")
-                    .style("right", 0)
-            } else {
-                selection
-                .style("bottom", 0)
-            }
-        }
+        .style("width", (d) => {console.log(d.textWidth); return d.textWidth + 1 + 'px' })
+        .style("height", (d) => { return d.textHeight + 'px' })
 }

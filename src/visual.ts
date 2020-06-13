@@ -356,12 +356,6 @@ export class Visual implements IVisual {
                         .on("mouseenter", (d, i, n) => {
                             if (ProcessedVisualSettings.textareaFocusedIndex != null)
                                 return
-                            titleFOs
-                                .filter((d,index)=> { return i == index})
-                                .select(".text")
-                                .style("opacity", 0)
-
-
                             d3.select(n[i]).selectAll(".text")
                                 .style("display", "none")
                             d3.select(n[i]).append("textarea")
@@ -374,7 +368,7 @@ export class Visual implements IVisual {
                                     ProcessedVisualSettings.textareaFocusedIndex = null
                                     this.shiftFired = false
                                     covers.select(".coverTitle").remove()
-                                    this.update(options)
+
                                 })
                                 .on("input", (d: ProcessedVisualSettings, i, n) => {
                                     let textContainer = coverTitle.data(data)
@@ -395,10 +389,6 @@ export class Visual implements IVisual {
                                 })
                         })
                         .on("mouseleave", (d, i, n) => {
-                            titleFOs
-                                .filter((d,index)=> {return i == index})
-                                .select(".text")
-                                .style("opacity", (d)=>{return d.textFillOpacity})
                             if (ProcessedVisualSettings.textareaFocusedIndex != null)
                                 return
                             d3.select(n[i]).selectAll(".text")
