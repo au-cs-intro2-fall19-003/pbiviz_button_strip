@@ -40,7 +40,6 @@ export class ProcessedVisualSettings{
             ProcessedVisualSettings.hoveredIdKey = stateIds.hoveredIdKey
             ProcessedVisualSettings.hoveredIndexUnbound = stateIds.hoveredIndexUnbound
             ProcessedVisualSettings.selectionIdKeys = (selectionManager.getSelectionIds() as powerbi.visuals.ISelectionId[]).map(x => x.getKey()) as string[]
-            // console.log(this.dataPoints[0].value)
         }
         if (this.indexInRow == 0){
             ProcessedVisualSettings.widthSoFar = 0;
@@ -111,7 +110,7 @@ export class ProcessedVisualSettings{
         return this.settings.text[this.getCorrectPropertyStateName("text", "color")]
     }
     get textFillOpacity(): number {
-        return 1 - (this.settings.text[this.getCorrectPropertyStateName("text", "transparency")]) / 100
+        return this.textareaIsFocused ? 0 : 1 - (this.settings.text[this.getCorrectPropertyStateName("text", "transparency")]) / 100
     }
     get fontSize(): number {
         return this.settings.text[this.getCorrectPropertyStateName("text", "fontSize")]
@@ -145,8 +144,6 @@ export class ProcessedVisualSettings{
         return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px').height;
     }
     get textWidth(): number {
-        // console.log(this.widthSpaceForText)
-        // console.log(calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px'))
         return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px').width;
     }
     get textContainerHeight(): number {
@@ -154,14 +151,12 @@ export class ProcessedVisualSettings{
     }
     get maxInlineTextWidth(): number {
         let w = this.titleFOWidth - 2*this.textHmargin
-        if(this.settings.icon.icons)
+        if(this.icons)
             w -= this.iconWidth + this.iconHmargin
         return Math.floor(w)
     }
     get textContainerWidthByIcon(): string {
-        // return 'auto'
-        // console.log(this.text)
-        return this.inlineTextWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) && this.settings.icon.icons ? 'min-content' : 'auto'
+        return this.inlineTextWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) && this.icons ? 'min-content' : 'auto'
     }
 
     get buttonFill(): string {
@@ -218,6 +213,9 @@ export class ProcessedVisualSettings{
         return this.dataPoints.slice(this.rowStartingIndex, this.rowStartingIndex + this.framesInRow).map(function(dp){return dp.value}) as string[]
     }
 
+    get icons(): boolean{
+        return this.settings.icon.icons
+    }
     get iconURL(): string {
         return this.dataPoints[this.i].iconValue as string
     }
@@ -359,12 +357,14 @@ export class ProcessedVisualSettings{
         text.className = 'text'
         text.textContent = this.text
         text.style.width = this.widthSpaceForText + 'px'
-        if(this.iconPlacement != enums.Icon_Placement.left){
-            text.style.position = 'absolute'
-            text.style.right = '0'
-        }
-        if(this.iconPlacement == enums.Icon_Placement.below){
-            text.style.bottom = '0'
+        if(this.icons){
+            if(this.iconPlacement != enums.Icon_Placement.left){
+                text.style.position = 'absolute'
+                text.style.right = '0'
+            }
+            if(this.iconPlacement == enums.Icon_Placement.below){
+                text.style.bottom = '0'
+            }
         }
         return text
     }
@@ -373,14 +373,16 @@ export class ProcessedVisualSettings{
         let textContainer = document.createElement('div')
         textContainer.className = 'textContainer'
         textContainer.style.position = 'relative'
-        if(this.iconPlacement == enums.Icon_Placement.left){
-            textContainer.style.display = 'inline-block'
-            textContainer.style.verticalAlign = 'middle'
-            textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
-            textContainer.style.width = this.textContainerWidthByIcon + 'px'
-        } else {
-            textContainer.style.width = this.widthSpaceForText + 'px'
-            textContainer.style.height = this.textContainerHeight + 'px'   
+        if(this.icons){
+            if(this.iconPlacement == enums.Icon_Placement.left){
+                textContainer.style.display = 'inline-block'
+                textContainer.style.verticalAlign = 'middle'
+                textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
+                textContainer.style.width = this.textContainerWidthByIcon + 'px'
+            } else {
+                textContainer.style.width = this.widthSpaceForText + 'px'
+                textContainer.style.height = this.textContainerHeight + 'px'   
+            }
         }
         return textContainer
     }
@@ -427,7 +429,7 @@ export class ProcessedVisualSettings{
         let textContainer = this.textContainer
         let img = this.img
         textContainer.append(text)
-        if (this.settings.icon.icons) {
+        if (this.icons) {
             if(this.iconPlacement == enums.Icon_Placement.left){
                 titleContainer.style.display = 'inline-block'
                 titleContainer.append(img, textContainer)
