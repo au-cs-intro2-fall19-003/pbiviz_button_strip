@@ -337,8 +337,25 @@ export class Visual implements IVisual {
                 if (d3.event.shiftKey && !this.shiftFired) {
                     if (ProcessedVisualSettings.textareaFocusedIndex != null)
                         return
-                    this.shiftFired = true
+                    this.shiftFired = true                    
 
+                    let firstCover = covers.filter((d, i) => { return i == 0 })
+                    let firstCoverData = firstCover.data()[0] as ProcessedVisualSettings
+                    firstCover.data(firstCoverData.handles)
+                        .append('use')
+                        .attr("class", "handle")
+                        .attr("href", (d) => {
+                            return d.axis == "x" ?
+                                "#handleHorizontal" :
+                                "#handleVertical"
+                        })
+                        .attr("x", function (d) { return d.xPos })
+                        .attr("y", function (d) { return d.yPos })
+                        .call(dragHandle);
+
+
+                    if(this.visualSettings.content.source != enums.Content_Source.fixed)
+                        return
                     covers.append('foreignObject')
                         .attr("class", function (d) { return "coverTitle " + d.buttonShape })
                         .call(constructTitleFamily)
@@ -407,22 +424,6 @@ export class Visual implements IVisual {
                                 .style("display", "inline")
                             d3.select(n[i]).select("textarea").remove()
                         })
-
-
-
-                    let firstCover = covers.filter((d, i) => { return i == 0 })
-                    let firstCoverData = firstCover.data()[0] as ProcessedVisualSettings
-                    firstCover.data(firstCoverData.handles)
-                        .append('use')
-                        .attr("class", "handle")
-                        .attr("href", (d) => {
-                            return d.axis == "x" ?
-                                "#handleHorizontal" :
-                                "#handleVertical"
-                        })
-                        .attr("x", function (d) { return d.xPos })
-                        .attr("y", function (d) { return d.yPos })
-                        .call(dragHandle);
                 }
             })
             .on("keyup", () => {
