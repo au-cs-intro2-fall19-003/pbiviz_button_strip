@@ -4,21 +4,27 @@ import { ProcessedVisualSettings } from "./processedvisualsettings";
 import powerbi from "powerbi-visuals-api";
 import { VisualSettings } from './settings';
 
-export function calculateWordDimensions(text: string, fontFamily: string, fontSize: string, width?: string): { width: number, height: number } {
+export function calculateWordDimensions(text: string, fontFamily: string, fontSize: string, widthType?: string, maxWidth?: string): { width: number, height: number } {
     var div = document.createElement('div');
     div.style.fontFamily = fontFamily
     div.style.fontSize = fontSize
-    div.style.width = 'auto'
-    div.style.maxWidth = width || 'none'
-    div.style.whiteSpace = width ? "normal" : "nowrap"
+    div.style.width = widthType
+    div.style.maxWidth = maxWidth || 'none'
+    div.style.whiteSpace = maxWidth ? "normal" : "nowrap"
     div.style.position = "absolute";
     div.innerHTML = text
     document.body.appendChild(div);
     var dimensions = {
-        width: div.offsetWidth,
+        width: div.offsetWidth+1,
         height: div.offsetHeight
     }
+    if(text.startsWith("what")){
+        console.log(dimensions)
+        console.log(div)
+    }
+
     div.parentNode.removeChild(div);
+    
     return dimensions;
 }
 

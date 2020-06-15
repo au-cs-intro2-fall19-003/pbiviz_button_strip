@@ -349,6 +349,8 @@ export class Visual implements IVisual {
                     coverTitle.select(".titleTableCell")
                         .call(styleTitleTableCell)
                         .append(function (d) { return d.titleContent })
+                        .select(".textContainer")
+                        .call(sizeTextContainer)
                         .call(styleTitleContent)
                         .call(showOnlyTextBorder)
 
@@ -362,7 +364,7 @@ export class Visual implements IVisual {
                                 .call(styleTextArea)
                                 .on("focus", () => {
                                     ProcessedVisualSettings.textareaFocusedIndex = i
-                                    covers.filter((d) => { return !d.textareaIsFocused }).remove()
+                                    coverTitle.filter((d) => { return !d.textareaIsFocused }).remove()
                                 })
                                 .on("focusout", () => {
                                     ProcessedVisualSettings.textareaFocusedIndex = null

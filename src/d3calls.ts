@@ -91,26 +91,33 @@ export function showOnlyTextBorder(selection) {
     selection.select(".icon")
         .style("opacity", 0)
     selection.select(".textContainer")
-        .style("border", "2px black solid")
+        // .style("border", "2px black solid")
         .style("box-sizing", "border-box")
 }
 
 import * as enums from "./enums"
-import { selection } from "d3"
+import { selection, style } from "d3"
 import { ProcessedVisualSettings } from "./processedvisualsettings"
 
 
-export function sizeTextContainer(selection){
-    if(selection.data()[0].iconPlacement == enums.Icon_Placement.left){
+export function sizeTextContainer(selection) {
+    console.log(selection._groups[0][0].style.width)
+    if (selection.data()[0].icons) {
         selection
-            .style("width", (d: ProcessedVisualSettings)=>{return d.textContainerWidthByIcon})
-            .style("maxWidth", (d: ProcessedVisualSettings)=>{return d.maxInlineTextWidth})
-            .style("display", "inline-block")
-            .style("verticalAlign", "middle")
-    } else {
-        selection
-            .style("width", (d: ProcessedVisualSettings)=>{return d.widthSpaceForText})
-            .style("height", (d: ProcessedVisualSettings)=>{return d.textContainerHeight})
+
+        if (selection.data()[0].iconPlacement == enums.Icon_Placement.left) {
+            selection
+                .style("width", (d: ProcessedVisualSettings) => { return d.textContainerWidthByIcon })
+                .style("maxWidth", (d: ProcessedVisualSettings) => { return d.maxInlineTextWidth })
+                .style("display", "inline-block")
+                .style("verticalAlign", "middle")
+                .style("width", (d: ProcessedVisualSettings) => { console.log(d.text); console.log("from d3 version", d.textWidth, d.textHeight); return d.textWidth + "px" })
+                .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 1 })
+        } else {
+            selection
+                .style("width", (d: ProcessedVisualSettings) => { return d.widthSpaceForText })
+                .style("height", (d: ProcessedVisualSettings) => { return d.textContainerHeight })
+        }
     }
 }
 
@@ -118,7 +125,7 @@ export function styleTextArea(selection) {
     selection
         .call(sizeTextArea)
         .style("display", "inline")
-        .style("background", "none")
+        .style("background", "rgba(255,255,255,0.3)")
         .style("outline-width", 0)
         .style("border", 0)
         .style("padding", 0)
@@ -134,8 +141,14 @@ export function styleTextArea(selection) {
         .html((d) => { return d.text })
 }
 
-export function sizeTextArea(selection){
+export function sizeTextArea(selection) {
     selection
-        .style("width", (d) => {console.log(d.textWidth); return d.textWidth + 1 + 'px' })
-        .style("height", (d) => { return d.textHeight + 'px' })
+        .style("width", (d: ProcessedVisualSettings) => { console.log(d.textWidth); return d.textWidth + 'px' })
+        .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 'px' })
+    if (selection.data()[0].icons) {
+        if (selection.data()[0].icons.iconPlacement == enums.Icon_Placement.left) {
+            selection
+                .style("bottom", "0px")
+        }
+    }
 }

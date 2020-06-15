@@ -142,12 +142,12 @@ export class ProcessedVisualSettings{
         return calculateWordDimensions(this.text, this.fontFamily, this.fontSize + "pt").width
     }
     get textHeight(): number {
-        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px').height;
+        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", this.textContainerWidthByIcon, (this.maxInlineTextWidth) + 'px').height;
     }
     get textWidth(): number {
         // console.log(this.widthSpaceForText)
         // console.log(calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px'))
-        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px').width;
+        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", this.textContainerWidthByIcon, (this.maxInlineTextWidth) + 'px').width;
     }
     get textContainerHeight(): number {
         return ProcessedVisualSettings.maxTextHeight + this.textVmargin
@@ -161,7 +161,7 @@ export class ProcessedVisualSettings{
     get textContainerWidthByIcon(): string {
         // return 'auto'
         // console.log(this.text)
-        return this.inlineTextWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) && this.settings.icon.icons ? 'min-content' : 'auto'
+        return this.inlineTextWidth + 2*this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) && this.settings.icon.icons ? 'min-content' : 'auto'
     }
 
     get buttonFill(): string {
@@ -234,7 +234,7 @@ export class ProcessedVisualSettings{
         return this.settings.icon[this.getCorrectPropertyStateName("icon", "bottomMargin")]
     }
     get spaceForIcon(): number {
-        return this.titleFOWidth - 2*this.iconHmargin
+        return this.titleFOWidth - this.iconHmargin
     }
     get iconPlacement(): enums.Icon_Placement {
         return this.settings.icon[this.getCorrectPropertyStateName("icon", "placement")]
@@ -354,18 +354,25 @@ export class ProcessedVisualSettings{
         return this.rowNumber * (this.buttonHeight + this.buttonVPadding) + this.effectSpace/2
     }
 
+
+    get icons(): boolean {
+        return this.settings.icon.icons
+    }
     get textElement(): HTMLSpanElement {
         let text = document.createElement('span')
         text.className = 'text'
         text.textContent = this.text
-        text.style.width = this.widthSpaceForText + 'px'
-        if(this.iconPlacement != enums.Icon_Placement.left){
-            text.style.position = 'absolute'
-            text.style.right = '0'
+        text.style.width = this.textWidth + 'px'
+        if(this.icons){
+            if(this.iconPlacement != enums.Icon_Placement.left){
+                // text.style.position = 'absolute'
+                // text.style.right = '0'
+            }
+            if(this.iconPlacement == enums.Icon_Placement.below){
+                text.style.bottom = '0'
+            }
         }
-        if(this.iconPlacement == enums.Icon_Placement.below){
-            text.style.bottom = '0'
-        }
+        
         return text
     }
 
@@ -373,15 +380,20 @@ export class ProcessedVisualSettings{
         let textContainer = document.createElement('div')
         textContainer.className = 'textContainer'
         textContainer.style.position = 'relative'
-        if(this.iconPlacement == enums.Icon_Placement.left){
-            textContainer.style.display = 'inline-block'
-            textContainer.style.verticalAlign = 'middle'
-            textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
-            textContainer.style.width = this.textContainerWidthByIcon + 'px'
-        } else {
-            textContainer.style.width = this.widthSpaceForText + 'px'
-            textContainer.style.height = this.textContainerHeight + 'px'   
+        if(this.settings.icon.icons){
+            if(this.iconPlacement == enums.Icon_Placement.left){
+                textContainer.style.display = 'inline-block'
+                textContainer.style.verticalAlign = 'middle'
+                console.log("from ts", this.text, this.textWidth)
+                textContainer.style.width = this.textContainerWidthByIcon 
+                textContainer.style.height = this.textHeight + 'px'
+                textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
+            } else {
+                textContainer.style.width = this.widthSpaceForText + 'px'
+                textContainer.style.height = this.textContainerHeight + 'px'   
+            }
         }
+        
         return textContainer
     }
 
