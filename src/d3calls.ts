@@ -79,8 +79,7 @@ export function styleTitleTableCell(selection) {
 
 export function styleTitleContent(selection) {
     selection
-        .select('.text')
-        .style("opacity", function (d) { return d.textFillOpacity })
+        .style("opacity", function (d: ProcessedVisualSettings) { return d.textareaIsFocused ? 0 : d.textFillOpacity })
         .style("font-size", function (d) { return d.fontSize + "pt" })
         .style("font-family", function (d) { return d.fontFamily })
         .style("color", function (d) { return d.textFill })
@@ -91,38 +90,38 @@ export function showOnlyTextBorder(selection) {
         .style("opacity", 0)
     selection.select(".icon")
         .style("opacity", 0)
-    selection.select(".textContainer")
-        .style("border", "2px black solid")
-        .style("box-sizing", "border-box")
 }
 
 import * as enums from "./enums"
-import { selection } from "d3"
 import { ProcessedVisualSettings } from "./processedvisualsettings"
 
 
-export function sizeTextContainer(selection){
-    if(selection.data()[0].icons){
-        if(selection.data()[0].iconPlacement == enums.Icon_Placement.left){
+export function sizeTextContainer(selection) {
+    console.log(selection._groups[0][0].style.width)
+    if (selection.data()[0].icons) {
+        selection
+
+        if (selection.data()[0].iconPlacement == enums.Icon_Placement.left) {
             selection
-                .style("width", (d: ProcessedVisualSettings)=>{return d.textContainerWidthByIcon})
-                .style("maxWidth", (d: ProcessedVisualSettings)=>{return d.maxInlineTextWidth})
+                .style("width", (d: ProcessedVisualSettings) => { return d.textContainerWidthByIcon })
+                .style("maxWidth", (d: ProcessedVisualSettings) => { return d.maxInlineTextWidth })
                 .style("display", "inline-block")
                 .style("verticalAlign", "middle")
+                .style("width", (d: ProcessedVisualSettings) => {return d.textWidth + "px" })
+                .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 1 })
         } else {
             selection
-                .style("width", (d: ProcessedVisualSettings)=>{return d.widthSpaceForText })
-                .style("height", (d: ProcessedVisualSettings)=>{return d.textContainerHeight})
+                .style("width", (d: ProcessedVisualSettings) => { return d.widthSpaceForText })
+                .style("height", (d: ProcessedVisualSettings) => { return d.textContainerHeight })
         }
     }
-    
 }
 
 export function styleTextArea(selection) {
     selection
         .call(sizeTextArea)
         .style("display", "inline")
-        .style("background", "none")
+        .style("background", "rgba(255,255,255,0.3)")
         .style("outline-width", 0)
         .style("border", 0)
         .style("padding", 0)
@@ -138,22 +137,21 @@ export function styleTextArea(selection) {
         .html((d) => { return d.text })
 }
 
-export function sizeTextArea(selection){
+export function makeTextTransparent(selection){
+    console.log(selection)
     selection
-        .style("width", (d) => {console.log(d.textWidth); return d.textWidth+1 +'px' })
-        .style("height", (d) => { console.log(d.textHeight); return d.textHeight + 'px' })
-        .style("min-width", 40)
-        .style("min-height", 22)
+        .select(".text")
+        .style("opacity",(d) => {console.log("here..."); return d.textFill })
+}
 
-        if(selection.data()[0].icons){
-            console.log("here...")
-            if(selection.data()[0].iconPlacement == enums.Icon_Placement.left){
-                selection
-                    .style("position", "absolute")
-                    .style("right", 0)
-            } else {
-                selection
-                .style("bottom", 0)
-            }
+export function sizeTextArea(selection) {
+    selection
+        .style("width", (d: ProcessedVisualSettings) => { return d.textWidth + 'px' })
+        .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 'px' })
+    if (selection.data()[0].icons) {
+        if (selection.data()[0].icons.iconPlacement == enums.Icon_Placement.left) {
+            selection
+                .style("bottom", "0px")
         }
+    }
 }

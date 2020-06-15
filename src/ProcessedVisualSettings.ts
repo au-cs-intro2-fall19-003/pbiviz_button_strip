@@ -40,6 +40,7 @@ export class ProcessedVisualSettings{
             ProcessedVisualSettings.hoveredIdKey = stateIds.hoveredIdKey
             ProcessedVisualSettings.hoveredIndexUnbound = stateIds.hoveredIndexUnbound
             ProcessedVisualSettings.selectionIdKeys = (selectionManager.getSelectionIds() as powerbi.visuals.ISelectionId[]).map(x => x.getKey()) as string[]
+            // console.log(this.dataPoints[0].value)
         }
         if (this.indexInRow == 0){
             ProcessedVisualSettings.widthSoFar = 0;
@@ -110,7 +111,7 @@ export class ProcessedVisualSettings{
         return this.settings.text[this.getCorrectPropertyStateName("text", "color")]
     }
     get textFillOpacity(): number {
-        return this.textareaIsFocused ? 0 : 1 - (this.settings.text[this.getCorrectPropertyStateName("text", "transparency")]) / 100
+        return 1 - (this.settings.text[this.getCorrectPropertyStateName("text", "transparency")]) / 100
     }
     get fontSize(): number {
         return this.settings.text[this.getCorrectPropertyStateName("text", "fontSize")]
@@ -141,22 +142,26 @@ export class ProcessedVisualSettings{
         return calculateWordDimensions(this.text, this.fontFamily, this.fontSize + "pt").width
     }
     get textHeight(): number {
-        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px').height;
+        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", this.textContainerWidthByIcon, (this.maxInlineTextWidth) + 'px').height;
     }
     get textWidth(): number {
-        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px').width;
+        // console.log(this.widthSpaceForText)
+        // console.log(calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", (this.maxInlineTextWidth - 2) + 'px'))
+        return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", this.textContainerWidthByIcon, (this.maxInlineTextWidth) + 'px').width;
     }
     get textContainerHeight(): number {
         return ProcessedVisualSettings.maxTextHeight + this.textVmargin
     }
     get maxInlineTextWidth(): number {
         let w = this.titleFOWidth - 2*this.textHmargin
-        if(this.icons)
+        if(this.settings.icon.icons)
             w -= this.iconWidth + this.iconHmargin
         return Math.floor(w)
     }
     get textContainerWidthByIcon(): string {
-        return this.inlineTextWidth + this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) && this.icons ? 'min-content' : 'auto'
+        // return 'auto'
+        // console.log(this.text)
+        return this.inlineTextWidth + 2*this.textHmargin + this.iconHmargin >= Math.floor(this.maxInlineTextWidth) && this.settings.icon.icons ? 'min-content' : 'auto'
     }
 
     get buttonFill(): string {
@@ -213,9 +218,6 @@ export class ProcessedVisualSettings{
         return this.dataPoints.slice(this.rowStartingIndex, this.rowStartingIndex + this.framesInRow).map(function(dp){return dp.value}) as string[]
     }
 
-    get icons(): boolean{
-        return this.settings.icon.icons
-    }
     get iconURL(): string {
         return this.dataPoints[this.i].iconValue as string
     }
@@ -232,7 +234,7 @@ export class ProcessedVisualSettings{
         return this.settings.icon[this.getCorrectPropertyStateName("icon", "bottomMargin")]
     }
     get spaceForIcon(): number {
-        return this.titleFOWidth - 2*this.iconHmargin
+        return this.titleFOWidth - this.iconHmargin
     }
     get iconPlacement(): enums.Icon_Placement {
         return this.settings.icon[this.getCorrectPropertyStateName("icon", "placement")]
@@ -352,20 +354,25 @@ export class ProcessedVisualSettings{
         return this.rowNumber * (this.buttonHeight + this.buttonVPadding) + this.effectSpace/2
     }
 
+
+    get icons(): boolean {
+        return this.settings.icon.icons
+    }
     get textElement(): HTMLSpanElement {
         let text = document.createElement('span')
         text.className = 'text'
         text.textContent = this.text
-        text.style.width = this.widthSpaceForText + 'px'
+        text.style.width = this.textWidth + 'px'
         if(this.icons){
             if(this.iconPlacement != enums.Icon_Placement.left){
-                text.style.position = 'absolute'
-                text.style.right = '0'
+                // text.style.position = 'absolute'
+                // text.style.right = '0'
             }
             if(this.iconPlacement == enums.Icon_Placement.below){
                 text.style.bottom = '0'
             }
         }
+        
         return text
     }
 
@@ -373,17 +380,20 @@ export class ProcessedVisualSettings{
         let textContainer = document.createElement('div')
         textContainer.className = 'textContainer'
         textContainer.style.position = 'relative'
-        if(this.icons){
+        if(this.settings.icon.icons){
             if(this.iconPlacement == enums.Icon_Placement.left){
                 textContainer.style.display = 'inline-block'
                 textContainer.style.verticalAlign = 'middle'
+                console.log("from ts", this.text, this.textWidth)
+                textContainer.style.width = this.textContainerWidthByIcon 
+                textContainer.style.height = this.textHeight + 'px'
                 textContainer.style.maxWidth = this.maxInlineTextWidth + 'px'
-                textContainer.style.width = this.textContainerWidthByIcon + 'px'
             } else {
                 textContainer.style.width = this.widthSpaceForText + 'px'
                 textContainer.style.height = this.textContainerHeight + 'px'   
             }
         }
+        
         return textContainer
     }
 
@@ -429,7 +439,7 @@ export class ProcessedVisualSettings{
         let textContainer = this.textContainer
         let img = this.img
         textContainer.append(text)
-        if (this.icons) {
+        if (this.settings.icon.icons) {
             if(this.iconPlacement == enums.Icon_Placement.left){
                 titleContainer.style.display = 'inline-block'
                 titleContainer.append(img, textContainer)
