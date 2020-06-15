@@ -79,7 +79,7 @@ export function styleTitleTableCell(selection) {
 
 export function styleTitleContent(selection) {
     selection
-        .style("opacity", function (d) { return d.textFillOpacity })
+        .style("opacity", function (d: ProcessedVisualSettings) { return d.textareaIsFocused ? 0 : d.textFillOpacity })
         .style("font-size", function (d) { return d.fontSize + "pt" })
         .style("font-family", function (d) { return d.fontFamily })
         .style("color", function (d) { return d.textFill })
@@ -90,13 +90,9 @@ export function showOnlyTextBorder(selection) {
         .style("opacity", 0)
     selection.select(".icon")
         .style("opacity", 0)
-    selection.select(".textContainer")
-        // .style("border", "2px black solid")
-        .style("box-sizing", "border-box")
 }
 
 import * as enums from "./enums"
-import { selection, style } from "d3"
 import { ProcessedVisualSettings } from "./processedvisualsettings"
 
 
@@ -111,7 +107,7 @@ export function sizeTextContainer(selection) {
                 .style("maxWidth", (d: ProcessedVisualSettings) => { return d.maxInlineTextWidth })
                 .style("display", "inline-block")
                 .style("verticalAlign", "middle")
-                .style("width", (d: ProcessedVisualSettings) => { console.log(d.text); console.log("from d3 version", d.textWidth, d.textHeight); return d.textWidth + "px" })
+                .style("width", (d: ProcessedVisualSettings) => {return d.textWidth + "px" })
                 .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 1 })
         } else {
             selection
@@ -141,9 +137,16 @@ export function styleTextArea(selection) {
         .html((d) => { return d.text })
 }
 
+export function makeTextTransparent(selection){
+    console.log(selection)
+    selection
+        .select(".text")
+        .style("opacity",(d) => {console.log("here..."); return d.textFill })
+}
+
 export function sizeTextArea(selection) {
     selection
-        .style("width", (d: ProcessedVisualSettings) => { console.log(d.textWidth); return d.textWidth + 'px' })
+        .style("width", (d: ProcessedVisualSettings) => { return d.textWidth + 'px' })
         .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 'px' })
     if (selection.data()[0].icons) {
         if (selection.data()[0].icons.iconPlacement == enums.Icon_Placement.left) {

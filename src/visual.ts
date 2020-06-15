@@ -56,7 +56,7 @@ type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 import * as enums from "./enums"
 import { select, merge } from "d3";
 
-import { styleTitleFO, styleTitleTable, styleTitleTableCell, constructTitleFamily, styleFrameFill, styleFrameStroke, addHandles, constructFrameFamily, styleTitleContent, showOnlyTextBorder, styleTextArea, sizeTextContainer, sizeTextArea } from './d3calls'
+import { styleTitleFO, styleTitleTable, styleTitleTableCell, constructTitleFamily, styleFrameFill, styleFrameStroke, addHandles, constructFrameFamily, styleTitleContent, showOnlyTextBorder, styleTextArea, sizeTextContainer, sizeTextArea, makeTextTransparent } from './d3calls'
 
 export class Visual implements IVisual {
     private target: HTMLElement;
@@ -358,19 +358,25 @@ export class Visual implements IVisual {
                         .on("mouseenter", (d, i, n) => {
                             if (ProcessedVisualSettings.textareaFocusedIndex != null)
                                 return
+
                             d3.select(n[i]).selectAll(".text")
                                 .style("display", "none")
+                            titleFOs
+                                .filter((d) => { return d.i == i})
+                                .selectAll(".text")
+                                .style("opacity", "0")
                             d3.select(n[i]).append("textarea")
-                                .call(styleTextArea)
+                                .call(styleTextArea) 
                                 .on("focus", () => {
                                     ProcessedVisualSettings.textareaFocusedIndex = i
                                     coverTitle.filter((d) => { return !d.textareaIsFocused }).remove()
+                                    
                                 })
                                 .on("focusout", () => {
                                     ProcessedVisualSettings.textareaFocusedIndex = null
                                     this.shiftFired = false
                                     covers.select(".coverTitle").remove()
-
+                                    this.update(options)
                                 })
                                 .on("input", (d: ProcessedVisualSettings, i, n) => {
                                     let textContainer = coverTitle.data(data)
@@ -393,6 +399,10 @@ export class Visual implements IVisual {
                         .on("mouseleave", (d, i, n) => {
                             if (ProcessedVisualSettings.textareaFocusedIndex != null)
                                 return
+                            titleFOs
+                                .filter((d) => { return d.i == i})
+                                .selectAll(".text")
+                                .style("opacity", d.textFillOpacity)
                             d3.select(n[i]).selectAll(".text")
                                 .style("display", "inline")
                             d3.select(n[i]).select("textarea").remove()
