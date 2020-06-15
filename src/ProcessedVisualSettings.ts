@@ -415,7 +415,7 @@ export class ProcessedVisualSettings{
         } else {
             img.style.width = this.spaceForIcon + 'px'
             img.style.height = this.iconHeight + 'px'
-            img.style.backgroundSize = Math.min(this.iconWidth, this.spaceForIcon) + 'px ' + this.iconHeight + 'px' 
+            img.style.backgroundSize = Math.min(this.iconWidth, this.spaceForIcon) + 'px ' 
             img.style.margin = this.iconTopMargin + 'px ' + this.iconHmargin + 'px ' + this.iconBottomMargin + 'px '
             if(this.iconPlacement == enums.Icon_Placement.above){
                 img.style.backgroundPosition = 'center bottom'
