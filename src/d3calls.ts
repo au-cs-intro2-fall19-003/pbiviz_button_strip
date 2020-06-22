@@ -43,18 +43,20 @@ export function styleFrameStroke(selection) {
 }
 
 
-export function constructTitleFamily(selection) {
-    selection
 
+export function constructTitleFamily(selection, prefix?: string) {
+    selection
         .append("xhtml:div")
-        .attr("class", "titleTable")
+        .attr("class", [prefix, "titleTable"].join(" "))
         .append("xhtml:div")
-        .attr("class", "titleTableCell")
+        .attr("class", [prefix, "titleTableCell"].join(" "))
         .append("xhtml:div")
-        .attr("class", "titleContainer")
+        .attr("class", [prefix, "titleContainer"].join(" "))
 }
 
+
 export function styleTitleFO(selection) {
+    console.log(selection)
     selection
         .attr("height", function (d) { return d.titleFOHeight })
         .attr("width", function (d) { return d.titleFOWidth })
@@ -77,7 +79,7 @@ export function styleTitleTableCell(selection) {
         .style("text-align", function (d) { return d.textAlign })
 }
 
-export function styleTitleContent(selection) {
+export function styleText(selection) {
     selection
         .style("opacity", function (d: ProcessedVisualSettings) { return d.textareaIsFocused ? 0 : d.textFillOpacity })
         .style("font-size", function (d) { return d.fontSize + "pt" })
@@ -86,21 +88,25 @@ export function styleTitleContent(selection) {
 }
 
 export function showOnlyTextBorder(selection) {
-    selection.select(".text")
-        .style("opacity", 0)
-    selection.select(".icon")
-        .style("opacity", 0)
+    
 }
 
 import * as enums from "./enums"
 import { ProcessedVisualSettings } from "./processedvisualsettings"
 
 
+export function resizeCoverTitleElements(selection) {
+    selection
+    .select(".textContainer")
+    .call(sizeTextContainer)
+selection
+    .select("textarea")
+    .call(sizeTextArea)
+}
+
 export function sizeTextContainer(selection) {
-    console.log(selection._groups[0][0].style.width)
     if (selection.data()[0].icons) {
         selection
-
         if (selection.data()[0].iconPlacement == enums.Icon_Placement.left) {
             selection
                 .style("width", (d: ProcessedVisualSettings) => { return d.textContainerWidthByIcon })
@@ -138,13 +144,13 @@ export function styleTextArea(selection) {
 }
 
 export function makeTextTransparent(selection){
-    console.log(selection)
-    selection
-        .select(".text")
-        .style("opacity",(d) => {console.log("here..."); return d.textFill })
+    selection.select(".text")
+        .style("opacity", 0)
+    selection.select(".icon")
+        .style("opacity", 0)
 }
 
-export function sizeTextArea(selection) {
+function sizeTextArea(selection) {
     selection
         .style("width", (d: ProcessedVisualSettings) => { return d.textWidth + 'px' })
         .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 'px' })

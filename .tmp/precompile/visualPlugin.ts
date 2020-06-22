@@ -5,8 +5,8 @@ import VisualConstructorOptions = powerbiVisualsApi.extensibility.visual.VisualC
 var powerbiKey: any = "powerbi";
 var powerbi: any = window[powerbiKey];
 
-var rocketsE9D7B5E2197F4868970D16E2455AB0AD: IVisualPlugin = {
-    name: 'rocketsE9D7B5E2197F4868970D16E2455AB0AD',
+var rocketsE9D7B5E2197F4868970D16E2455AB0AD_DEBUG: IVisualPlugin = {
+    name: 'rocketsE9D7B5E2197F4868970D16E2455AB0AD_DEBUG',
     displayName: 'Button Strip',
     class: 'Visual',
     apiVersion: '2.6.0',
@@ -23,7 +23,7 @@ var rocketsE9D7B5E2197F4868970D16E2455AB0AD: IVisualPlugin = {
 if (typeof powerbi !== "undefined") {
     powerbi.visuals = powerbi.visuals || {};
     powerbi.visuals.plugins = powerbi.visuals.plugins || {};
-    powerbi.visuals.plugins["rocketsE9D7B5E2197F4868970D16E2455AB0AD"] = rocketsE9D7B5E2197F4868970D16E2455AB0AD;
+    powerbi.visuals.plugins["rocketsE9D7B5E2197F4868970D16E2455AB0AD_DEBUG"] = rocketsE9D7B5E2197F4868970D16E2455AB0AD_DEBUG;
 }
 
-export default rocketsE9D7B5E2197F4868970D16E2455AB0AD;
+export default rocketsE9D7B5E2197F4868970D16E2455AB0AD_DEBUG;
