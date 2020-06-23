@@ -167,6 +167,8 @@ export class Visual implements IVisual {
             delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "topMargin")]
             delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "bottomMargin")]
         }
+        if(!(settings.content.source != enums.Content_Source.measures && settings.icon.icons && iconPlacement == enums.Icon_Placement.above))
+            delete settings.text[getCorrectPropertyStateName(settings.text.state, "bmargin")]
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
             delete settings.layout.buttonWidth;

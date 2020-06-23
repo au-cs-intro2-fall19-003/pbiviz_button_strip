@@ -86,10 +86,10 @@ export class TextSettings{
   public hmarginU: number = 0;
   public hmarginH: number = 0;
 
-  public vmarginA: number = null;
-  public vmarginS: number = 0;
-  public vmarginU: number = 0;
-  public vmarginH: number = 0;
+  public bmarginA: number = null;
+  public bmarginS: number = 0;
+  public bmarginU: number = 0;
+  public bmarginH: number = 0;
   
   public transparencyA: number = null;
   public transparencyS: number = 0;
@@ -231,6 +231,41 @@ export class ContentSettings{
   public icon10: string = ""
 }
 
+export class MeasuresSettings{
+  public state : enums.State = enums.State.all;
+  public hover: boolean = false
+
+  public colorA: string = "";
+  public colorS: string = "#fff";
+  public colorU: string = "#fff";
+  public colorH: string = "#fff";
+
+  public alignmentA: enums.Align = enums.Align.center;
+  public alignmentS: enums.Align = enums.Align.center;
+  public alignmentU: enums.Align = enums.Align.center;
+  public alignmentH: enums.Align = enums.Align.center;
+
+  public fontSizeA: number = null;
+  public fontSizeS: number = 14;
+  public fontSizeU: number = 14;
+  public fontSizeH: number = 14;
+
+  public fontFamilyA: string = "";
+  public fontFamilyS: string = "wf_standard-font, helvetica, arial, sans-serif";
+  public fontFamilyU: string = "wf_standard-font, helvetica, arial, sans-serif";
+  public fontFamilyH: string = "wf_standard-font, helvetica, arial, sans-serif";
+  
+  public vmarginA: number = null;
+  public vmarginS: number = 0;
+  public vmarginU: number = 0;
+  public vmarginH: number = 0;
+  
+  public transparencyA: number = null;
+  public transparencyS: number = 0;
+  public transparencyU: number = 0;
+  public transparencyH: number = 0;
+}
+
 export class VisualSettings extends DataViewObjectsParser {
   public button: ButtonSettings = new ButtonSettings();
   public text: TextSettings = new TextSettings();
@@ -238,4 +273,5 @@ export class VisualSettings extends DataViewObjectsParser {
   public layout: LayoutSettings = new LayoutSettings();
   public effects: EffectsSettings = new EffectsSettings();
   public content: ContentSettings = new ContentSettings();
+  public measures: MeasuresSettings = new MeasuresSettings();
 }

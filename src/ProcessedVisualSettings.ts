@@ -49,7 +49,6 @@ export class ProcessedVisualSettings {
         ProcessedVisualSettings.totalTextHmargin += 2 * this.textHmargin
         this.widthSoFar = ProcessedVisualSettings.widthSoFar
         ProcessedVisualSettings.widthSoFar += this.buttonWidth
-        console.log(this.textContainerHeight)
         ProcessedVisualSettings.maxTextHeight = Math.max(this.textHeight, ProcessedVisualSettings.maxTextHeight)
     }
 
@@ -143,7 +142,7 @@ export class ProcessedVisualSettings {
         return this.settings.text[this.getCorrectPropertyStateName("text", "hmargin")]
     }
     get textVmargin(): number {
-        return this.settings.text[this.getCorrectPropertyStateName("text", "vmargin")]
+        return this.settings.text[this.getCorrectPropertyStateName("text", "bmargin")]
     }
     get widthSpaceForAllText(): number {
         let totalPadding = (this.framesInRow - 1) * this.settings.layout.padding;
@@ -369,7 +368,7 @@ export class ProcessedVisualSettings {
 
 
     get icons(): boolean {
-        return this.settings.icon.icons
+        return !this.isMeasures(this.datapoint) && this.settings.icon.icons
     }
     get textElement(): HTMLSpanElement {
         let text = document.createElement('span')
@@ -393,6 +392,8 @@ export class ProcessedVisualSettings {
         let textContainer = document.createElement('div')
         textContainer.className = 'textContainer'
         textContainer.style.position = 'relative'
+        textContainer.style.paddingLeft = this.textHmargin + 'px'
+        textContainer.style.paddingRight = this.textHmargin + 'px'
         if (this.settings.icon.icons) {
             if (this.iconPlacement == enums.Icon_Placement.left) {
                 textContainer.style.display = 'inline-block'
@@ -403,7 +404,6 @@ export class ProcessedVisualSettings {
             } else {
                 textContainer.style.width = this.widthSpaceForText + 'px'
                 textContainer.style.height = this.textContainerHeight + 'px'
-                console.log(this.textContainerHeight)
             }
         }
 
@@ -411,63 +411,89 @@ export class ProcessedVisualSettings {
     }
 
     get img(): HTMLDivElement {
-        let img = this.auxillaryDiv
+        let img = this.auxillaryDivGeneric
         img.className = 'icon'
         img.style.backgroundImage = "url(" + this.iconURL + ")"
         img.style.backgroundRepeat = 'no-repeat'
         img.style.opacity = this.iconOpacity.toString()
+        if (this.iconPlacement == enums.Icon_Placement.left) {
+            img.style.minWidth = this.iconWidth + 'px'
+            img.style.height = this.iconWidth + 'px'
+            img.style.display = 'inline-block'
+            img.style.verticalAlign = 'middle'
+            img.style.marginRight = this.iconHmargin + 'px'
+            img.style.backgroundPosition = 'center center'
+            img.style.backgroundSize = 'contain'
+        } else {
+            img.style.maxWidth = this.spaceForIcon + 'px'
+            img.style.height = this.iconHeight + 'px'
+            img.style.backgroundSize = Math.min(this.iconWidth, this.spaceForIcon) + 'px '
+            img.style.margin = this.iconTopMargin + 'px ' + this.iconHmargin + 'px ' + this.iconBottomMargin + 'px '
+            if (this.iconPlacement == enums.Icon_Placement.above) {
+                img.style.backgroundPosition = 'center bottom'
+            } else {
+                img.style.backgroundPosition = 'center top'
+                img.style.position = 'absolute'
+                img.style.bottom = '0'
+            }
+        }
         return img
     }
 
-    get auxillaryDiv(): HTMLDivElement {
+    get measureValueContainer(): HTMLDivElement{
+        let container = this.auxillaryDivGeneric
+        let text = document.createElement('span')
+        text.className = 'text'
+        text.textContent = this.isMeasures(this.datapoint) ? this.datapoint.measureValue as string : null
+        container.append(text)
+        return container
+    }
+
+    get auxillaryDivGeneric(): HTMLDivElement {
         let aux = document.createElement('div')
-        if (this.iconPlacement == enums.Icon_Placement.left) {
-            aux.style.minWidth = this.iconWidth + 'px'
-            aux.style.height = this.iconWidth + 'px'
-            aux.style.display = 'inline-block'
-            aux.style.verticalAlign = 'middle'
-            aux.style.marginRight = this.iconHmargin + 'px'
-            aux.style.backgroundPosition = 'center center'
-            aux.style.backgroundSize = 'contain'
-        } else {
-            aux.style.maxWidth = this.spaceForIcon + 'px'
-            aux.style.height = this.iconHeight + 'px'
-            aux.style.backgroundSize = Math.min(this.iconWidth, this.spaceForIcon) + 'px '
-            aux.style.margin = this.iconTopMargin + 'px ' + this.iconHmargin + 'px ' + this.iconBottomMargin + 'px '
-            if (this.iconPlacement == enums.Icon_Placement.above) {
-                aux.style.backgroundPosition = 'center bottom'
-            } else {
-                aux.style.backgroundPosition = 'center top'
-                aux.style.position = 'absolute'
-                aux.style.bottom = '0'
-            }
-        }
+        
         return aux
+    }
+
+    get showAuxillary(): boolean {
+        if(this.settings.content.source == enums.Content_Source.measures)
+            return true
+        else
+            return this.settings.icon.icons
+    }
+
+    get auxillaryDiv(): HTMLDivElement {
+        if(this.settings.content.source == enums.Content_Source.measures)
+            return this.measureValueContainer
+        else
+            return this.img
     }
 
 
     get titleContent(): HTMLDivElement {
         let titleContainer = document.createElement('div')
         titleContainer.className = "titleContainer"
-        titleContainer.style.paddingLeft = this.textHmargin + 'px'
-        titleContainer.style.paddingRight = this.textHmargin + 'px'
 
         let text = this.textElement
         let textContainer = this.textContainer
-        let img = this.img
         textContainer.append(text)
-        if (this.settings.icon.icons) {
-            if (this.iconPlacement == enums.Icon_Placement.left) {
-                titleContainer.style.display = 'inline-block'
-                titleContainer.append(img, textContainer)
+        if (this.showAuxillary) {
+            let aux = this.auxillaryDiv
+            if(this.icons){
+                if (this.iconPlacement == enums.Icon_Placement.left) {
+                    titleContainer.style.display = 'inline-block'
+                    titleContainer.append(aux, textContainer)
+                } else {
+                    titleContainer.style.height = this.titleFOHeight + 'px'
+                    titleContainer.style.maxHeight = this.titleFOHeight + 'px'
+                    if (this.iconPlacement == enums.Icon_Placement.above)
+                        titleContainer.append(aux, textContainer)
+                    else
+                        titleContainer.append(textContainer, aux)
+                }
             } else {
-                titleContainer.style.height = this.titleFOHeight + 'px'
-                titleContainer.style.maxHeight = this.titleFOHeight + 'px'
-                if (this.iconPlacement == enums.Icon_Placement.above)
-                    titleContainer.append(img, textContainer)
-                else
-                    titleContainer.append(textContainer, img)
-            }
+                titleContainer.append(aux, textContainer)
+            }                
         } else
             titleContainer.append(textContainer)
         return titleContainer
