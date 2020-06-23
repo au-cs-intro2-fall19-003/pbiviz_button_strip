@@ -44,10 +44,12 @@ import { VisualSettings } from "./settings";
 import VisualObjectInstanceEnumeration = powerbi.VisualObjectInstanceEnumeration;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils"
+
 import * as d3 from "d3";
 import { ProcessedVisualSettings } from "./processedvisualsettings";
 
-import { dataPoint, propertyStateName, stateIds, Handle } from './interfaces'
+import { Datapoint, propertyStateName, stateIds, Handle, DatapointDatabound, DatapointFixed, DatapointMeasures } from './interfaces'
 import { getPropertyStateNameArr, addFilters, getObjectsToPersist, levelProperties, getCorrectPropertyStateName } from './functions'
 import { SelectionManagerUnbound } from './SelectionManagerUnbound'
 
@@ -69,7 +71,7 @@ export class Visual implements IVisual {
     private visualSettings: VisualSettings;
     private selectionIdBuilder: ISelectionIdBuilder;
 
-    private dataPoints: dataPoint[];
+    private datapoints: Datapoint[];
     private svg: Selection<SVGElement>;
     private container: Selection<SVGElement>;
     private hoveredIdKey: string;
@@ -167,6 +169,8 @@ export class Visual implements IVisual {
             delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "topMargin")]
             delete settings.icon[getCorrectPropertyStateName(settings.icon.state, "bottomMargin")]
         }
+        if(!(settings.content.source != enums.Content_Source.measures && settings.icon.icons && iconPlacement == enums.Icon_Placement.above))
+            delete settings.text[getCorrectPropertyStateName(settings.text.state, "bmargin")]
 
         if (settings.layout.sizingMethod != enums.Button_Sizing_Method.fixed) {
             delete settings.layout.buttonWidth;
@@ -208,18 +212,20 @@ export class Visual implements IVisual {
             this.host.persistProperties(objects);
 
 
-        this.dataPoints = []
-        const dataView = options.dataViews[0]
-        const categories = dataView.categorical.categories;
+        this.datapoints = []
+        let dataView = options.dataViews[0]
+        let categories: powerbi.DataViewCategoryColumn[] = dataView.categorical.categories;
+        let measures: powerbi.DataViewValueColumn[] = dataView.categorical.values
+        console.log(measures)
         switch (this.visualSettings.content.source) {
             case enums.Content_Source.databound:
                 for (let categoryIndex = 0; categoryIndex < categories[0].values.length; categoryIndex++) {
-                    const pageValue: powerbi.PrimitiveValue = categories[0].values[categoryIndex];
-                    const iconValue: powerbi.PrimitiveValue = categories[1].values[categoryIndex];
-                    const categorySelectionId = this.host.createSelectionIdBuilder()
+                    let pageValue: powerbi.PrimitiveValue = categories[0].values[categoryIndex];
+                    let iconValue: powerbi.PrimitiveValue = categories[1] ? categories[1].values[categoryIndex] : null;
+                    let categorySelectionId = this.host.createSelectionIdBuilder()
                         .withCategory(categories[0], categoryIndex)
                         .createSelectionId();
-                    this.dataPoints.push({
+                    (<DatapointDatabound[]>this.datapoints).push({
                         value: pageValue,
                         iconValue: iconValue,
                         selectionId: categorySelectionId,
@@ -228,11 +234,40 @@ export class Visual implements IVisual {
                 break
             case enums.Content_Source.fixed:
                 for (let i = 0; i < this.visualSettings.content.n; i++) {
-                    this.dataPoints.push({
+                    (<DatapointFixed[]>this.datapoints).push({
                         value: this.visualSettings.content['text' + (i + 1)],
                         iconValue: this.visualSettings.content.icons ? this.visualSettings.content['icon' + (i + 1)] : "",
                     });
                 }
+                break
+            case enums.Content_Source.measures:
+                let dps: DatapointMeasures[][] = [[]]
+                for (let i = 0; i < measures.length; i++) {
+                    let iValueFormatter = valueFormatter.create({ format: measures[i].source.format });
+                    for(let j = 0; j < measures[i].values.length; j++){
+                        // (<DatapointMeasures[]>this.datapoints).push({
+                        //     value: measures[i].source.displayName,
+                        //     measureValue:  measures[i].values[j]
+                        // });
+
+                        // if(i == 0){
+                        //     (<DatapointMeasures[]>this.datapoints)[j*measures.length + i] = {
+                        //         value: "Hello?",
+                        //         measureValue:  "Um"
+                        //     }
+                        // }
+
+                        (<DatapointMeasures[]>this.datapoints)[j*measures.length + i] = {
+                                value: measures[i].source.displayName,
+                                measureValue:  iValueFormatter.format(measures[i].values[j])
+                                // measureValue:  measures[i].values[j]
+                            }
+                    }                   
+                }
+                this.visualSettings.layout.buttonLayout = enums.Button_Layout.grid
+                this.visualSettings.layout.rowLength = measures.length
+                // this.visualSettings.layout.rowLength = measures.length
+                break
         }
 
         let stateIds: stateIds = {
@@ -245,8 +280,8 @@ export class Visual implements IVisual {
         defs.html("")
         defs.call(addHandles)
         let data: ProcessedVisualSettings[] = [];
-        for (let i = 0; i < this.dataPoints.length; i++) {
-            data.push(new ProcessedVisualSettings(i, this.dataPoints, this.visualSettings, this.selectionManager, stateIds, options))
+        for (let i = 0; i < this.datapoints.length; i++) {
+            data.push(new ProcessedVisualSettings(i, this.datapoints, this.visualSettings, this.selectionManager, stateIds, options))
             addFilters(defs, data[i])
         }
 
@@ -297,7 +332,7 @@ export class Visual implements IVisual {
                 covers.select(".handle").remove()
                 switch (this.visualSettings.content.source) {
                     case enums.Content_Source.databound:
-                        this.hoveredIdKey = this.dataPoints[i].selectionId.getKey()
+                        this.hoveredIdKey = d.selectionId.getKey()
                         break
                     case enums.Content_Source.fixed:
                         this.hoveredIndexUnbound = i
@@ -324,7 +359,7 @@ export class Visual implements IVisual {
                     return
                 switch (this.visualSettings.content.source) {
                     case enums.Content_Source.databound:
-                        this.selectionManager.select(this.dataPoints[i].selectionId, this.visualSettings.content.multiselect)
+                        this.selectionManager.select(d.selectionId, this.visualSettings.content.multiselect)
                         break
                     case enums.Content_Source.fixed:
                         this.selectionManagerUnbound.select(i, this.visualSettings.content.multiselect)
@@ -427,7 +462,6 @@ export class Visual implements IVisual {
             .on("keyup", () => {
                 if (d3.event.keyCode == 16) {
                     covers.select(".handle").remove()
-                    console.log("keyup, checking focused", ProcessedVisualSettings.textareaFocusedIndex)
                     if (ProcessedVisualSettings.textareaFocusedIndex == null)
                         covers.select(".coverTitle").remove()
                     this.shiftFired = false

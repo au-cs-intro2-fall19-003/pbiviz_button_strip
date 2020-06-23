@@ -56,7 +56,6 @@ export function constructTitleFamily(selection, prefix?: string) {
 
 
 export function styleTitleFO(selection) {
-    console.log(selection)
     selection
         .attr("height", function (d) { return d.titleFOHeight })
         .attr("width", function (d) { return d.titleFOWidth })
@@ -80,11 +79,16 @@ export function styleTitleTableCell(selection) {
 }
 
 export function styleText(selection) {
-    selection
+    selection.select('.textContainer')
         .style("opacity", function (d: ProcessedVisualSettings) { return d.textareaIsFocused ? 0 : d.textFillOpacity })
         .style("font-size", function (d) { return d.fontSize + "pt" })
         .style("font-family", function (d) { return d.fontFamily })
         .style("color", function (d) { return d.textFill })
+    selection.select('.measureContainer')
+        .style("opacity", function (d: ProcessedVisualSettings) { return d.measureTextFillOpacity })
+        .style("font-size", function (d: ProcessedVisualSettings) { return d.measureFontSize + "pt" })
+        .style("font-family", function (d: ProcessedVisualSettings) { return d.measureFontFamily })
+        .style("color", function (d: ProcessedVisualSettings) { return d.measureTextFill })
 }
 
 export function showOnlyTextBorder(selection) {
@@ -109,16 +113,15 @@ export function sizeTextContainer(selection) {
         selection
         if (selection.data()[0].iconPlacement == enums.Icon_Placement.left) {
             selection
-                .style("width", (d: ProcessedVisualSettings) => { return d.textContainerWidthByIcon })
-                .style("maxWidth", (d: ProcessedVisualSettings) => { return d.maxInlineTextWidth })
+                .style("maxWidth", (d: ProcessedVisualSettings) => { return d.maxInlineTextWidth + 'px'})
                 .style("display", "inline-block")
                 .style("verticalAlign", "middle")
                 .style("width", (d: ProcessedVisualSettings) => {return d.textWidth + "px" })
-                .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 1 })
+                .style("height", (d: ProcessedVisualSettings) => { return d.textHeight + 1 + 'px'})
         } else {
             selection
-                .style("width", (d: ProcessedVisualSettings) => { return d.widthSpaceForText })
-                .style("height", (d: ProcessedVisualSettings) => { return d.textContainerHeight })
+                .style("width", (d: ProcessedVisualSettings) => { return d.widthSpaceForText + 'px'})
+                .style("height", (d: ProcessedVisualSettings) => { return d.textContainerHeight +'px'})
         }
     }
 }
