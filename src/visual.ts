@@ -242,7 +242,7 @@ export class Visual implements IVisual {
                 for (let i = 0; i < measures.length; i++) {
                     for(let j = 0; j < measures[i].values.length; j++){
                         (<DatapointMeasures[]>this.datapoints).push({
-                            value: measures[i].source.displayName + measures[i].values[j],
+                            value: measures[i].source.displayName,
                             measureValue:  measures[i].values[j]
                         });
                     }                   

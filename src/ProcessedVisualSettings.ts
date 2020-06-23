@@ -141,9 +141,23 @@ export class ProcessedVisualSettings {
     get textHmargin(): number {
         return this.settings.text[this.getCorrectPropertyStateName("text", "hmargin")]
     }
-    get textVmargin(): number {
+    get textBmargin(): number {
         return this.settings.text[this.getCorrectPropertyStateName("text", "bmargin")]
     }
+
+    get measureTextFill(): string {
+        return this.settings.measures[this.getCorrectPropertyStateName("text", "color")]
+    }
+    get measureTextFillOpacity(): number {
+        return 1 - (this.settings.measures[this.getCorrectPropertyStateName("text", "transparency")]) / 100
+    }
+    get measureFontSize(): number {
+        return this.settings.measures[this.getCorrectPropertyStateName("text", "fontSize")]
+    }
+    get measureFontFamily(): string {
+        return this.settings.measures[this.getCorrectPropertyStateName("text", "fontFamily")]
+    }
+
     get widthSpaceForAllText(): number {
         let totalPadding = (this.framesInRow - 1) * this.settings.layout.padding;
         return this.viewportWidth - totalPadding - ProcessedVisualSettings.totalTextHmargin;
@@ -164,7 +178,7 @@ export class ProcessedVisualSettings {
         return calculateWordDimensions(this.text as string, this.fontFamily, this.fontSize + "pt", this.textContainerWidthByIcon, (this.maxInlineTextWidth) + 'px').width;
     }
     get textContainerHeight(): number {
-        return ProcessedVisualSettings.maxTextHeight + this.textVmargin
+        return ProcessedVisualSettings.maxTextHeight + this.textBmargin
     }
     get maxInlineTextWidth(): number {
         let w = this.titleFOWidth - 2 * this.textHmargin
@@ -442,8 +456,9 @@ export class ProcessedVisualSettings {
 
     get measureValueContainer(): HTMLDivElement{
         let container = this.auxillaryDivGeneric
+        container.className = 'measureContainer'
         let text = document.createElement('span')
-        text.className = 'text'
+        text.className = 'measureText'
         text.textContent = this.isMeasures(this.datapoint) ? this.datapoint.measureValue as string : null
         container.append(text)
         return container

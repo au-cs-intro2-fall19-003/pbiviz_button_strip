@@ -79,11 +79,16 @@ export function styleTitleTableCell(selection) {
 }
 
 export function styleText(selection) {
-    selection
+    selection.select('.textContainer')
         .style("opacity", function (d: ProcessedVisualSettings) { return d.textareaIsFocused ? 0 : d.textFillOpacity })
         .style("font-size", function (d) { return d.fontSize + "pt" })
         .style("font-family", function (d) { return d.fontFamily })
         .style("color", function (d) { return d.textFill })
+    selection.select('.measureContainer')
+        .style("opacity", function (d: ProcessedVisualSettings) { return d.measureTextFillOpacity })
+        .style("font-size", function (d: ProcessedVisualSettings) { return d.measureFontSize + "pt" })
+        .style("font-family", function (d: ProcessedVisualSettings) { return d.measureFontFamily })
+        .style("color", function (d: ProcessedVisualSettings) { return d.measureTextFill })
 }
 
 export function showOnlyTextBorder(selection) {

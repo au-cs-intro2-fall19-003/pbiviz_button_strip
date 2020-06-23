@@ -236,9 +236,9 @@ export class MeasuresSettings{
   public hover: boolean = false
 
   public colorA: string = "";
-  public colorS: string = "#fff";
-  public colorU: string = "#fff";
-  public colorH: string = "#fff";
+  public colorS: string = "#252423";
+  public colorU: string = "#252423";
+  public colorH: string = "#252423";
 
   public alignmentA: enums.Align = enums.Align.center;
   public alignmentS: enums.Align = enums.Align.center;
@@ -246,9 +246,9 @@ export class MeasuresSettings{
   public alignmentH: enums.Align = enums.Align.center;
 
   public fontSizeA: number = null;
-  public fontSizeS: number = 14;
-  public fontSizeU: number = 14;
-  public fontSizeH: number = 14;
+  public fontSizeS: number = 45;
+  public fontSizeU: number = 45;
+  public fontSizeH: number = 45;
 
   public fontFamilyA: string = "";
   public fontFamilyS: string = "wf_standard-font, helvetica, arial, sans-serif";
