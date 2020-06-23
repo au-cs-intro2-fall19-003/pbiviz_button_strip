@@ -3,38 +3,17 @@
         {
             "displayName": "Pages",
             "name": "pages",
-            "kind": "Grouping",
-            "requiredTypes": [
-                {
-                    "text": true
-                },
-                {
-                    "numeric": true
-                },
-                {
-                    "integer": true
-                }
-            ],
-            "preferredTypes": [
-                {
-                    "text": true
-                }
-            ]
+            "kind": "Grouping"
         },
         {
             "displayName": "Icons",
             "name": "icons",
-            "kind": "Grouping",
-            "requiredTypes": [
-                {
-                    "text": true
-                }
-            ],
-            "preferredTypes": [
-                {
-                    "text": true
-                }
-            ]
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Measures",
+            "name": "measures",
+            "kind": "Measure"
         }
     ],
     "objects": {
@@ -1386,6 +1365,10 @@
                             {
                                 "displayName": "Fixed",
                                 "value": "fixed"
+                            },
+                            {
+                                "displayName": "Measures",
+                                "value": "measures"
                             }
                         ]
                     }
@@ -1562,6 +1545,11 @@
                                 "in": "icons"
                             }
                         }
+                    ]
+                },
+                "values": {
+                    "select": [
+                        {"bind": {"to": "measures" }}
                     ]
                 }
             }

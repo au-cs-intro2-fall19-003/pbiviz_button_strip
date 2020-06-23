@@ -2,10 +2,23 @@ import powerbi from "powerbi-visuals-api";
 import * as enums from "./enums"
 import { SelectionManagerUnbound } from "./SelectionManagerUnbound";
 
-export interface dataPoint {
+export type Datapoint = DatapointDatabound | DatapointFixed | DatapointMeasures
+
+export interface DatapointDatabound extends DatapointCommon{
+    iconValue: powerbi.PrimitiveValue,
+    selectionId: powerbi.visuals.ISelectionId,
+}
+
+export interface DatapointFixed extends DatapointCommon{
+    iconValue: powerbi.PrimitiveValue,
+}
+
+export interface DatapointMeasures extends DatapointCommon{
+    measureValue: powerbi.PrimitiveValue
+}
+
+interface DatapointCommon {
     value: powerbi.PrimitiveValue,
-    iconValue?: powerbi.PrimitiveValue,
-    selectionId?: powerbi.visuals.ISelectionId,
 }
 
 export interface propertyStateName {

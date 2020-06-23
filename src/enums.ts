@@ -56,5 +56,6 @@ export enum Button_Shape {
 
 export enum Content_Source {
     databound = "databound",
-    fixed = "fixed"
+    fixed = "fixed",
+    measures = "measures"
 }

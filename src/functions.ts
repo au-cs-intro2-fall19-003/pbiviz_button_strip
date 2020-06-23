@@ -18,11 +18,6 @@ export function calculateWordDimensions(text: string, fontFamily: string, fontSi
         width: div.offsetWidth+1,
         height: div.offsetHeight
     }
-    if(text.startsWith("what")){
-        console.log(dimensions)
-        console.log(div)
-    }
-
     div.parentNode.removeChild(div);
     
     return dimensions;

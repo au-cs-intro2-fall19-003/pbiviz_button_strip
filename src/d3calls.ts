@@ -56,7 +56,6 @@ export function constructTitleFamily(selection, prefix?: string) {
 
 
 export function styleTitleFO(selection) {
-    console.log(selection)
     selection
         .attr("height", function (d) { return d.titleFOHeight })
         .attr("width", function (d) { return d.titleFOWidth })
