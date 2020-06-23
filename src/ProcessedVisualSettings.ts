@@ -40,7 +40,6 @@ export class ProcessedVisualSettings {
             ProcessedVisualSettings.hoveredIdKey = stateIds.hoveredIdKey
             ProcessedVisualSettings.hoveredIndexUnbound = stateIds.hoveredIndexUnbound
             ProcessedVisualSettings.selectionIdKeys = (selectionManager.getSelectionIds() as powerbi.visuals.ISelectionId[]).map(x => x.getKey()) as string[]
-            // console.log(this.dataPoints[0].value)
         }
         if (this.indexInRow == 0) {
             ProcessedVisualSettings.widthSoFar = 0;
@@ -50,6 +49,7 @@ export class ProcessedVisualSettings {
         ProcessedVisualSettings.totalTextHmargin += 2 * this.textHmargin
         this.widthSoFar = ProcessedVisualSettings.widthSoFar
         ProcessedVisualSettings.widthSoFar += this.buttonWidth
+        console.log(this.textContainerHeight)
         ProcessedVisualSettings.maxTextHeight = Math.max(this.textHeight, ProcessedVisualSettings.maxTextHeight)
     }
 
@@ -69,8 +69,8 @@ export class ProcessedVisualSettings {
         return this.datapoints[this.i]
     }
 
-    get selectionId():  powerbi.visuals.ISelectionId {
-        if(this.isDatabound(this.datapoint))
+    get selectionId(): powerbi.visuals.ISelectionId {
+        if (this.isDatabound(this.datapoint))
             return this.datapoint.selectionId
     }
 
@@ -82,13 +82,13 @@ export class ProcessedVisualSettings {
     }
 
     get isSelected(): boolean {
-        switch(this.settings.content.source){
+        switch (this.settings.content.source) {
             case enums.Content_Source.databound:
-                return this.selectionId && 
+                return this.selectionId &&
                     ProcessedVisualSettings.selectionIdKeys &&
                     ProcessedVisualSettings.selectionIdKeys.indexOf(this.selectionId.getKey() as string) > -1
             case enums.Content_Source.fixed:
-                if(this.settings.content.multiselect)  
+                if (this.settings.content.multiselect)
                     return ProcessedVisualSettings.selectionManagerUnboundIndexes && ProcessedVisualSettings.selectionManagerUnboundIndexes.indexOf(this.i) > -1
                 else
                     return ProcessedVisualSettings.selectionManagerUnboundIndexes.length > 0 && ProcessedVisualSettings.selectionManagerUnboundIndexes[0] == this.i
@@ -96,16 +96,16 @@ export class ProcessedVisualSettings {
     }
 
     get isHovered(): boolean {
-        switch(this.settings.content.source){
+        switch (this.settings.content.source) {
             case enums.Content_Source.databound:
-                return  this.selectionId && 
-                        ProcessedVisualSettings.hoveredIdKey &&
-                        ProcessedVisualSettings.hoveredIdKey == this.selectionId.getKey()
+                return this.selectionId &&
+                    ProcessedVisualSettings.hoveredIdKey &&
+                    ProcessedVisualSettings.hoveredIdKey == this.selectionId.getKey()
             case enums.Content_Source.fixed:
                 return ProcessedVisualSettings.hoveredIndexUnbound == this.i
         }
     }
-    
+
     get textareaIsFocused(): boolean {
         return ProcessedVisualSettings.textareaFocusedIndex == this.i
     }
@@ -169,7 +169,7 @@ export class ProcessedVisualSettings {
     }
     get maxInlineTextWidth(): number {
         let w = this.titleFOWidth - 2 * this.textHmargin
-        if (this.settings.icon.icons)
+        if (this.settings.icon.icons && this.iconPlacement == enums.Icon_Placement.left)
             w -= this.iconWidth + this.iconHmargin
         return Math.floor(w)
     }
@@ -403,6 +403,7 @@ export class ProcessedVisualSettings {
             } else {
                 textContainer.style.width = this.widthSpaceForText + 'px'
                 textContainer.style.height = this.textContainerHeight + 'px'
+                console.log(this.textContainerHeight)
             }
         }
 
@@ -410,34 +411,38 @@ export class ProcessedVisualSettings {
     }
 
     get img(): HTMLDivElement {
-        let img = document.createElement('div')
+        let img = this.auxillaryDiv
         img.className = 'icon'
         img.style.backgroundImage = "url(" + this.iconURL + ")"
         img.style.backgroundRepeat = 'no-repeat'
-        img.style.backgroundSize = 'contain'
         img.style.opacity = this.iconOpacity.toString()
+        return img
+    }
 
+    get auxillaryDiv(): HTMLDivElement {
+        let aux = document.createElement('div')
         if (this.iconPlacement == enums.Icon_Placement.left) {
-            img.style.minWidth = this.iconWidth + 'px'
-            img.style.height = this.iconWidth + 'px'
-            img.style.display = 'inline-block'
-            img.style.verticalAlign = 'middle'
-            img.style.marginRight = this.iconHmargin + 'px'
-            img.style.backgroundPosition = 'center center'
+            aux.style.minWidth = this.iconWidth + 'px'
+            aux.style.height = this.iconWidth + 'px'
+            aux.style.display = 'inline-block'
+            aux.style.verticalAlign = 'middle'
+            aux.style.marginRight = this.iconHmargin + 'px'
+            aux.style.backgroundPosition = 'center center'
+            aux.style.backgroundSize = 'contain'
         } else {
-            img.style.width = this.spaceForIcon + 'px'
-            img.style.height = this.iconHeight + 'px'
-            img.style.backgroundSize = Math.min(this.iconWidth, this.spaceForIcon) + 'px '
-            img.style.margin = this.iconTopMargin + 'px ' + this.iconHmargin + 'px ' + this.iconBottomMargin + 'px '
+            aux.style.maxWidth = this.spaceForIcon + 'px'
+            aux.style.height = this.iconHeight + 'px'
+            aux.style.backgroundSize = Math.min(this.iconWidth, this.spaceForIcon) + 'px '
+            aux.style.margin = this.iconTopMargin + 'px ' + this.iconHmargin + 'px ' + this.iconBottomMargin + 'px '
             if (this.iconPlacement == enums.Icon_Placement.above) {
-                img.style.backgroundPosition = 'center bottom'
+                aux.style.backgroundPosition = 'center bottom'
             } else {
-                img.style.backgroundPosition = 'center top'
-                img.style.position = 'absolute'
-                img.style.bottom = '0'
+                aux.style.backgroundPosition = 'center top'
+                aux.style.position = 'absolute'
+                aux.style.bottom = '0'
             }
         }
-        return img
+        return aux
     }
 
 
