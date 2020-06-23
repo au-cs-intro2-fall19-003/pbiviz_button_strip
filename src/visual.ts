@@ -216,7 +216,6 @@ export class Visual implements IVisual {
         let dataView = options.dataViews[0]
         let categories: powerbi.DataViewCategoryColumn[] = dataView.categorical.categories;
         let measures: powerbi.DataViewValueColumn[] = dataView.categorical.values
-        console.log(measures)
         switch (this.visualSettings.content.source) {
             case enums.Content_Source.databound:
                 for (let categoryIndex = 0; categoryIndex < categories[0].values.length; categoryIndex++) {
@@ -244,31 +243,38 @@ export class Visual implements IVisual {
                 let dps: DatapointMeasures[][] = [[]]
                 for (let i = 0; i < measures.length; i++) {
                     let iValueFormatter = valueFormatter.create({ format: measures[i].source.format });
-                    for(let j = 0; j < measures[i].values.length; j++){
-                        // (<DatapointMeasures[]>this.datapoints).push({
-                        //     value: measures[i].source.displayName,
-                        //     measureValue:  measures[i].values[j]
-                        // });
+                    for(let j = 0; j < measures[i].values.length; j++){                        
+                        if(categories){
+                            let categorySelectionId = this.host.createSelectionIdBuilder()
+                                .withCategory(categories[0], j)
+                                .createSelectionId();
+                            if(i == 0){
+                                (<DatapointDatabound[]>this.datapoints)[j*(measures.length+1) + i] = {
+                                    value: categories[0].values[j],
+                                    iconValue: "",
+                                    selectionId: categorySelectionId,
+                                }
+                            }
 
-                        // if(i == 0){
-                        //     (<DatapointMeasures[]>this.datapoints)[j*measures.length + i] = {
-                        //         value: "Hello?",
-                        //         measureValue:  "Um"
-                        //     }
-                        // }
-
-                        (<DatapointMeasures[]>this.datapoints)[j*measures.length + i] = {
+                            (<DatapointMeasures[]>this.datapoints)[j*(measures.length + 1) + i + 1] = {
                                 value: measures[i].source.displayName,
                                 measureValue:  iValueFormatter.format(measures[i].values[j])
-                                // measureValue:  measures[i].values[j]
                             }
+                        } else {
+                            (<DatapointMeasures[]>this.datapoints)[j*measures.length + i] = {
+                                value: measures[i].source.displayName,
+                                measureValue:  iValueFormatter.format(measures[i].values[j])
+                            }
+                        }
                     }                   
                 }
-                this.visualSettings.layout.buttonLayout = enums.Button_Layout.grid
-                this.visualSettings.layout.rowLength = measures.length
-                // this.visualSettings.layout.rowLength = measures.length
+                if(categories){
+                    this.visualSettings.layout.buttonLayout = enums.Button_Layout.grid
+                    this.visualSettings.layout.rowLength = measures.length + 1
+                }
                 break
         }
+        console.log(this.datapoints)
 
         let stateIds: stateIds = {
             hoveredIdKey: this.hoveredIdKey,
