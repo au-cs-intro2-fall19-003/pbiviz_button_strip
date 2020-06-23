@@ -44,6 +44,8 @@ import { VisualSettings } from "./settings";
 import VisualObjectInstanceEnumeration = powerbi.VisualObjectInstanceEnumeration;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils"
+
 import * as d3 from "d3";
 import { ProcessedVisualSettings } from "./processedvisualsettings";
 
@@ -239,14 +241,32 @@ export class Visual implements IVisual {
                 }
                 break
             case enums.Content_Source.measures:
+                let dps: DatapointMeasures[][] = [[]]
                 for (let i = 0; i < measures.length; i++) {
+                    let iValueFormatter = valueFormatter.create({ format: measures[i].source.format });
                     for(let j = 0; j < measures[i].values.length; j++){
-                        (<DatapointMeasures[]>this.datapoints).push({
-                            value: measures[i].source.displayName,
-                            measureValue:  measures[i].values[j]
-                        });
+                        // (<DatapointMeasures[]>this.datapoints).push({
+                        //     value: measures[i].source.displayName,
+                        //     measureValue:  measures[i].values[j]
+                        // });
+
+                        // if(i == 0){
+                        //     (<DatapointMeasures[]>this.datapoints)[j*measures.length + i] = {
+                        //         value: "Hello?",
+                        //         measureValue:  "Um"
+                        //     }
+                        // }
+
+                        (<DatapointMeasures[]>this.datapoints)[j*measures.length + i] = {
+                                value: measures[i].source.displayName,
+                                measureValue:  iValueFormatter.format(measures[i].values[j])
+                                // measureValue:  measures[i].values[j]
+                            }
                     }                   
                 }
+                this.visualSettings.layout.buttonLayout = enums.Button_Layout.grid
+                this.visualSettings.layout.rowLength = measures.length
+                // this.visualSettings.layout.rowLength = measures.length
                 break
         }
 

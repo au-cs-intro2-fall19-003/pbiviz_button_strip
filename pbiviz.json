@@ -17,7 +17,8 @@
     "assets": {
         "icon": "assets/baseline_double_arrow_black_18dp.png"
     },
-    "externalJS": null,
+    "externalJS": [
+      ],
     "style": "style/visual.less",
     "capabilities": "capabilities.json",
     "dependencies": null,
