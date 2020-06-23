@@ -56,7 +56,7 @@ type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 import * as enums from "./enums"
 import { select, merge } from "d3";
 
-import { styleTitleFO, styleTitleTable, styleTitleTableCell, constructTitleFamily, styleFrameFill, styleFrameStroke, addHandles, constructFrameFamily, styleTitleContent, showOnlyTextBorder, styleTextArea, sizeTextContainer, sizeTextArea, makeTextTransparent } from './d3calls'
+import { styleTitleFO, styleTitleTable, styleTitleTableCell, constructTitleFamily, styleFrameFill, styleFrameStroke, addHandles, constructFrameFamily, styleTextArea, resizeCoverTitleElements, sizeTextContainer, makeTextTransparent, styleText } from './d3calls'
 
 export class Visual implements IVisual {
     private target: HTMLElement;
@@ -280,7 +280,7 @@ export class Visual implements IVisual {
         titleFOs.select(".titleTableCell")
             .call(styleTitleTableCell)
             .append(function (d) { return d.titleContent })
-            .call(styleTitleContent)
+            .call(styleText)
 
         let covers = this.container.selectAll('.cover').data(data)
         covers.exit().remove()
@@ -337,7 +337,7 @@ export class Visual implements IVisual {
                 if (d3.event.shiftKey && !this.shiftFired) {
                     if (ProcessedVisualSettings.textareaFocusedIndex != null)
                         return
-                    this.shiftFired = true                    
+                    this.shiftFired = true
 
                     let firstCover = covers.filter((d, i) => { return i == 0 })
                     let firstCoverData = firstCover.data()[0] as ProcessedVisualSettings
@@ -354,7 +354,7 @@ export class Visual implements IVisual {
                         .call(dragHandle);
 
 
-                    if(this.visualSettings.content.source != enums.Content_Source.fixed)
+                    if (this.visualSettings.content.source != enums.Content_Source.fixed)
                         return
                     covers.append('foreignObject')
                         .attr("class", function (d) { return "coverTitle " + d.buttonShape })
@@ -368,8 +368,8 @@ export class Visual implements IVisual {
                         .append(function (d) { return d.titleContent })
                         .select(".textContainer")
                         .call(sizeTextContainer)
-                        .call(styleTitleContent)
-                        .call(showOnlyTextBorder)
+                        .call(styleText)
+                        .call(makeTextTransparent)
 
                     coverTitle.select(".textContainer")
                         .on("mouseenter", (d, i, n) => {
@@ -379,30 +379,28 @@ export class Visual implements IVisual {
                             d3.select(n[i]).selectAll(".text")
                                 .style("display", "none")
                             titleFOs
-                                .filter((d) => { return d.i == i})
+                                .filter((d) => { return d.i == i })
                                 .selectAll(".text")
                                 .style("opacity", "0")
-                            d3.select(n[i]).append("textarea")
-                                .call(styleTextArea) 
+                            d3.select(n[i])
+                                .append("textarea")
+                                .call(styleTextArea)
                                 .on("focus", () => {
                                     ProcessedVisualSettings.textareaFocusedIndex = i
                                     coverTitle.filter((d) => { return !d.textareaIsFocused }).remove()
-                                    
                                 })
                                 .on("focusout", () => {
                                     ProcessedVisualSettings.textareaFocusedIndex = null
                                     this.shiftFired = false
-                                    covers.select(".coverTitle").remove()
+                                    covers.select(".coverTitle")
+                                        .remove()
                                     this.update(options)
                                 })
-                                .on("input", (d: ProcessedVisualSettings, i, n) => {
-                                    let textContainer = coverTitle.data(data)
+                                .on("input", (d, i, n) => {
+                                    coverTitle.data(data)
                                         .filter((d) => { return d.textareaIsFocused })
-                                        .select(".textContainer")
                                         .each((d) => { d.text = n[i].value })
-                                        .call(sizeTextContainer)
-                                        .select("textarea")
-                                        .call(sizeTextArea)
+                                        .call(resizeCoverTitleElements)
                                     let object: powerbi.VisualObjectInstance = {
                                         objectName: 'content',
                                         selector: undefined,
@@ -417,7 +415,7 @@ export class Visual implements IVisual {
                             if (ProcessedVisualSettings.textareaFocusedIndex != null)
                                 return
                             titleFOs
-                                .filter((d) => { return d.i == i})
+                                .filter((d) => { return d.i == i })
                                 .selectAll(".text")
                                 .style("opacity", d.textFillOpacity)
                             d3.select(n[i]).selectAll(".text")
@@ -429,6 +427,7 @@ export class Visual implements IVisual {
             .on("keyup", () => {
                 if (d3.event.keyCode == 16) {
                     covers.select(".handle").remove()
+                    console.log("keyup, checking focused", ProcessedVisualSettings.textareaFocusedIndex)
                     if (ProcessedVisualSettings.textareaFocusedIndex == null)
                         covers.select(".coverTitle").remove()
                     this.shiftFired = false
